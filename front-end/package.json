@@ -1,0 +1,26 @@
+{
+  "name": "front-end",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "apexcharts": "^4.7.0",
+    "axios": "^1.9.0",
+    "gsap": "^3.13.0",
+    "idb": "^8.0.3",
+    "pinia": "^3.0.2",
+    "tailwindcss": "^4.1.6",
+    "vite-plugin-pwa": "^1.0.0",
+    "vue": "^3.4.21",
+    "vue-router": "^4.5.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "vite": "^5.2.0"
+  }
+}
