@@ -1,17 +1,23 @@
 import { createRouter, createWebHistory } from "vue-router";
-import NotFound from "../views/NotFound.vue";
-import Home from "../views/Home.vue";
+import NotFoundPage from "../views/NotFoundPage.vue";
+import HomePage from "../views/HomePage.vue";
+import LoginPage from "../views/LoginPage.vue";
 
 const routes = createRouter({
   routes: [
     {
       path: "/",
-      component: Home,
+      component: HomePage,
       meta: { layout: "MainLayout" },
     },
     {
+      path: "/login",
+      component: LoginPage,
+      meta: { layout: "DefaultLayout" },
+    },
+    {
       path: "/:notFound*",
-      component: NotFound,
+      component: NotFoundPage,
       meta: { layout: "DefaultLayout" },
     },
   ],
