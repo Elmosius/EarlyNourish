@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import NotFoundPage from "../views/NotFoundPage.vue";
 import HomePage from "../views/HomePage.vue";
 import LoginPage from "../views/LoginPage.vue";
+import RegisterPage from "../views/RegisterPage.vue";
 
 const routes = createRouter({
   routes: [
@@ -13,6 +14,11 @@ const routes = createRouter({
     {
       path: "/login",
       component: LoginPage,
+      meta: { layout: "DefaultLayout" },
+    },
+    {
+      path: "/register",
+      component: RegisterPage,
       meta: { layout: "DefaultLayout" },
     },
     {

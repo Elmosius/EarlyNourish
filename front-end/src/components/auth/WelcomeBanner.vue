@@ -16,9 +16,9 @@ const features = ref([
 <template>
   <div class="bg-secondary text-white p-8 md:p-13 md:w-1/2">
     <h2 class="text-3xl font-bold mb-6 mt-5">{{ title }}</h2>
-    <p class="mb-8 text-[0.9rem]">{{ description }}</p>
+    <p class="mb-4 text-[0.9rem]">{{ description }}</p>
 
-    <div class="space-y-2">
+    <div class="space-y-3">
       <FeatureItem
         v-for="(feature, index) in features"
         :key="index"
