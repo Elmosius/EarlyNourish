@@ -16,7 +16,7 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <div class="my-auto md:p-8 md:w-1/2">
+  <div class="w-full my-auto lg:w-1/2 p-4 md:p-6 lg:p-8">
     <h2 class="text-2xl font-extrabold mb-1 text-center">Masuk ke Akun</h2>
     <p class="text-gray-500 mb-6 text-center text-base">
       Silahkan masuk untuk melanjutkan

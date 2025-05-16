@@ -5,10 +5,10 @@ import LoginForm from "../components/auth/LoginForm.vue";
 
 <template>
   <div
-    class="w-full max-w-3xl h-[500px] bg-white rounded-xl shadow-xl overflow-hidden flex flex-col md:flex-row"
+    class="md:w-[30rem] lg:w-full lg:max-w-3xl lg:h-[500px] bg-white rounded-xl shadow-xl overflow-hidden flex flex-col lg:flex-row"
   >
-    <WelcomeBanner />
-    <LoginForm />
+    <WelcomeBanner class="hidden lg:block lg:w-1/2" />
+    <LoginForm class="p-6" />
   </div>
 </template>
 
