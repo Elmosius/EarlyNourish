@@ -5,7 +5,7 @@ const isMenuOpen = ref(false);
 </script>
 
 <template>
-  <header class="bg-white shadow-sm">
+  <header class="bg-white shadow-sm sticky top-0 z-50">
     <div
       class="container mx-auto py-3 flex items-center lg:gap-4 px-4 justify-between lg:justify-evenly"
     >
