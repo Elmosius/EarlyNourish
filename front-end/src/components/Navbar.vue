@@ -81,9 +81,9 @@ const isMenuOpen = ref(false);
               <div
                 class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center"
               >
-                <span class="text-sm">RD</span>
+                <span class="text-sm">ES</span>
               </div>
-              <span>Rahma Dwi Cinta</span>
+              <span>Elmosius Suli</span>
             </button>
           </div>
         </nav>
