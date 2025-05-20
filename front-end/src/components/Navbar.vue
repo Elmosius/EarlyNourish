@@ -6,7 +6,9 @@ const isMenuOpen = ref(false);
 
 <template>
   <header class="bg-white shadow-sm">
-    <div class="container mx-auto py-3 flex items-center gap-4 justify-evenly">
+    <div
+      class="container mx-auto py-3 flex items-center lg:gap-4 px-4 justify-between lg:justify-evenly"
+    >
       <div class="flex items-center">
         <img src="/logo.png" alt="Early Nourish" class="h-8 w-8" />
         <span class="ml-2 font-semibold text-gray-800">Early Nourish</span>
