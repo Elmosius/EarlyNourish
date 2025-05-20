@@ -21,6 +21,7 @@ const routes = createRouter({
       component: RegisterPage,
       meta: { layout: "DefaultLayout" },
     },
+
     {
       path: "/:notFound*",
       component: NotFoundPage,

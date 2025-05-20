@@ -1,17 +1,18 @@
-<script setup></script>
+<script setup>
+import Navbar from "../components/Navbar.vue";
+import Footer from "../components/Footer.vue";
+</script>
 
 <template>
-  <header>
-    <h1>ini Header</h1>
-  </header>
+  <div class="min-h-screen flex flex-col">
+    <Navbar />
 
-  <main class="container mx-auto">
-    <slot></slot>
-  </main>
+    <main class="container mx-auto px-4 flex-grow">
+      <slot></slot>
+    </main>
 
-  <footer>
-    <h1>ini Footer</h1>
-  </footer>
+    <Footer />
+  </div>
 </template>
 
 <style scoped></style>
