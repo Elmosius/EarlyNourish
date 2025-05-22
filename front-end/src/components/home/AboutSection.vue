@@ -9,7 +9,7 @@ import { ClipboardList, ShieldCheck, CircleAlert } from "lucide-vue-next";
     >
       MISI KAMI
     </h1>
-    <div class="container mx-auto px-4">
+    <div class="container mx-auto px-8">
       <div class="text-center mb-12">
         <h2
           class="font-montserrat text-2xl md:text-3xl font-bold text-gray-800 mb-4"

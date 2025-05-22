@@ -1,7 +1,7 @@
 <script setup></script>
 
 <template>
-  <section class="pt-12 md:py-20 px-4">
+  <section class="pt-12 md:py-20 px-8">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
       <div class="order-2 md:order-1">
         <h1
