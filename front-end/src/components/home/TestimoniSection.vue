@@ -1,4 +1,6 @@
 <script setup>
+import { Quote } from "lucide-vue-next";
+
 const testimonials = [
   {
     name: "Fatimah Salim",
@@ -48,19 +50,22 @@ const testimonials = [
           :key="index"
           class="bg-white p-6 rounded-lg shadow-md"
         >
-          <div class="flex mb-4">
-            <span
-              v-for="i in testimonial.rating"
-              :key="i"
-              class="text-yellow-400"
-              >★</span
-            >
-            <span
-              v-for="i in 5 - testimonial.rating"
-              :key="i + testimonial.rating"
-              class="text-gray-300"
-              >★</span
-            >
+          <div class="flex justify-between mb-4">
+            <div>
+              <span
+                v-for="i in testimonial.rating"
+                :key="i"
+                class="text-yellow-400"
+                >★</span
+              >
+              <span
+                v-for="i in 5 - testimonial.rating"
+                :key="i + testimonial.rating"
+                class="text-gray-300"
+                >★</span
+              >
+            </div>
+            <Quote class="text-secondary opacity-60" />
           </div>
           <p class="text-gray-600 mb-6 text-base italic leading-loose">
             {{ testimonial.content }}
