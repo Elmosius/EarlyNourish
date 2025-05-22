@@ -7,7 +7,7 @@ const isMenuOpen = ref(false);
 <template>
   <header class="bg-white shadow-sm sticky top-0 z-50">
     <div
-      class="container mx-auto py-3 flex items-center lg:gap-4 px-4 justify-between lg:justify-evenly"
+      class="container mx-auto py-3 flex items-center px-6 lg:gap-4 lg:px-0 justify-between lg:justify-evenly"
     >
       <div class="flex items-center">
         <img src="/logo.png" alt="Early Nourish" class="h-8 w-8" />
