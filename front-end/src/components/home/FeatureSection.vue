@@ -50,7 +50,10 @@ const features = [
 </script>
 
 <template>
-  <section class="py-10 bg-gray-50 px-8">
+  <section
+    id="feature-home"
+    class="py-12 md:px-14 bg-gray-50 px-8 lg:py-20 lg:px-38"
+  >
     <div class="container mx-auto">
       <div class="text-center mb-12">
         <h1
@@ -80,7 +83,7 @@ const features = [
 
           <div class="p-6 text-justify">
             <div
-              class="bg-linear-65 from-[#4ADE80] to-[#22C55E] shadow-lg p-3 inline-block rounded-lg mb-4"
+              class="bg-linear-65 from-[#4ADE80] to-[#22C55E] shadow-lg p-3 inline-block rounded-lg mb-4 inset-shadow-xs inset-shadow-gray-800"
             >
               <component :is="feature.icon" class="h-6 w-6 text-white" />
             </div>

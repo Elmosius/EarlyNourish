@@ -28,7 +28,7 @@ const steps = [
 </script>
 
 <template>
-  <section class="py-10 px-8">
+  <section id="carakerja-home" class="py-10 lg:py-20 px-8 md:px-14 lg:px-38">
     <div class="container mx-auto">
       <div class="text-center mb-12">
         <h1
@@ -53,7 +53,7 @@ const steps = [
           class="bg-white rounded-lg text-center"
         >
           <div
-            class="bg-linear-65 from-[#4ADE80] to-[#22C55E] shadow-xl text-white w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4"
+            class="bg-linear-65 from-[#4ADE80] to-[#22C55E] shadow-xl text-white w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 inset-shadow-xs inset-shadow-gray-800"
           >
             <span class="font-bold text-lg">{{ step.number }}</span>
           </div>

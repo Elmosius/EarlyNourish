@@ -1,13 +1,29 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { MenuIcon, XIcon } from "lucide-vue-next";
+
 const isMenuOpen = ref(false);
+const scrolled = ref(false);
+
+const handleScroll = () => {
+  scrolled.value = window.scrollY > 50;
+};
+
+onMounted(() => {
+  window.addEventListener("scroll", handleScroll);
+});
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll);
+});
 </script>
 
 <template>
-  <header class="bg-white shadow-sm sticky top-0 z-50">
+  <header
+    class="bg-gray-50 sticky top-0 z-50 duration-500 transition-shadow md:px-8 lg:px-35"
+    :class="{ 'shadow-sm': scrolled }"
+  >
     <div
-      class="container mx-auto py-3 flex items-center px-6 lg:gap-4 lg:px-0 justify-between lg:justify-evenly"
+      class="container mx-auto py-3 flex items-center px-6 lg:px-0 justify-between"
     >
       <div class="flex items-center">
         <img src="/logo.png" alt="Early Nourish" class="h-8 w-8" />
@@ -27,16 +43,24 @@ const isMenuOpen = ref(false);
           <a href="#" class="text-gray-700 hover:text-tertiary font-medium px-6"
             >Beranda</a
           >
-          <a href="#" class="text-gray-700 hover:text-tertiary font-medium px-6"
+          <a
+            href="#about-home"
+            class="text-gray-700 hover:text-tertiary font-medium px-6"
             >Tentang Kami</a
           >
-          <a href="#" class="text-gray-700 hover:text-tertiary font-medium px-6"
+          <a
+            href="#feature-home"
+            class="text-gray-700 hover:text-tertiary font-medium px-6"
             >Layanan</a
           >
-          <a href="#" class="text-gray-700 hover:text-tertiary font-medium px-6"
+          <a
+            href="#carakerja-home"
+            class="text-gray-700 hover:text-tertiary font-medium px-6"
             >Cara Kerja</a
           >
-          <a href="#" class="text-gray-700 hover:text-tertiary font-medium px-6"
+          <a
+            href="#testimoni-home"
+            class="text-gray-700 hover:text-tertiary font-medium px-6"
             >Testimoni</a
           >
           <div class="ml-6">
@@ -56,7 +80,10 @@ const isMenuOpen = ref(false);
     </div>
 
     <!-- Mobile Menu -->
-    <div v-if="isMenuOpen" class="lg:hidden bg-white border-t border-gray-200">
+    <div
+      v-if="isMenuOpen"
+      class="lg:hidden bg-white border-t border-gray-200 px-4"
+    >
       <div class="container mx-auto px-4 py-3">
         <nav class="flex flex-col space-y-3">
           <a href="#" class="text-gray-700 hover:text-tertiary font-medium py-2"
