@@ -15,7 +15,7 @@
         </p>
         <div class="flex flex-row gap-4">
           <button
-            class="bg-linear-to-r from-[#4E586B] to-[#4ADE80] hover:bg-green-700 text-white font-medium px-4 py-2 rounded-4xl transition duration-300 shadow-lg"
+            class="bg-linear-to-r from-[#4E586B] to-[#4ADE80] hover:opacity-85 text-white font-medium px-4 py-2 rounded-4xl transition duration-300 shadow-lg"
           >
             Mulai Penilaian
           </button>

@@ -51,13 +51,13 @@ const features = [
 
 <template>
   <section class="py-10 bg-gray-50 px-8">
-    <h1
-      class="font-montserrat tracking-wider text-center font-bold mb-2 text-sm text-tertiary"
-    >
-      LAYANAN KAMI
-    </h1>
     <div class="container mx-auto">
       <div class="text-center mb-12">
+        <h1
+          class="font-montserrat tracking-wider font-bold mb-2 text-sm text-tertiary"
+        >
+          LAYANAN KAMI
+        </h1>
         <h2
           class="font-montserrat text-2xl md:text-3xl font-bold text-gray-800 mb-4"
         >
