@@ -3,12 +3,18 @@ import NotFoundPage from "../views/NotFoundPage.vue";
 import HomePage from "../views/HomePage.vue";
 import LoginPage from "../views/LoginPage.vue";
 import RegisterPage from "../views/RegisterPage.vue";
+import AsesmenPage from "../views/AsesmenPage.vue";
 
 const routes = createRouter({
   routes: [
     {
       path: "/",
       component: HomePage,
+      meta: { layout: "MainLayout" },
+    },
+    {
+      path: "/asesmen",
+      component: AsesmenPage,
       meta: { layout: "MainLayout" },
     },
     {

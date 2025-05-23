@@ -4,15 +4,13 @@ import Footer from "../components/Footer.vue";
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col">
-    <Navbar />
+  <Navbar />
 
-    <main class="mx-auto">
-      <slot></slot>
-    </main>
+  <main class="mx-auto">
+    <slot></slot>
+  </main>
 
-    <Footer />
-  </div>
+  <Footer />
 </template>
 
 <style scoped></style>
