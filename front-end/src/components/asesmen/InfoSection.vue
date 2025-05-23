@@ -24,7 +24,7 @@ const benefits = [
 </script>
 
 <template>
-  <section class="px-8 bg-quaternary py-12">
+  <section class="px-8 bg-quaternary py-12 md:px-14 lg:px-38">
     <div class="container mx-auto">
       <h2
         class="text-2xl font-montserrat text-center font-bold text-gray-800 mb-4"

@@ -3,7 +3,7 @@ import { HelpCircleIcon, ChevronRightIcon } from "lucide-vue-next";
 </script>
 
 <template>
-  <section class="px-8">
+  <section class="px-8 md:px-14 lg:px-38">
     <div
       class="container mx-auto p-6 rounded-lg shadow-sm mb-8 border border-gray-100 px-8"
     >

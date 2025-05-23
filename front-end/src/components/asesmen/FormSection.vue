@@ -20,7 +20,7 @@ const submitForm = () => {
 </script>
 
 <template>
-  <section class="px-8 py-12">
+  <section class="px-8 py-12 md:px-14 lg:px-38">
     <div class="container mx-auto">
       <!-- Progress bar -->
       <div class="mb-6">
@@ -37,70 +37,74 @@ const submitForm = () => {
         class="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100"
       >
         <div class="bg-green-50 p-6">
-          <h2 class="text-sm font-montserrat font-semibold text-gray-800">
+          <h2
+            class="text-sm lg:text-lg font-montserrat font-semibold text-gray-800"
+          >
             Detail Informasi
           </h2>
-          <p class="text-gray-600 mt-1 text-base">
+          <p class="text-gray-600 mt-1 text-base lg:text-sm">
             Mari kita mulai dengan beberapa informasi dasar tentang anak Anda.
           </p>
         </div>
 
         <form @submit.prevent="submitForm" class="p-6">
-          <div class="space-y-6">
-            <FormInput
-              id="childName"
-              label="Nama Anak"
-              v-model="childName"
-              placeholder="Masukkan nama anak"
-            />
-
-            <div>
-              <label
-                for="birthDate"
-                class="block text-gray-700 mb-1 text-base font-semibold"
-                >Tanggal Lahir</label
-              >
-              <input
-                id="birthDate"
-                type="date"
-                v-model="birthDate"
-                placeholder="mm/dd/yyyy"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
-                required
+          <div class="space-y-6 flex flex-col">
+            <div class="lg:flex gap-6">
+              <FormInput
+                id="childName"
+                label="Nama Anak"
+                v-model="childName"
+                placeholder="Masukkan nama anak"
+                class="w-full"
               />
+              <div class="mt-4 w-full lg:mt-0">
+                <label
+                  for="birthDate"
+                  class="block text-gray-700 mb-1 text-base font-semibold"
+                  >Tanggal Lahir</label
+                >
+                <input
+                  id="birthDate"
+                  type="date"
+                  v-model="birthDate"
+                  placeholder="mm/dd/yyyy"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
+                  required
+                />
+              </div>
             </div>
 
-            <div>
-              <label class="block text-gray-700 mb-1 text-base font-semibold"
-                >Jenis Kelamin</label
+            <label class="text-gray-700 mb-1 text-base font-semibold"
+              >Jenis Kelamin</label
+            >
+            <div class="lg:flex gap-6">
+              <div
+                class="w-full border border-gray-300 rounded-md px-4 py-2 mb-2 lg:mb-0"
               >
-              <div class="space-y-2">
-                <div class="border border-gray-300 rounded-md px-4 py-2">
-                  <label class="flex items-center cursor-pointer">
-                    <input
-                      id="male"
-                      type="radio"
-                      name="gender"
-                      value="male"
-                      v-model="gender"
-                      class="h-4 w-4 text-green-600 focus:ring-green-500"
-                    />
-                    <span class="ml-2 text-gray-700 text-base">Laki-laki</span>
-                  </label>
-                </div>
-                <div class="border border-gray-300 rounded-md px-4 py-2">
-                  <label class="flex items-center cursor-pointer">
-                    <input
-                      id="female"
-                      type="radio"
-                      name="gender"
-                      value="female"
-                      v-model="gender"
-                      class="h-4 w-4 text-green-600 focus:ring-green-500"
-                    />
-                    <span class="ml-2 text-gray-700 text-base">Perempuan</span>
-                  </label>
-                </div>
+                <label class="flex items-center cursor-pointer">
+                  <input
+                    id="male"
+                    type="radio"
+                    name="gender"
+                    value="male"
+                    v-model="gender"
+                    class="h-4 w-4 text-green-600 focus:ring-green-500"
+                  />
+                  <span class="ml-2 text-gray-700 text-base">Laki-laki</span>
+                </label>
+              </div>
+              <div class="w-full border border-gray-300 rounded-md px-4 py-2">
+                <label class="flex items-center cursor-pointer">
+                  <input
+                    id="female"
+                    type="radio"
+                    name="gender"
+                    value="female"
+                    v-model="gender"
+                    class="h-4 w-4 text-green-600 focus:ring-green-500"
+                  />
+                  <span class="ml-2 text-gray-700 text-base">Perempuan</span>
+                </label>
               </div>
             </div>
 
@@ -119,7 +123,6 @@ const submitForm = () => {
               placeholder="Masukkan Email Anda"
             />
           </div>
-
           <div class="mt-5 border-t border-gray-300">
             <div class="mt-4 flex justify-end">
               <button

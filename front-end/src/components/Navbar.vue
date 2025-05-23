@@ -40,26 +40,28 @@ onUnmounted(() => {
         </button>
 
         <nav class="hidden lg:flex items-center">
-          <a href="#" class="text-gray-700 hover:text-tertiary font-medium px-6"
+          <a
+            href="/#"
+            class="text-gray-700 hover:text-tertiary font-medium px-6"
             >Beranda</a
           >
           <a
-            href="#about-home"
+            href="/#about-home"
             class="text-gray-700 hover:text-tertiary font-medium px-6"
             >Tentang Kami</a
           >
           <a
-            href="#feature-home"
+            href="/#feature-home"
             class="text-gray-700 hover:text-tertiary font-medium px-6"
             >Layanan</a
           >
           <a
-            href="#carakerja-home"
+            href="/#carakerja-home"
             class="text-gray-700 hover:text-tertiary font-medium px-6"
             >Cara Kerja</a
           >
           <a
-            href="#testimoni-home"
+            href="/#testimoni-home"
             class="text-gray-700 hover:text-tertiary font-medium px-6"
             >Testimoni</a
           >
@@ -80,25 +82,30 @@ onUnmounted(() => {
     </div>
 
     <!-- Mobile Menu -->
-    <div
-      v-if="isMenuOpen"
-      class="lg:hidden bg-white border-t border-gray-200 px-4"
-    >
+    <div v-if="isMenuOpen" class="lg:hidden border-t border-gray-200 px-4">
       <div class="container mx-auto px-4 py-3">
         <nav class="flex flex-col space-y-3">
           <a href="#" class="text-gray-700 hover:text-tertiary font-medium py-2"
             >Beranda</a
           >
-          <a href="#" class="text-gray-700 hover:text-tertiary font-medium py-2"
+          <a
+            href="#about-home"
+            class="text-gray-700 hover:text-tertiary font-medium py-2"
             >Tentang Kami</a
           >
-          <a href="#" class="text-gray-700 hover:text-tertiary font-medium py-2"
+          <a
+            href="#feature-home"
+            class="text-gray-700 hover:text-tertiary font-medium py-2"
             >Layanan</a
           >
-          <a href="#" class="text-gray-700 hover:text-tertiary font-medium py-2"
+          <a
+            href="#carakerja-home"
+            class="text-gray-700 hover:text-tertiary font-medium py-2"
             >Cara Kerja</a
           >
-          <a href="#" class="text-gray-700 hover:text-tertiary font-medium py-2"
+          <a
+            href="#testimoni-home"
+            class="text-gray-700 hover:text-tertiary font-medium py-2"
             >Testimoni</a
           >
           <div class="py-2">
