@@ -1,5 +1,5 @@
 module.exports = {
-    name: 'auth',
+    name: 'profile',
     version: '1.0.0',
     register: async (server) => {
         const routes = require('./routes');

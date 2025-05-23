@@ -10,6 +10,8 @@ const predictionsPlugin = require('./api/predictions');
 const recommendationsPlugin = require('./api/recommendations');
 const notificationsPlugin = require('./api/notifications');
 const feedbackPlugin = require('./api/feedback');
+const profilePlugin = require('./api/profile');
+const riwayatPlugin = require('./api/riwayat');
 
 
 const init = async () => {
@@ -59,7 +61,9 @@ const init = async () => {
         recommendationsPlugin,
         notificationsPlugin,
         feedbackPlugin,
-        ]);
+        profilePlugin,
+        riwayatPlugin,
+    ]);
 
     await server.start();
     console.log(`Server berjalan pada ${server.info.uri}`);
