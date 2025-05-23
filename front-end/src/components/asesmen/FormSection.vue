@@ -29,7 +29,7 @@ const submitForm = () => {
           <p class="text-sm">50%</p>
         </div>
         <div class="w-full bg-gray-200 rounded-full h-2">
-          <div class="bg-tertiary h-2 rounded-full" style="width: 50%"></div>
+          <div class="bg-tertiary h-2 rounded-full w-[50%]"></div>
         </div>
       </div>
 

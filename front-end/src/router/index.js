@@ -3,20 +3,11 @@ import NotFoundPage from "../views/NotFoundPage.vue";
 import HomePage from "../views/HomePage.vue";
 import LoginPage from "../views/LoginPage.vue";
 import RegisterPage from "../views/RegisterPage.vue";
-import AsesmenPage from "../views/AsesmenPage.vue";
+import AssessmentPage from "../views/AssessmentPage.vue";
+import ProfilePage from "../views/ProfilePage.vue";
 
 const routes = createRouter({
   routes: [
-    {
-      path: "/",
-      component: HomePage,
-      meta: { layout: "MainLayout" },
-    },
-    {
-      path: "/asesmen",
-      component: AsesmenPage,
-      meta: { layout: "MainLayout" },
-    },
     {
       path: "/login",
       component: LoginPage,
@@ -26,6 +17,21 @@ const routes = createRouter({
       path: "/register",
       component: RegisterPage,
       meta: { layout: "DefaultLayout" },
+    },
+    {
+      path: "/",
+      component: HomePage,
+      meta: { layout: "MainLayout" },
+    },
+    {
+      path: "/profile",
+      component: ProfilePage,
+      meta: { layout: "MainLayout" },
+    },
+    {
+      path: "/assessment",
+      component: AssessmentPage,
+      meta: { layout: "MainLayout" },
     },
 
     {

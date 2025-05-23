@@ -1,5 +1,7 @@
-<script></script>
+<script setup>
+import FormSection from "../components/profile/FormSection.vue";
+</script>
 
-<template></template>
-
-<style scoped></style>
+<template>
+  <FormSection />
+</template>
