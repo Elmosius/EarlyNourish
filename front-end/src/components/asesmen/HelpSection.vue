@@ -4,7 +4,9 @@ import { HelpCircleIcon, ChevronRightIcon } from "lucide-vue-next";
 
 <template>
   <section class="px-8">
-    <div class="p-6 rounded-lg shadow-sm mb-8 border border-gray-100 px-8">
+    <div
+      class="container mx-auto p-6 rounded-lg shadow-sm mb-8 border border-gray-100 px-8"
+    >
       <div class="flex items-start">
         <div class="bg-green-100 p-2 rounded-full mr-4">
           <HelpCircleIcon class="h-6 w-6 text-green-600" />
