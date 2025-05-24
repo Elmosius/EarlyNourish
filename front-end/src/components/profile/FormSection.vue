@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "vue";
-import { CalendarIcon, InfoIcon, UserIcon } from "lucide-vue-next";
+import { InfoIcon, UserIcon } from "lucide-vue-next";
 import FormInput from "../ui/FormInput.vue";
 
 const profilePhoto = ref(null);

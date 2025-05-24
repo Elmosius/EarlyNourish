@@ -5,6 +5,7 @@ import LoginPage from "../views/LoginPage.vue";
 import RegisterPage from "../views/RegisterPage.vue";
 import AssessmentPage from "../views/AssessmentPage.vue";
 import ProfilePage from "../views/ProfilePage.vue";
+import DashboardPage from "../views/DashboardPage.vue";
 
 const routes = createRouter({
   routes: [
@@ -33,7 +34,11 @@ const routes = createRouter({
       component: AssessmentPage,
       meta: { layout: "MainLayout" },
     },
-
+    {
+      path: "/dashboard",
+      component: DashboardPage,
+      meta: { layout: "MainLayout" },
+    },
     {
       path: "/:notFound*",
       component: NotFoundPage,

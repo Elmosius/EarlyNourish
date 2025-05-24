@@ -88,7 +88,7 @@ const submitForm = () => {
                     name="gender"
                     value="male"
                     v-model="gender"
-                    class="h-4 w-4 text-green-600 focus:ring-green-500"
+                    class="h-4 w-4 text-tertiary focus:ring-tertiary"
                   />
                   <span class="ml-2 text-gray-700 text-base">Laki-laki</span>
                 </label>
