@@ -12,7 +12,7 @@ defineProps({
       {
         name: "Berat Berdasarkan Umur",
         value: "x",
-        percentage: 65,
+        percentage: 95,
         color: "red",
       },
       {
@@ -47,7 +47,9 @@ const getProgressBarClass = (color) => {
 
 <template>
   <section class="px-8 py-3 md:px-14 lg:px-38">
-    <div class="bg-white rounded-xl shadow-xl mb-4 p-6">
+    <div
+      class="container mx-auto max-w-4xl bg-white rounded-xl shadow-xl mb-4 p-6"
+    >
       <h2 class="font-bold text-gray-800 mb-3">Status Pertumbuhan</h2>
 
       <div v-for="status in growthStatuses" :key="status.name" class="mb-3 p-1">

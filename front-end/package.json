@@ -19,7 +19,8 @@
     "tailwindcss": "^4.1.6",
     "vite-plugin-pwa": "^1.0.0",
     "vue": "^3.4.21",
-    "vue-router": "^4.5.1"
+    "vue-router": "^4.5.1",
+    "vue3-apexcharts": "^1.8.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
