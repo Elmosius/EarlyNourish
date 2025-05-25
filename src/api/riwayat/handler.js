@@ -1,32 +1,24 @@
-const Prediction = require('../../models/prediction.model');
-const Recommendation = require('../../models/recommendation.model');
 const mongoose = require('mongoose');
+const riwayatService = require('../../services/riwayat.service');
 
 const getHistoryHandler = async (request, h) => {
-    const { userId } = request.params;
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-        return h.response({ error: true, message: 'User ID tidak valid' }).code(400);
-    }
-
-    const predictions = await Prediction.find({ userId });
-
-    const history = await Promise.all(
-        predictions.map(async (pred) => {
-        const recommendation = await Recommendation.findOne({ predId: pred._id });
-        return {
-            prediction: pred,
-            recommendation: recommendation || null,
-        };
-        })
-    );
-
+  const { userId } = request.params;
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    return h.response({ error: true, message: 'User ID tidak valid' }).code(400);
+  }
+  try {
+    const history = await riwayatService.getUserHistory(userId);
     return {
-        error: false,
-        message: 'success',
-        history,
+      error: false,
+      message: 'success',
+      history,
     };
+  } catch (err) {
+    console.error(err);
+    return h.response({ error: true, message: 'Gagal mengambil riwayat' }).code(500);
+  }
 };
 
 module.exports = {
-    getHistoryHandler,
+  getHistoryHandler,
 };

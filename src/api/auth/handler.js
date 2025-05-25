@@ -1,69 +1,67 @@
-const User = require('../../models/user.model');
-const Role = require('../../models/role.model');
-const bcrypt = require('bcrypt');
-const Jwt = require('@hapi/jwt');
+const Joi = require('joi');
+const authService = require('../../services/auth.service');
+
+const registerSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().min(8).required(),
+  fullName: Joi.string().required(),
+});
+
+const loginSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().min(8).required(),
+});
 
 const registerHandler = async (request, h) => {
-    const { email, password, fullName } = request.payload;
-
-    const exists = await User.findOne({ email });
-    if (exists) {
-        return h.response({ error: true, message: 'Email sudah terdaftar' }).code(400);
+  try {
+    const { error, value } = registerSchema.validate(request.payload);
+    if (error) {
+      return h.response({ error: true, message: error.details[0].message }).code(400);
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    const userRole = await Role.findOne({ name: 'user' });
-    if (!userRole) {
-        return h.response({ error: true, message: 'Role user tidak ditemukan' }).code(500);
-    }
-
-    const user = new User({
-        email,
-        passwordHash,
-        fullName,
-        roleId: userRole._id,
-    });
-
-    await user.save();
+    await authService.registerUser(value);
 
     return h.response({ error: false, message: 'User berhasil dibuat' }).code(201);
+  } catch (err) {
+    if (err.message.includes('Email sudah digunakan')) {
+      return h.response({ error: true, message: err.message }).code(400);
+    }
+    console.error(err);
+    return h.response({ error: true, message: 'Terjadi kesalahan server' }).code(500);
+  }
 };
 
 const loginHandler = async (request, h) => {
-    const { email, password } = request.payload;
-    const user = await User.findOne({ email }).populate('roleId');
-    if (!user) {
-        return h.response({ error: true, message: 'Email tidak ditemukan' }).code(401);
+  try {
+    const { error, value } = loginSchema.validate(request.payload);
+    if (error) {
+      return h.response({ error: true, message: error.details[0].message }).code(400);
     }
 
-    const isValid = await bcrypt.compare(password, user.passwordHash);
-    if (!isValid) {
-        return h.response({ error: true, message: 'Password salah' }).code(401);
-    }
-
-    const token = Jwt.token.generate(
-        {
-        userId: user._id.toString(),
-        email: user.email,
-        role: user.roleId.name,
-        fullName: user.fullName,
-        },
-        {
-        key: process.env.JWT_SECRET,
-        algorithm: 'HS256',
-        }
-    );
+    const { user, token } = await authService.loginUser(value);
 
     return {
-        error: false,
-        message: 'success',
-        loginResult: {
+      error: false,
+      message: 'success',
+      loginResult: {
         userId: user._id.toString(),
         name: user.fullName,
         token,
-        },
+      },
     };
+  } catch (err) {
+    if (
+      err.message === 'Email tidak ditemukan' ||
+      err.message === 'Password salah'
+    ) {
+      return h.response({ error: true, message: err.message }).code(401);
+    }
+    console.error(err);
+    return h.response({ error: true, message: 'Terjadi kesalahan server' }).code(500);
+  }
 };
 
-module.exports = { registerHandler, loginHandler };
+module.exports = {
+  registerHandler,
+  loginHandler,
+};
