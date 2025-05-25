@@ -43,7 +43,7 @@ const statusCirle = computed(() => {
     case "Berisiko Stunting":
       return `${baseClass} bg-yellow-500`;
     case "Normal":
-      return `${baseClass} bg-green-500`;
+      return `${baseClass} bg-tertiary`;
     case "Stunting":
       return `${baseClass} bg-red-500 `;
     default:
@@ -58,7 +58,7 @@ const statusClass = computed(() => {
     case "Berisiko Stunting":
       return `${baseClass} bg-yellow-100 text-yellow-800`;
     case "Normal":
-      return `${baseClass} bg-green-100 text-green-800`;
+      return `${baseClass} bg-quaternary text-tertiary`;
     case "Stunting":
       return `${baseClass} bg-red-100 text-red-800`;
     default:
@@ -76,7 +76,7 @@ const statusClass = computed(() => {
       <div class="block md:hidden">
         <div class="flex flex-col items-center text-center gap-4 mb-4">
           <div
-            class="bg-green-100 rounded-full p-3 shadow-lg border-white border-2"
+            class="bg-quaternary rounded-full p-3 shadow-lg border-white border-2"
           >
             <UserIcon class="text-tertiary h-8 w-8" />
           </div>
@@ -114,7 +114,7 @@ const statusClass = computed(() => {
       <div class="hidden md:flex items-center gap-8">
         <div class="flex-shrink-0">
           <div
-            class="bg-green-100 rounded-full p-8 shadow-lg border-white border-4 w-24 h-24 flex items-center justify-center"
+            class="bg-quaternary rounded-full p-8 shadow-lg border-white border-4 w-24 h-24 flex items-center justify-center"
           >
             <UserIcon class="text-tertiary h-8 w-8" />
           </div>

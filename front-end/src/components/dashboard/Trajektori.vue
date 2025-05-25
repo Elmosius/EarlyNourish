@@ -229,11 +229,10 @@ const chartOptions = computed(() => ({
 <template>
   <section class="px-8 py-3 md:px-14 lg:px-38">
     <div
-      class="container mx-auto max-w-4xl bg-white rounded-xl shadow-sm mb-4 p-6"
+      class="container mx-auto max-w-4xl bg-white rounded-xl shadow-xl mb-4 p-6"
     >
       <h2 class="font-bold text-gray-800 mb-3">Trajektori Pertumbuhan</h2>
 
-      <!-- Chart Container -->
       <div class="h-64 w-full">
         <apexchart
           type="line"
@@ -243,14 +242,13 @@ const chartOptions = computed(() => ({
         />
       </div>
 
-      <!-- Legend -->
       <div class="flex justify-center gap-4 mt-3">
         <div class="flex items-center">
           <div class="w-3 h-3 bg-blue-500 rounded-full mr-1"></div>
           <span class="text-xs text-gray-600">Berat (kg)</span>
         </div>
         <div class="flex items-center">
-          <div class="w-3 h-3 bg-green-500 rounded-full mr-1"></div>
+          <div class="w-3 h-3 bg-tertiary rounded-full mr-1"></div>
           <span class="text-xs text-gray-600">Tinggi (cm)</span>
         </div>
         <div class="flex items-center">

@@ -3,6 +3,10 @@ import ProfileSection from "../components/dashboard/ProfileSection.vue";
 import InfoSection from "../components/dashboard/InfoSection.vue";
 import StatusPertumbuhan from "../components/dashboard/StatusPertumbuhan.vue";
 import Trajektori from "../components/dashboard/Trajektori.vue";
+import Riseko from "../components/dashboard/Riseko.vue";
+import Rekomendasi from "../components/dashboard/Rekomendasi.vue";
+import LangkahSelanjutnya from "../components/dashboard/LangkahSelanjutnya.vue";
+import RencanaLanjutan from "../components/dashboard/RencanaLanjutan.vue";
 </script>
 
 <template>
@@ -11,6 +15,10 @@ import Trajektori from "../components/dashboard/Trajektori.vue";
     <InfoSection />
     <StatusPertumbuhan />
     <Trajektori />
+    <Riseko />
+    <Rekomendasi />
+    <LangkahSelanjutnya />
+    <RencanaLanjutan />
   </div>
 </template>
 

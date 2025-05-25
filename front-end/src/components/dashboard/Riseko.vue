@@ -1,0 +1,106 @@
+<script setup>
+import { computed } from "vue";
+import { CircleAlert } from "lucide-vue-next";
+
+const props = defineProps({
+  riskPercentage: {
+    type: Number,
+    default: 50,
+  },
+  riskFactors: {
+    type: Array,
+    default: () => [
+      "Tinggi Berdasarkan Umur Dibawah -2 SD",
+      "Asupan Protein Tidak Mencukupi",
+      "Kekurangan Vitamin A Reguler",
+    ],
+  },
+});
+
+const riskCircleClass = computed(() => {
+  if (props.riskPercentage >= 70) return "border-red-400 bg-red-50";
+  if (props.riskPercentage >= 40) return "border-yellow-400 bg-yellow-50";
+  return "border-secondary bg-quaternary";
+});
+
+const riskTextColorClass = computed(() => {
+  if (props.riskPercentage >= 70) return "text-red-600";
+  if (props.riskPercentage >= 40) return "text-yellow-600";
+  return "text-tertiary";
+});
+
+const riskStatusClass = computed(() => {
+  if (props.riskPercentage >= 70)
+    return "bg-red-100 text-red-800 hover:bg-red-200";
+  if (props.riskPercentage >= 40)
+    return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200";
+  return "bg-quaternary text-tertiary hover:bg-green-200";
+});
+
+const riskStatusText = computed(() => {
+  if (props.riskPercentage >= 70) return "Risiko Stunting Tinggi";
+  if (props.riskPercentage >= 40) return "Risiko Stunting Sedang";
+  return "Risiko Stunting Rendah";
+});
+</script>
+
+<template>
+  <section class="px-8 py-3 md:px-14 lg:px-38">
+    <div
+      class="container mx-auto max-w-4xl bg-white rounded-xl shadow-xl mb-4 p-6"
+    >
+      <h2 class="font-bold text-gray-800">Asesmen Risiko Stunting</h2>
+
+      <div class="flex justify-center my-10">
+        <div
+          :class="riskCircleClass"
+          class="w-32 h-32 rounded-full border-4 flex items-center justify-center"
+        >
+          <div class="text-center">
+            <div :class="riskTextColorClass" class="text-4xl font-bold">
+              {{ riskPercentage }}%
+            </div>
+            <div :class="riskTextColorClass" class="text-xs font-medium mt-1">
+              Risiko
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="font-semibold text-gray-700 mb-2 text-sm">
+        Faktor Risiko Teridentifikasi
+      </h3>
+      <ul class="space-y-2 mb-4">
+        <li
+          v-for="factor in riskFactors"
+          :key="factor"
+          class="flex items-start"
+        >
+          <CircleAlert
+            class="h-5 w-5 text-yellow-500 mr-2 flex-shrink-0 mt-0.5"
+          />
+          <span class="text-base md:sm">{{ factor }}</span>
+        </li>
+      </ul>
+
+      <div class="flex flex-col gap-2">
+        <button
+          :class="riskStatusClass"
+          class="text-base md:text-sm py-2 px-4 rounded-full w-full text-center font-medium"
+        >
+          {{ riskStatusText }}
+        </button>
+        <button
+          class="bg-blue-50 text-blue-800 text-base md:text-sm py-2 px-4 rounded-full w-full text-center hover:bg-blue-100 transition-colors ease-in-out duration-200"
+        >
+          Informasi Nutrisi Dipersonalisasi
+        </button>
+        <button
+          class="bg-gray-100 text-gray-800 text-base md:text-sm py-2 px-4 rounded-full w-full text-center hover:bg-gray-200 transition-colors ease-in-out duration-200"
+        >
+          Pemeriksaan Rutin Diperlukan
+        </button>
+      </div>
+    </div>
+  </section>
+</template>
