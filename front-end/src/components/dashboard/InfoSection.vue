@@ -68,7 +68,7 @@ const statusClass = computed(() => {
 </script>
 
 <template>
-  <section class="px-8 py-4 md:px-14 lg:px-38">
+  <section class="px-8 py-3 md:px-14 lg:px-38">
     <div
       class="container mx-auto max-w-4xl bg-white rounded-xl shadow-xl mb-4 p-6"
     >
@@ -123,8 +123,8 @@ const statusClass = computed(() => {
         <div class="flex-1">
           <div class="flex justify-between items-start mb-6">
             <div class="flex-1">
-              <h2 class="font-bold text-lg">{{ childName }}</h2>
-              <p class="text-gray-600">{{ gender }}, {{ childAge }}</p>
+              <h2 class="font-bold">{{ childName }}</h2>
+              <p class="text-gray-600 text-sm">{{ gender }}, {{ childAge }}</p>
             </div>
             <div class="flex-shrink-0 my-auto p-3">
               <div :class="statusClass">
@@ -137,22 +137,22 @@ const statusClass = computed(() => {
           <div class="grid grid-cols-2 gap-6">
             <div class="bg-gray-50 rounded-lg p-3">
               <p class="text-gray-600 text-sm mb-1">Berat</p>
-              <p class="font-semibold text-lg mb-3">{{ weight }} kg</p>
+              <p class="font-semibold mb-3">{{ weight }} kg</p>
             </div>
 
             <div class="bg-gray-50 rounded-lg p-3">
               <p class="text-gray-600 text-sm mb-1">Berat Berdasarkan Usia</p>
-              <p class="font-semibold text-lg">{{ weightSD }}</p>
+              <p class="font-semibold">{{ weightSD }}</p>
             </div>
 
             <div class="bg-gray-50 rounded-lg p-3">
               <p class="text-gray-600 text-sm mb-1">Tinggi</p>
-              <p class="font-semibold text-lg mb-3">{{ height }} cm</p>
+              <p class="font-semibold mb-3">{{ height }} cm</p>
             </div>
 
             <div class="bg-gray-50 rounded-lg p-3">
               <p class="text-gray-600 text-sm mb-1">Tinggi Berdasarkan Usia</p>
-              <p class="font-semibold text-lg">{{ heightSD }}</p>
+              <p class="font-semibold">{{ heightSD }}</p>
             </div>
           </div>
         </div>

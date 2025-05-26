@@ -22,9 +22,7 @@ defineProps({
             </div>
 
             <div>
-              <h2 class="font-bold text-gray-800 md:text-lg lg:text-xl">
-                Early Nourish
-              </h2>
+              <h2 class="font-bold text-gray-800">Early Nourish</h2>
               <p class="text-xs text-gray-500 md:text-sm">
                 Aplikasi Pemantauan Stunting
               </p>

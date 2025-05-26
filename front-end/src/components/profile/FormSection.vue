@@ -50,7 +50,7 @@ const handleSubmit = () => {
     <div
       class="container mx-auto max-w-5xl bg-white rounded-xl shadow-sm border border-gray-100 p-6"
     >
-      <h1 class="text-[1rem] font-montserrat font-semibold text-gray-800 mb-6">
+      <h1 class="font-montserrat font-bold text-gray-800 mb-6">
         Informasi Pribadi
       </h1>
 

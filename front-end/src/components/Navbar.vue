@@ -46,7 +46,7 @@ onUnmounted(() => {
 
 const profileMenuItems = [
   { icon: UserIcon, label: "Informasi Pribadi", href: "/profile" },
-  { icon: History, label: "Riwayat Asesmen", href: "/assessment" },
+  { icon: History, label: "Riwayat Asesmen", href: "/riwayat" },
   { icon: LogOutIcon, label: "Keluar", href: "/logout", isLogout: true },
 ];
 </script>
