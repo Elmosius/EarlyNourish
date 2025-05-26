@@ -1,26 +1,60 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
-import { MenuIcon, XIcon } from "lucide-vue-next";
+import {
+  MenuIcon,
+  XIcon,
+  UserIcon,
+  History,
+  LogOutIcon,
+  ChevronDownIcon,
+} from "lucide-vue-next";
 
 const isMenuOpen = ref(false);
+const isProfileModalOpen = ref(false);
 const scrolled = ref(false);
 
 const handleScroll = () => {
   scrolled.value = window.scrollY > 50;
 };
 
+const toggleProfileModal = () => {
+  isProfileModalOpen.value = !isProfileModalOpen.value;
+};
+
+const closeProfileModal = () => {
+  isProfileModalOpen.value = false;
+};
+
+const handleClickOutside = (event) => {
+  if (
+    isProfileModalOpen.value &&
+    !event.target.closest(".profile-menu-container")
+  ) {
+    closeProfileModal();
+  }
+};
+
 onMounted(() => {
   window.addEventListener("scroll", handleScroll);
+  document.addEventListener("click", handleClickOutside);
 });
+
 onUnmounted(() => {
   window.removeEventListener("scroll", handleScroll);
+  document.removeEventListener("click", handleClickOutside);
 });
+
+const profileMenuItems = [
+  { icon: UserIcon, label: "Informasi Pribadi", href: "/profile" },
+  { icon: History, label: "Riwayat Asesmen", href: "/assessment" },
+  { icon: LogOutIcon, label: "Keluar", href: "/logout", isLogout: true },
+];
 </script>
 
 <template>
   <header
-    class="bg-gray-50 sticky top-0 z-50 duration-500 transition-shadow md:px-8 lg:px-35"
-    :class="{ 'shadow-sm': scrolled }"
+    class="bg-gray-50 sticky top-0 z-50 duration-500 transition-all md:px-8 lg:px-35"
+    :class="{ 'shadow-sm bg-white': scrolled }"
   >
     <div
       class="container mx-auto py-3 flex items-center px-6 lg:px-0 justify-between"
@@ -65,8 +99,9 @@ onUnmounted(() => {
             class="text-gray-700 hover:text-tertiary font-medium px-6"
             >Testimoni</a
           >
-          <div class="ml-6">
+          <div class="ml-6 relative profile-menu-container">
             <button
+              @click="toggleProfileModal"
               class="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-full font-medium transition-colors"
             >
               <div
@@ -75,7 +110,35 @@ onUnmounted(() => {
                 <span class="text-sm">El</span>
               </div>
               <span>Elmosius Suli</span>
+              <ChevronDownIcon
+                class="h-4 w-4"
+                :class="{ 'rotate-180': isProfileModalOpen }"
+              />
             </button>
+
+            <!-- Desktop Profile Dropdown -->
+            <div
+              v-if="isProfileModalOpen"
+              class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
+            >
+              <div class="px-4 py-3 border-b border-gray-100">
+                <p class="text-sm font-medium text-gray-900">Elmosius Suli</p>
+                <p class="text-sm text-gray-500">elmosius@example.com</p>
+              </div>
+              <div class="py-1">
+                <a
+                  v-for="item in profileMenuItems"
+                  :key="item.label"
+                  :href="item.href"
+                  class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                  :class="{ 'text-red-600 hover:bg-red-50': item.isLogout }"
+                  @click="closeProfileModal"
+                >
+                  <component :is="item.icon" class="h-4 w-4 mr-3" />
+                  {{ item.label }}
+                </a>
+              </div>
+            </div>
           </div>
         </nav>
       </div>
@@ -85,40 +148,57 @@ onUnmounted(() => {
     <div v-if="isMenuOpen" class="lg:hidden border-t border-gray-200 px-4">
       <div class="container mx-auto px-4 py-3">
         <nav class="flex flex-col space-y-3">
-          <a href="#" class="text-gray-700 hover:text-tertiary font-medium py-2"
+          <a href="/" class="text-gray-700 hover:text-tertiary font-medium py-2"
             >Beranda</a
           >
           <a
-            href="#about-home"
+            href="/#about-home"
             class="text-gray-700 hover:text-tertiary font-medium py-2"
             >Tentang Kami</a
           >
           <a
-            href="#feature-home"
+            href="/#feature-home"
             class="text-gray-700 hover:text-tertiary font-medium py-2"
             >Layanan</a
           >
           <a
-            href="#carakerja-home"
+            href="/#carakerja-home"
             class="text-gray-700 hover:text-tertiary font-medium py-2"
             >Cara Kerja</a
           >
           <a
-            href="#testimoni-home"
+            href="/#testimoni-home"
             class="text-gray-700 hover:text-tertiary font-medium py-2"
             >Testimoni</a
           >
-          <div class="py-2">
-            <button
-              class="flex items-center space-x-2 w-full bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-full font-medium transition-colors"
-            >
+
+          <!-- Mobile Profile Section -->
+          <div class="py-2 border-t border-gray-200 mt-2">
+            <div class="flex items-center space-x-3 px-2 py-3">
               <div
-                class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center"
+                class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center"
               >
-                <span class="text-sm">ES</span>
+                <span class="text-sm font-medium">El</span>
               </div>
-              <span>Elmosius Suli</span>
-            </button>
+              <div>
+                <p class="text-sm font-semibold text-gray-900">Elmosius Suli</p>
+                <p class="text-xs text-gray-500">elmosius@example.com</p>
+              </div>
+            </div>
+
+            <!-- Mobile Profile Menu Items -->
+            <div class="space-y-1 mt-2">
+              <a
+                v-for="item in profileMenuItems"
+                :key="item.label"
+                :href="item.href"
+                class="flex items-center px-2 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                :class="{ 'text-red-600 hover:bg-red-50': item.isLogout }"
+              >
+                <component :is="item.icon" class="h-4 w-4 mr-3" />
+                {{ item.label }}
+              </a>
+            </div>
           </div>
         </nav>
       </div>
@@ -126,4 +206,8 @@ onUnmounted(() => {
   </header>
 </template>
 
-<style scoped></style>
+<style scoped>
+.rotate-180 {
+  transform: rotate(180deg);
+}
+</style>
