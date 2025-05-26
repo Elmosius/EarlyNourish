@@ -230,31 +230,6 @@ const getMealTypeLabel = (mealType) => {
           <p class="text-xs md:text-sm text-gray-600">{{ food.benefit }}</p>
         </div>
       </div>
-
-      <!-- Daily Meal Plan -->
-      <div class="bg-blue-50 rounded-xl p-4 md:p-6">
-        <h3 class="font-bold text-gray-800 mb-4">Rencana Makanan Harian</h3>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-          <div v-for="(meals, mealType) in mealPlan" :key="mealType">
-            <h4 class="font-bold text-blue-700 mb-3 text-sm md:text-base">
-              {{ getMealTypeLabel(mealType) }}
-            </h4>
-            <ul class="space-y-2">
-              <li
-                v-for="meal in meals"
-                :key="meal"
-                class="flex items-center text-xs md:text-sm text-gray-700"
-              >
-                <div
-                  class="w-1.5 h-1.5 bg-blue-400 rounded-full mr-2 flex-shrink-0"
-                ></div>
-                {{ meal }}
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
     </div>
   </section>
 </template>

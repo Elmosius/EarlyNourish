@@ -61,7 +61,7 @@ const handleSubmit = () => {
             <div
               class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center border-4 border-white shadow-lg"
             >
-              <UserIcon class="h-12 w-12 text-green-600" />
+              <UserIcon class="h-12 w-12 text-tertiary" />
             </div>
           </div>
 
@@ -143,7 +143,7 @@ const handleSubmit = () => {
                 v-model="address"
                 placeholder="Masukkan Alamat Anda"
                 rows="3"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base resize-none"
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary focus:border-tertiary text-base resize-none"
                 required
               ></textarea>
             </div>
@@ -176,7 +176,7 @@ const handleSubmit = () => {
                 step="0.1"
                 v-model="birthWeight"
                 placeholder="Contoh : 3.2"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary focus:border-tertiary text-base"
                 required
               />
             </div>
@@ -194,7 +194,7 @@ const handleSubmit = () => {
                 type="date"
                 v-model="birthDate"
                 placeholder="dd/mm/yyyy"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary focus:border-tertiary text-base"
                 required
               />
             </div>
@@ -210,7 +210,7 @@ const handleSubmit = () => {
                 type="number"
                 v-model="birthHeight"
                 placeholder="Contoh : 50"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary focus:border-tertiary text-base"
                 required
               />
             </div>
@@ -228,7 +228,7 @@ const handleSubmit = () => {
                 type="number"
                 v-model="headCircumference"
                 placeholder="Contoh : 34"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
+                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary focus:border-tertiary text-base"
                 required
               />
             </div>
