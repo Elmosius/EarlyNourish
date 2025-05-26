@@ -23,11 +23,8 @@ const registerHandler = async (request, h) => {
 
     return h.response({ error: false, message: 'User berhasil dibuat' }).code(201);
   } catch (err) {
-    if (err.message.includes('Email sudah digunakan')) {
-      return h.response({ error: true, message: err.message }).code(400);
-    }
     console.error(err);
-    return h.response({ error: true, message: 'Terjadi kesalahan server' }).code(500);
+    return h.response({ error: true, message: err.message }).code(500);
   }
 };
 
@@ -50,14 +47,8 @@ const loginHandler = async (request, h) => {
       },
     };
   } catch (err) {
-    if (
-      err.message === 'Email tidak ditemukan' ||
-      err.message === 'Password salah'
-    ) {
-      return h.response({ error: true, message: err.message }).code(401);
-    }
     console.error(err);
-    return h.response({ error: true, message: 'Terjadi kesalahan server' }).code(500);
+    return h.response({ error: true, message: err.message }).code(500);
   }
 };
 

@@ -1,5 +1,7 @@
 'use strict';
 
+require('dotenv').config();
+
 const Hapi = require('@hapi/hapi');
 const Jwt = require('@hapi/jwt');
 const config = require('./config');
@@ -12,6 +14,7 @@ const notificationsPlugin = require('./api/notifications');
 const feedbackPlugin = require('./api/feedback');
 const profilePlugin = require('./api/profile');
 const riwayatPlugin = require('./api/riwayat');
+
 
 
 const init = async () => {

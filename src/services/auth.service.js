@@ -18,7 +18,7 @@ const generateToken = (user) => {
     {
       userId: user._id.toString(),
       email: user.email,
-      role: user.roleId.name || user.roleId, 
+      role: user.roleId.name || user.roleId,
       fullName: user.fullName,
     },
     {
@@ -26,7 +26,7 @@ const generateToken = (user) => {
       algorithm: 'HS256',
     },
     {
-      ttlSec: 14400, 
+      ttlSec: 14400,
     }
   );
 };
@@ -35,10 +35,16 @@ const registerUser = async ({ email, password, fullName }) => {
   const existingUser = await User.findOne({ email });
   if (existingUser) throw new Error('Email sudah digunakan');
 
-  const passwordHash = await hashPassword(password);
-
+  console.log("Mencari role 'user'...");
   const userRole = await Role.findOne({ name: 'user' });
-  if (!userRole) throw new Error('Role user tidak ditemukan');
+  console.log("Role ditemukan:", userRole);
+
+  if (!userRole) {
+    console.error("Role tidak ditemukan");
+    throw new Error('Role user tidak ditemukan');
+  }
+
+  const passwordHash = await hashPassword(password);
 
   const newUser = new User({
     email,
@@ -51,15 +57,20 @@ const registerUser = async ({ email, password, fullName }) => {
   return newUser;
 };
 
+
 const loginUser = async ({ email, password }) => {
-  const user = await User.findOne({ email }).populate('roleId');
-  if (!user) throw new Error('Email tidak ditemukan');
+  try {
+    const user = await User.findOne({ email }).populate('roleId');
+    if (!user) throw new Error('Email tidak ditemukan');
 
-  const valid = await verifyPassword(password, user.passwordHash);
-  if (!valid) throw new Error('Password salah');
+    const valid = await verifyPassword(password, user.passwordHash);
+    if (!valid) throw new Error('Password salah');
 
-  const token = generateToken(user);
-  return { user, token };
+    const token = generateToken(user);
+    return { user, token };
+  } catch (err) {
+    throw new Error(err.message);
+  }
 };
 
 module.exports = {
