@@ -87,7 +87,7 @@ const resetForm = () => {
 </script>
 
 <template>
-  <section class="px-8 py-4 md:px-14 lg:px-38">
+  <section class="px-8 py-4 pb-10 md:px-14 lg:px-38">
     <div
       class="container max-w-4xl mx-auto bg-[#EEF2FF] rounded-xl shadow-xl mb-4 p-6"
     >
@@ -189,7 +189,7 @@ const resetForm = () => {
                 ? 'bg-gray-800 hover:bg-gray-900'
                 : 'bg-gray-400 cursor-not-allowed'
             "
-            class="text-white font-medium py-2 px-8 md:px-12 rounded-lg transition-colors text-base md:text-sm"
+            class="text-white font-medium py-2 px-6 rounded-full transition-colors text-base md:text-sm"
           >
             {{ isSubmitting ? "Mengirim..." : "Kirim" }}
           </button>
