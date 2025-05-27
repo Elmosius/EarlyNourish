@@ -99,14 +99,15 @@
 
 <style scoped>
 .oval-shadow {
-  width: 100%;
+  border-left: 1px solid black;
+  width: 80%;
   height: 90%;
   background: rgba(167, 243, 208, 0.5);
-  border-radius: 50% / 60%;
-  filter: blur(40px);
+  border-radius: 50% / 80%;
+  //filter: blur(40px);
   z-index: 1;
-  top: 50%;
-  left: 50%;
+  top: 55%;
+  left: 45%;
   transform: translate(-50%, -50%);
 }
 </style>
