@@ -9,20 +9,16 @@ defineProps({
     default: "",
   },
   modelValue: {
-    type: [String, Number],
-    default: "",
-  },
-  type: {
     type: String,
-    default: "text",
+    default: "",
   },
   placeholder: {
     type: String,
     default: "",
   },
-  step: {
-    type: [String, Number],
-    default: null,
+  rows: {
+    type: Number,
+    default: 3,
   },
   required: {
     type: Boolean,
@@ -41,16 +37,14 @@ defineEmits(["update:modelValue"]);
       class="block text-gray-700 mb-1 text-base font-semibold"
       >{{ label }}</label
     >
-    <input
+    <textarea
       :id="id"
-      :type="type"
       :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
       :placeholder="placeholder"
-      class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary focus:border-tertiary text-base bg-white"
-      :step="type === 'number' ? step : null"
+      :rows="rows"
+      class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary focus:border-tertiary text-base resize-none bg-white"
       :required="required"
-      autofocus
-    />
+    ></textarea>
   </div>
 </template>

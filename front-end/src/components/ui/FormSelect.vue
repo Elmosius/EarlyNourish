@@ -12,17 +12,13 @@ defineProps({
     type: [String, Number],
     default: "",
   },
-  type: {
-    type: String,
-    default: "text",
+  options: {
+    type: Array,
+    required: true,
   },
-  placeholder: {
+  disabledOptionText: {
     type: String,
-    default: "",
-  },
-  step: {
-    type: [String, Number],
-    default: null,
+    default: "Pilih",
   },
   required: {
     type: Boolean,
@@ -41,16 +37,21 @@ defineEmits(["update:modelValue"]);
       class="block text-gray-700 mb-1 text-base font-semibold"
       >{{ label }}</label
     >
-    <input
+    <select
       :id="id"
-      :type="type"
       :value="modelValue"
-      @input="$emit('update:modelValue', $event.target.value)"
-      :placeholder="placeholder"
+      @change="$emit('update:modelValue', $event.target.value)"
       class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary focus:border-tertiary text-base bg-white"
-      :step="type === 'number' ? step : null"
       :required="required"
-      autofocus
-    />
+    >
+      <option value="" disabled>{{ disabledOptionText }}</option>
+      <option
+        v-for="option in options"
+        :key="option.value"
+        :value="option.value"
+      >
+        {{ option.label }}
+      </option>
+    </select>
   </div>
 </template>

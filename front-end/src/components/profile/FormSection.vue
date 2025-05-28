@@ -2,6 +2,8 @@
 import { ref } from "vue";
 import { InfoIcon, UserIcon } from "lucide-vue-next";
 import FormInput from "../ui/FormInput.vue";
+import FormSelect from "../ui/FormSelect.vue";
+import FormTextArea from "../ui/FormTextArea.vue";
 
 const profilePhoto = ref(null);
 const fullName = ref("");
@@ -97,29 +99,18 @@ const handleSubmit = () => {
               label="Nama Lengkap"
               v-model="fullName"
               placeholder="Masukkan nama Anda"
+              required
             />
 
             <div>
-              <label
-                for="role"
-                class="block text-gray-700 mb-1 text-base font-semibold"
-                >Peran</label
-              >
-              <select
+              <FormSelect
                 id="role"
+                :options="roles"
+                label="Peran"
                 v-model="role"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary focus:border-tertiary text-base"
+                disabled-option-text="Pilih peran"
                 required
-              >
-                <option value="" disabled>Pilih</option>
-                <option
-                  v-for="roleOption in roles"
-                  :key="roleOption.value"
-                  :value="roleOption.value"
-                >
-                  {{ roleOption.label }}
-                </option>
-              </select>
+              />
             </div>
           </div>
 
@@ -133,19 +124,14 @@ const handleSubmit = () => {
             />
 
             <div>
-              <label
-                for="address"
-                class="block text-gray-700 mb-1 text-base font-semibold"
-                >Alamat</label
-              >
-              <textarea
+              <FormTextArea
                 id="address"
                 v-model="address"
                 placeholder="Masukkan Alamat Anda"
                 rows="3"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary focus:border-tertiary text-base resize-none"
                 required
-              ></textarea>
+                label="Alamat"
+              />
             </div>
           </div>
         </div>
