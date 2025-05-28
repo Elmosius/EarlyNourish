@@ -1,6 +1,7 @@
 const Joi = require('joi');
 const mongoose = require('mongoose');
 const notificationService = require('../../services/notification.service');
+const mqService = require('../../services/mq.service');
 
 const notificationSchema = Joi.object({
   type: Joi.string().required(),
@@ -32,9 +33,17 @@ const createNotificationHandler = async (request, h) => {
       type: value.type,
       message: value.message,
     });
+
+    await mqService.sendMessage('notifications', {
+      notificationId,
+      userId: request.auth.credentials.userId,
+      type: value.type,
+      message: value.message,
+    });
+
     return h.response({
       error: false,
-      message: 'Notification sent',
+      message: 'Notification sent to queue',
       notificationId,
     }).code(201);
   } catch (err) {
