@@ -100,14 +100,14 @@
 <style scoped>
 .oval-shadow {
   border-left: 1px solid black;
-  width: 80%;
+  width: 100%;
   height: 90%;
   background: rgba(167, 243, 208, 0.5);
   border-radius: 50% / 80%;
-  //filter: blur(40px);
+  filter: blur(40px);
   z-index: 1;
-  top: 55%;
-  left: 45%;
+  top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
 }
 </style>
