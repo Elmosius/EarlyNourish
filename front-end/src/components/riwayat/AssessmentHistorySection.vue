@@ -218,11 +218,3 @@ onMounted(() => {
     </div>
   </section>
 </template>
-
-<style scoped>
-.transition-colors {
-  transition:
-    color 0.2s ease-in-out,
-    background-color 0.2s ease-in-out;
-}
-</style>

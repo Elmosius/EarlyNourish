@@ -7,7 +7,7 @@ import Riseko from "../components/dashboard/Riseko.vue";
 import Rekomendasi from "../components/dashboard/Rekomendasi.vue";
 import LangkahSelanjutnya from "../components/dashboard/LangkahSelanjutnya.vue";
 import RencanaLanjutan from "../components/dashboard/RencanaLanjutan.vue";
-import Feedback from "./Feedback.vue";
+import Feedback from "../components/dashboard/Feedback.vue";
 </script>
 
 <template>
