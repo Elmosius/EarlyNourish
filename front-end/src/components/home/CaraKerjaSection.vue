@@ -63,11 +63,12 @@ const steps = [
       </div>
 
       <div class="mt-6 text-center">
-        <button
+        <a
+          href="/assessment"
           class="bg-linear-to-r from-[#4E586B] to-[#4ADE80] hover:opacity-85 text-white font-medium py-3 px-4 rounded-4xl transition duration-300 shadow-xl"
         >
           Mulai Penilaian Sekarang
-        </button>
+        </a>
       </div>
     </div>
   </section>

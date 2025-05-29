@@ -15,16 +15,18 @@
             nutrisi yang disesuaikan, kami bantu si Kecil berkembang optimal!
           </p>
           <div class="flex flex-row gap-4">
-            <button
+            <a
+              href="/assessment"
               class="bg-linear-to-r from-[#4E586B] to-[#4ADE80] hover:opacity-85 text-white font-medium px-4 py-2 rounded-4xl transition duration-300 shadow-lg"
             >
               Mulai Penilaian
-            </button>
-            <button
+            </a>
+            <a
+              href="#carakerja-home"
               class="border border-green-600 text-green-600 hover:bg-green-50 font-medium px-4 py-2 rounded-4xl transition duration-300 shadow-lg"
             >
               Selengkapnya
-            </button>
+            </a>
           </div>
           <div class="mt-8 flex items-center">
             <div class="flex -space-x-2">
