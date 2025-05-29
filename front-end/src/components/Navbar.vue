@@ -59,10 +59,10 @@ const profileMenuItems = [
     <div
       class="container mx-auto py-3 flex items-center px-6 lg:px-0 justify-between"
     >
-      <div class="flex items-center">
+      <a href="#" class="flex items-center">
         <img src="/logo.png" alt="Early Nourish" class="h-8 w-8" />
         <span class="ml-2 font-semibold text-gray-800">Early Nourish</span>
-      </div>
+      </a>
 
       <div class="flex items-center">
         <button
