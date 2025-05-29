@@ -1,5 +1,26 @@
 <script setup>
 import { ClipboardList, ShieldCheck, CircleAlert } from "lucide-vue-next";
+
+const items = [
+  {
+    icon: ClipboardList,
+    title: "Pemantauan Berkala Data",
+    description:
+      "Pantau pertumbuhan anak secara berkala dengan input data yang mudah dan visualisasi yang jelas.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Deteksi Risiko Stunting",
+    description:
+      "Algoritma kami membantu mendeteksi risiko stunting berdasarkan data pertumbuhan anak.",
+  },
+  {
+    icon: CircleAlert,
+    title: "Rekomendasi Personalisasi",
+    description:
+      "Dapatkan rekomendasi nutrisi dan aktivitas yang disesuaikan dengan kebutuhan anak Anda.",
+  },
+];
 </script>
 
 <template>
@@ -19,70 +40,39 @@ import { ClipboardList, ShieldCheck, CircleAlert } from "lucide-vue-next";
         >
           Tentang Early Nourish
         </h2>
-        <p class="text-gray-600 text-base max-w-2xl mx-auto text-base">
+        <p class="text-gray-600 max-w-2xl mx-auto text-base">
           Kami berkomitmen untuk membantu orang tua memantau pertumbuhan anak
           dan mencegah stunting sejak dini.
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         <div class="order-1 flex justify-center">
           <img
             src="../../assets/gambar-about-us.png"
             alt="Mother and Child"
-            class="w-full max-w-md rounded-lg shadow-2xl shadow-[#D1F1DB] bg-[#D1F1DB]"
+            class="w-full max-w-md rounded-lg shadow-2xl drop-shadow-2xl drop-shadow-[#D1F1DB] shadow-[#D1F1DB] bg-[#D1F1DB] mb-10"
           />
         </div>
 
         <div class="order-2 md:order-1">
           <div class="space-y-6">
-            <div class="flex items-center">
+            <div
+              v-for="(item, index) in items"
+              :key="index"
+              class="flex items-center"
+            >
               <div
                 class="bg-linear-65 from-[#4ADE80] to-[#22C55E] p-3 rounded-lg mr-4 shadow-lg inset-shadow-xs inset-shadow-gray-800"
               >
-                <ClipboardList class="text-white font-bold" />
+                <component :is="item.icon" class="text-white font-bold" />
               </div>
               <div>
                 <h3 class="font-semibold text-lg mb-2">
-                  Pemantauan Berkala Data
+                  {{ item.title }}
                 </h3>
                 <p class="text-gray-600 text-base">
-                  Pantau pertumbuhan anak secara berkala dengan input data yang
-                  mudah dan visualisasi yang jelas.
-                </p>
-              </div>
-            </div>
-
-            <div class="flex items-center">
-              <div
-                class="bg-linear-65 from-[#4ADE80] to-[#22C55E] p-3 rounded-lg mr-4 shadow-lg inset-shadow-xs inset-shadow-gray-800"
-              >
-                <ShieldCheck class="text-white font-bold" />
-              </div>
-              <div>
-                <h3 class="font-semibold text-lg mb-2">
-                  Deteksi Risiko Stunting
-                </h3>
-                <p class="text-gray-600 text-base">
-                  Algoritma kami membantu mendeteksi risiko stunting berdasarkan
-                  data pertumbuhan anak.
-                </p>
-              </div>
-            </div>
-
-            <div class="flex items-center">
-              <div
-                class="bg-linear-65 from-[#4ADE80] to-[#22C55E] p-3 rounded-lg mr-4 shadow-lg inset-shadow-xs inset-shadow-gray-800"
-              >
-                <CircleAlert class="text-white font-bold" />
-              </div>
-              <div>
-                <h3 class="font-semibold text-lg mb-2">
-                  Rekomendasi Personalisasi
-                </h3>
-                <p class="text-gray-600 text-base">
-                  Dapatkan rekomendasi nutrisi dan aktivitas yang disesuaikan
-                  dengan kebutuhan anak Anda.
+                  {{ item.description }}
                 </p>
               </div>
             </div>
