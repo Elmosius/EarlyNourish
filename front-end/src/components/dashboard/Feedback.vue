@@ -1,7 +1,8 @@
 <script setup>
 import { ref, computed, watch } from "vue";
 import { Star, CheckCircle } from "lucide-vue-next";
-import FormInput from "../components/ui/FormInput.vue";
+import FormInput from "../ui/FormInput.vue";
+import FormTextArea from "../ui/FormTextArea.vue";
 
 const emit = defineEmits(["feedback-submitted"]);
 
@@ -106,6 +107,7 @@ const resetForm = () => {
           id="fullName"
           placeholder="Masukkan nama Anda"
           v-model="formData.fullName"
+          :autofocus="false"
         />
 
         <div>
@@ -161,20 +163,14 @@ const resetForm = () => {
         </div>
 
         <div>
-          <label
-            for="testimonial"
-            class="block text-gray-700 mb-2 text-base md:text-sm font-medium"
-          >
-            Testimoni
-          </label>
-          <textarea
+          <FormTextArea
             id="testimonial"
             v-model="formData.testimonial"
-            rows="5"
             placeholder="Masukkan pengalaman Anda"
-            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary focus:border-tertiary text-base resize-none bg-white"
-            required
-          ></textarea>
+            :rows="5"
+            :max-length="500"
+          />
+
           <p class="text-xs text-gray-500 mt-1">
             {{ formData.testimonial.length }}/500 karakter
           </p>
