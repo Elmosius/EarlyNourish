@@ -9,7 +9,7 @@ import { HelpCircleIcon, ChevronRightIcon } from "lucide-vue-next";
     >
       <div class="flex items-start">
         <div class="bg-green-100 p-2 rounded-full mr-4">
-          <HelpCircleIcon class="h-6 w-6 text-green-600" />
+          <HelpCircleIcon class="h-6 w-6 text-tertiary" />
         </div>
         <div>
           <h3 class="font-montserrat text-sm font-medium mb-2">
@@ -21,7 +21,7 @@ import { HelpCircleIcon, ChevronRightIcon } from "lucide-vue-next";
           </p>
           <a
             href="#"
-            class="text-green-600 font-medium flex items-center text-sm"
+            class="text-tertiary font-medium flex items-center text-sm"
           >
             Contact Support
             <ChevronRightIcon class="h-4 w-4 ml-1" />
