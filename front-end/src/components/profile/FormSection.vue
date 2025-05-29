@@ -57,7 +57,6 @@ const handleSubmit = () => {
       </h1>
 
       <form @submit.prevent="handleSubmit" class="space-y-8">
-        <!-- Profile Photo Section -->
         <div class="flex flex-col items-center">
           <div class="relative mb-4">
             <div
@@ -150,74 +149,45 @@ const handleSubmit = () => {
               placeholder="Masukkan nama anak Anda"
             />
 
-            <div>
-              <label
-                for="birthWeight"
-                class="block text-gray-700 mb-1 text-base font-semibold"
-                >Berat Lahir (kg)</label
-              >
-              <input
-                id="birthWeight"
-                type="number"
-                step="0.1"
-                v-model="birthWeight"
-                placeholder="Contoh : 3.2"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary focus:border-tertiary text-base"
-                required
-              />
-            </div>
+            <FormInput
+              id="birthWeight"
+              type="number"
+              v-model="birthWeight"
+              placeholder="Contoh : 3.2"
+              step="0.1"
+              label="Berat Lahir (kg)"
+              required
+            />
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label
-                for="birthDate"
-                class="block text-gray-700 mb-1 text-base font-semibold"
-                >Tanggal Lahir</label
-              >
-              <input
-                id="birthDate"
-                type="date"
-                v-model="birthDate"
-                placeholder="dd/mm/yyyy"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary focus:border-tertiary text-base"
-                required
-              />
-            </div>
+            <FormInput
+              id="birthDate"
+              label="Tanggal Lahir"
+              type="date"
+              v-model="birthDate"
+              required
+            />
 
-            <div>
-              <label
-                for="birthHeight"
-                class="block text-gray-700 mb-1 text-base font-semibold"
-                >Tinggi Lahir (cm)</label
-              >
-              <input
-                id="birthHeight"
-                type="number"
-                v-model="birthHeight"
-                placeholder="Contoh : 50"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary focus:border-tertiary text-base"
-                required
-              />
-            </div>
+            <FormInput
+              id="birthHeight"
+              type="number"
+              v-model="birthHeight"
+              placeholder="Contoh : 50"
+              label="Tinggi Lahir (cm)"
+              required
+            />
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label
-                for="headCircumference"
-                class="block text-gray-700 mb-1 text-base font-semibold"
-                >Lingkar Kepala ketika Lahir (cm)</label
-              >
-              <input
-                id="headCircumference"
-                type="number"
-                v-model="headCircumference"
-                placeholder="Contoh : 34"
-                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary focus:border-tertiary text-base"
-                required
-              />
-            </div>
+            <FormInput
+              id="headCircumference"
+              type="number"
+              v-model="headCircumference"
+              placeholder="Contoh : 34"
+              label="Lingkar Kepala ketika Lahir (cm)"
+              required
+            />
           </div>
         </div>
 
