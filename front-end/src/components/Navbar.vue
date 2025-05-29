@@ -67,10 +67,11 @@ const profileMenuItems = [
       <div class="flex items-center">
         <button
           @click="isMenuOpen = !isMenuOpen"
-          class="lg:hidden p-2 rounded-full hover:bg-gray-100"
+          class="lg:hidden p-2 rounded-full hover:bg-gray-100 transition-transform duration-300 ease-in-out"
+          :class="{ 'rotate-90': isMenuOpen }"
         >
-          <MenuIcon v-if="!isMenuOpen" class="h-6 w-6 text-gray-700" />
-          <XIcon v-else class="h-6 w-6 text-gray-700" />
+          <XIcon v-if="isMenuOpen" class="h-6 w-6 text-gray-700" />
+          <MenuIcon v-else class="h-6 w-6 text-gray-700" />
         </button>
 
         <nav class="hidden lg:flex items-center">
@@ -111,103 +112,142 @@ const profileMenuItems = [
               </div>
               <span>Elmosius Suli</span>
               <ChevronDownIcon
-                class="h-4 w-4"
+                class="h-4 w-4 transition-transform duration-300"
                 :class="{ 'rotate-180': isProfileModalOpen }"
               />
             </button>
 
             <!-- Desktop Profile Dropdown -->
-            <div
-              v-if="isProfileModalOpen"
-              class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
-            >
-              <div class="px-4 py-3 border-b border-gray-100">
-                <p class="text-sm font-medium text-gray-900">Elmosius Suli</p>
-                <p class="text-sm text-gray-500">elmosius@example.com</p>
+            <transition name="fade">
+              <div
+                v-if="isProfileModalOpen"
+                class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
+              >
+                <div class="px-4 py-3 border-b border-gray-100">
+                  <p class="text-sm font-medium text-gray-900">Elmosius Suli</p>
+                  <p class="text-sm text-gray-500">elmosius@example.com</p>
+                </div>
+                <div class="py-1">
+                  <a
+                    v-for="item in profileMenuItems"
+                    :key="item.label"
+                    :href="item.href"
+                    class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                    :class="{ 'text-red-600 hover:bg-red-50': item.isLogout }"
+                    @click="closeProfileModal"
+                  >
+                    <component :is="item.icon" class="h-4 w-4 mr-3" />
+                    {{ item.label }}
+                  </a>
+                </div>
               </div>
-              <div class="py-1">
-                <a
-                  v-for="item in profileMenuItems"
-                  :key="item.label"
-                  :href="item.href"
-                  class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                  :class="{ 'text-red-600 hover:bg-red-50': item.isLogout }"
-                  @click="closeProfileModal"
-                >
-                  <component :is="item.icon" class="h-4 w-4 mr-3" />
-                  {{ item.label }}
-                </a>
-              </div>
-            </div>
+            </transition>
           </div>
         </nav>
       </div>
     </div>
 
     <!-- Mobile Menu -->
-    <div v-if="isMenuOpen" class="lg:hidden border-t border-gray-200 px-4">
-      <div class="container mx-auto px-4 py-3">
-        <nav class="flex flex-col space-y-3">
-          <a href="/" class="text-gray-700 hover:text-tertiary font-medium py-2"
-            >Beranda</a
-          >
-          <a
-            href="/#about-home"
-            class="text-gray-700 hover:text-tertiary font-medium py-2"
-            >Tentang Kami</a
-          >
-          <a
-            href="/#feature-home"
-            class="text-gray-700 hover:text-tertiary font-medium py-2"
-            >Layanan</a
-          >
-          <a
-            href="/#carakerja-home"
-            class="text-gray-700 hover:text-tertiary font-medium py-2"
-            >Cara Kerja</a
-          >
-          <a
-            href="/#testimoni-home"
-            class="text-gray-700 hover:text-tertiary font-medium py-2"
-            >Testimoni</a
-          >
+    <transition name="slide-fade">
+      <div
+        v-if="isMenuOpen"
+        class="lg:hidden border-t border-gray-200 px-4 overflow-hidden"
+      >
+        <div class="container mx-auto px-4 py-3">
+          <nav class="flex flex-col space-y-3">
+            <a
+              href="/"
+              class="text-gray-700 hover:text-tertiary font-medium py-2"
+              @click="isMenuOpen = false"
+              >Beranda</a
+            >
+            <a
+              href="/#about-home"
+              class="text-gray-700 hover:text-tertiary font-medium py-2"
+              @click="isMenuOpen = false"
+              >Tentang Kami</a
+            >
+            <a
+              href="/#feature-home"
+              class="text-gray-700 hover:text-tertiary font-medium py-2"
+              @click="isMenuOpen = false"
+              >Layanan</a
+            >
+            <a
+              href="/#carakerja-home"
+              class="text-gray-700 hover:text-tertiary font-medium py-2"
+              @click="isMenuOpen = false"
+              >Cara Kerja</a
+            >
+            <a
+              href="/#testimoni-home"
+              class="text-gray-700 hover:text-tertiary font-medium py-2"
+              @click="isMenuOpen = false"
+              >Testimoni</a
+            >
 
-          <!-- Mobile Profile Section -->
-          <div class="py-2 border-t border-gray-200 mt-2">
-            <div class="flex items-center space-x-3 px-2 py-3">
-              <div
-                class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center"
-              >
-                <span class="text-sm font-medium">El</span>
+            <!-- Mobile Profile Section -->
+            <div class="py-2 border-t border-gray-200 mt-2">
+              <div class="flex items-center space-x-3 px-2 py-3">
+                <div
+                  class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center"
+                >
+                  <span class="text-sm font-medium">El</span>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-900">
+                    Elmosius Suli
+                  </p>
+                  <p class="text-xs text-gray-500">elmosius@example.com</p>
+                </div>
               </div>
-              <div>
-                <p class="text-sm font-semibold text-gray-900">Elmosius Suli</p>
-                <p class="text-xs text-gray-500">elmosius@example.com</p>
+
+              <!-- Mobile Profile Menu Items -->
+              <div class="space-y-1 mt-2">
+                <a
+                  v-for="item in profileMenuItems"
+                  :key="item.label"
+                  :href="item.href"
+                  class="flex items-center px-2 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                  :class="{ 'text-red-600 hover:bg-red-50': item.isLogout }"
+                  @click="isMenuOpen = false"
+                >
+                  <component :is="item.icon" class="h-4 w-4 mr-3" />
+                  {{ item.label }}
+                </a>
               </div>
             </div>
-
-            <!-- Mobile Profile Menu Items -->
-            <div class="space-y-1 mt-2">
-              <a
-                v-for="item in profileMenuItems"
-                :key="item.label"
-                :href="item.href"
-                class="flex items-center px-2 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-                :class="{ 'text-red-600 hover:bg-red-50': item.isLogout }"
-              >
-                <component :is="item.icon" class="h-4 w-4 mr-3" />
-                {{ item.label }}
-              </a>
-            </div>
-          </div>
-        </nav>
+          </nav>
+        </div>
       </div>
-    </div>
+    </transition>
   </header>
 </template>
 
 <style scoped>
-.rotate-180 {
-  transform: rotate(180deg);
+/* Transisi for mobile menu */
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateY(-20px);
+  opacity: 0;
+}
+
+/* Transition for profile dropdown */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
