@@ -73,7 +73,7 @@ const testimonials = [
           <p class="text-gray-600 mb-6 text-base italic leading-loose">
             {{ testimonial.content }}
           </p>
-          <div class="flex items-center">
+          <div class="flex">
             <div
               class="bg-[#DCFCE7] inset-shadow-sm inset-shadow-gray-300 w-10 h-10 rounded-full flex items-center justify-center mr-3"
             >
