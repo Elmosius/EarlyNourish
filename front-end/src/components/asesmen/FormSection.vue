@@ -58,17 +58,12 @@ const submitForm = () => {
                 class="w-full"
               />
               <div class="mt-4 w-full lg:mt-0">
-                <label
-                  for="birthDate"
-                  class="block text-gray-700 mb-1 text-base font-semibold"
-                  >Tanggal Lahir</label
-                >
-                <input
+                <FormInput
                   id="birthDate"
+                  label="Tanggal Lahir"
                   type="date"
                   v-model="birthDate"
                   placeholder="mm/dd/yyyy"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-base"
                   required
                 />
               </div>
