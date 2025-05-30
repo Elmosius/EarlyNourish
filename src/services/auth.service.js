@@ -5,18 +5,16 @@ const Jwt = require('@hapi/jwt');
 
 const SALT_ROUNDS = 10;
 
-const hashPassword = async (plainPassword) => {
-  return bcrypt.hash(plainPassword, SALT_ROUNDS);
-};
+const hashPassword = (plain) =>
+  bcrypt.hash(plain, SALT_ROUNDS);
 
-const verifyPassword = async (plainPassword, hashedPassword) => {
-  return bcrypt.compare(plainPassword, hashedPassword);
-};
+const verifyPassword = (plain, hash) =>
+  bcrypt.compare(plain, hash);
 
-const generateToken = (user) => {
-  return Jwt.token.generate(
+const generateToken = (user) =>
+  Jwt.token.generate(
     {
-      userId: user._id.toString(),
+      userId: user.userId,
       email: user.email,
       role: user.roleId.name || user.roleId,
       fullName: user.fullName,
@@ -26,27 +24,23 @@ const generateToken = (user) => {
       algorithm: 'HS256',
     },
     {
-      ttlSec: 14400,
+      ttlSec: 14400, // 4 jam
     }
   );
-};
 
-const registerUser = async ({ email, password, fullName }) => {
-  const existingUser = await User.findOne({ email });
-  if (existingUser) throw new Error('Email sudah digunakan');
+const registerUser = async ({ email, password, fullName, userId }) => {
+  if (await User.findOne({ email })) {
+    throw new Error('Email sudah digunakan');
+  }
 
-  console.log("Mencari role 'user'...");
   const userRole = await Role.findOne({ name: 'user' });
-  console.log("Role ditemukan:", userRole);
-
   if (!userRole) {
-    console.error("Role tidak ditemukan");
     throw new Error('Role user tidak ditemukan');
   }
 
   const passwordHash = await hashPassword(password);
-
   const newUser = new User({
+    userId,
     email,
     passwordHash,
     fullName,
@@ -57,20 +51,15 @@ const registerUser = async ({ email, password, fullName }) => {
   return newUser;
 };
 
-
 const loginUser = async ({ email, password }) => {
-  try {
-    const user = await User.findOne({ email }).populate('roleId');
-    if (!user) throw new Error('Email tidak ditemukan');
+  const user = await User.findOne({ email }).populate('roleId');
+  if (!user) throw new Error('Email tidak ditemukan');
 
-    const valid = await verifyPassword(password, user.passwordHash);
-    if (!valid) throw new Error('Password salah');
+  const valid = await verifyPassword(password, user.passwordHash);
+  if (!valid) throw new Error('Password salah');
 
-    const token = generateToken(user);
-    return { user, token };
-  } catch (err) {
-    throw new Error(err.message);
-  }
+  const token = generateToken(user);
+  return { user, token };
 };
 
 module.exports = {

@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const { nanoid } = require('nanoid');
 const authService = require('../../services/auth.service');
 
 const registerSchema = Joi.object({
@@ -16,15 +17,22 @@ const registerHandler = async (request, h) => {
   try {
     const { error, value } = registerSchema.validate(request.payload);
     if (error) {
-      return h.response({ error: true, message: error.details[0].message }).code(400);
+      return h
+        .response({ error: true, message: error.details[0].message })
+        .code(400);
     }
 
-    await authService.registerUser(value);
+    const generatedUserId = `user-${nanoid(16)}`;
+    await authService.registerUser({ ...value, userId: generatedUserId });
 
-    return h.response({ error: false, message: 'User berhasil dibuat' }).code(201);
+    return h
+      .response({ error: false, message: 'User created' })
+      .code(201);
   } catch (err) {
     console.error(err);
-    return h.response({ error: true, message: err.message }).code(500);
+    return h
+      .response({ error: true, message: err.message })
+      .code(500);
   }
 };
 
@@ -32,23 +40,29 @@ const loginHandler = async (request, h) => {
   try {
     const { error, value } = loginSchema.validate(request.payload);
     if (error) {
-      return h.response({ error: true, message: error.details[0].message }).code(400);
+      return h
+        .response({ error: true, message: error.details[0].message })
+        .code(400);
     }
 
     const { user, token } = await authService.loginUser(value);
 
-    return {
-      error: false,
-      message: 'success',
-      loginResult: {
-        userId: user._id.toString(),
-        name: user.fullName,
-        token,
-      },
-    };
+    return h
+      .response({
+        error: false,
+        message: 'success',
+        loginResult: {
+          userId: user.userId,
+          name: user.fullName,
+          token,
+        },
+      })
+      .code(200);
   } catch (err) {
     console.error(err);
-    return h.response({ error: true, message: err.message }).code(500);
+    return h
+      .response({ error: true, message: err.message })
+      .code(500);
   }
 };
 

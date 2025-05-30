@@ -16,12 +16,6 @@ const userSchema = Joi.object({
 });
 
 const getAllUsersHandler = async (request, h) => {
-  const userRole = request.auth.credentials.role;
-
-  if (userRole !== 'admin' && userRole !== 'user') {
-    return h.response({ error: true, message: 'Akses ditolak' }).code(403);
-  }
-
   try {
     const users = await userService.getAllUsers();
     return { error: false, message: 'success', users };
@@ -49,11 +43,6 @@ const getUserByIdHandler = async (request, h) => {
 };
 
 const createUserHandler = async (request, h) => {
-  const userRole = request.auth.credentials.role;
-  if (userRole !== 'admin') {
-    return h.response({ error: true, message: 'Akses ditolak: hanya admin yang dapat membuat user' }).code(403);
-  }
-
   const { error, value } = userSchema.validate(request.payload);
   if (error) {
     return h.response({ error: true, message: error.details[0].message }).code(400);
@@ -71,11 +60,6 @@ const createUserHandler = async (request, h) => {
 };
 
 const updateUserHandler = async (request, h) => {
-  const userRole = request.auth.credentials.role;
-  if (userRole !== 'admin') {
-    return h.response({ error: true, message: 'Akses ditolak: hanya admin yang dapat memperbarui user' }).code(403);
-  }
-
   const { id } = request.params;
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return h.response({ error: true, message: 'ID tidak valid' }).code(400);
@@ -100,11 +84,6 @@ const updateUserHandler = async (request, h) => {
 };
 
 const deleteUserHandler = async (request, h) => {
-  const userRole = request.auth.credentials.role;
-  if (userRole !== 'admin') {
-    return h.response({ error: true, message: 'Akses ditolak: hanya admin yang dapat menghapus user' }).code(403);
-  }
-
   const { id } = request.params;
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return h.response({ error: true, message: 'ID tidak valid' }).code(400);

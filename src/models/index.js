@@ -11,25 +11,13 @@ const connectDB = async () => {
         });
         console.log('MongoDB connected');
 
-        let userRole = await Role.findOne({ name: 'user' });
+        const userRole = await Role.findOne({ name: 'user' });
         if (!userRole) {
             console.log('Role "user" tidak ditemukan, membuat role baru...');
-            userRole = new Role({ name: 'user' });
-            await userRole.save();
+            const newRole = new Role({ name: 'user' });
+            await newRole.save();
             console.log('Role "user" berhasil dibuat');
-        } else {
-            console.log('Role "user" sudah ada');
-        }
-
-        let adminRole = await Role.findOne({ name: 'admin' });
-        if (!adminRole) {
-            console.log('Role "admin" tidak ditemukan, membuat role baru...');
-            adminRole = new Role({ name: 'admin' });
-            await adminRole.save();
-            console.log('Role "admin" berhasil dibuat');
-        } else {
-            console.log('Role "admin" sudah ada');
-        }
+        } 
 
     } catch (error) {
         console.error('Failed to connect MongoDB:', error);
