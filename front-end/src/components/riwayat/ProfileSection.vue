@@ -7,7 +7,7 @@ import { Clipboard } from "lucide-vue-next";
     <div
       class="container mx-auto max-w-4xl bg-white rounded-xl shadow-xl mb-4 p-6"
     >
-      <div class="flex flex-row justify-between items-start mb-2">
+      <div class="flex flex-col md:flex-row justify-between items-start mb-2">
         <div>
           <div class="flex items-center gap-2 md:gap-3">
             <div class="bg-green-100 p-2 md:p-4 rounded-lg">
@@ -20,10 +20,10 @@ import { Clipboard } from "lucide-vue-next";
             </div>
           </div>
         </div>
-        <div class="my-auto mt-3">
+        <div class="my-auto mt-5 md:mt-auto ml-auto">
           <a
             href=""
-            class="bg-linear-65 from-[#4ADE80] to-[#22C55E] shadow-xl inset-shadow-xs inset-shadow-gray-500 text-white text-xs px-4 py-2 md:text-sm rounded-lg hover:opacity-85 transition-opacity lg:px-6"
+            class="bg-linear-65 from-[#4ADE80] to-[#22C55E] shadow-xl inset-shadow-xs inset-shadow-gray-300 text-white text-xs px-4 py-2 md:text-sm rounded-lg hover:opacity-85 transition-opacity lg:px-6"
           >
             Export Data
           </a>
