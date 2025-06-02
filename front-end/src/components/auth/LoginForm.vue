@@ -1,17 +1,41 @@
 <script setup>
 import { ref } from "vue";
 import FormInput from "../ui/FormInput.vue";
+import { validateForm } from "../../utils/validation.js";
+import FormError from "../ui/FormError.vue";
 
 const email = ref("");
 const password = ref("");
 const rememberMe = ref(false);
+const errors = ref({});
 
 const handleSubmit = () => {
-  console.log("Login attempt with:", {
+  const rules = {
+    email: {
+      required: true,
+      type: "email",
+      label: "Email",
+    },
+    password: {
+      required: true,
+      label: "Password",
+    },
+  };
+
+  const formData = {
     email: email.value,
     password: password.value,
     rememberMe: rememberMe.value,
-  });
+  };
+
+  const validation = validateForm(formData, rules);
+
+  if (validation.isValid) {
+    console.log("Login attempt with:", formData);
+    errors.value = {};
+  } else {
+    errors.value = validation.errors;
+  }
 };
 </script>
 
@@ -22,7 +46,10 @@ const handleSubmit = () => {
       Silahkan masuk untuk melanjutkan
     </p>
 
-    <form @submit.prevent="handleSubmit">
+    <form
+      @submit.prevent="handleSubmit"
+      :autocomplete="rememberMe ? 'on' : 'off'"
+    >
       <div class="mb-4">
         <FormInput
           id="email"
@@ -30,7 +57,9 @@ const handleSubmit = () => {
           type="email"
           v-model="email"
           placeholder="nama@gmail.com"
+          autocomplete="email"
         />
+        <FormError :message="errors.email" v-if="errors.email" />
       </div>
 
       <div class="mb-4">
@@ -52,7 +81,9 @@ const handleSubmit = () => {
           type="password"
           v-model="password"
           placeholder="••••••••"
+          autocomplete="current-password"
         />
+        <FormError :message="errors.password" v-if="errors.password" />
       </div>
 
       <div class="mb-6">

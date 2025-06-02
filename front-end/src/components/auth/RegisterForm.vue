@@ -1,19 +1,65 @@
 <script setup>
 import { ref } from "vue";
+import { validateForm } from "../../utils/validation.js";
 import FormInput from "../ui/FormInput.vue";
+import FormError from "../ui/FormError.vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const nama = ref("");
 const email = ref("");
 const password = ref("");
 const confirm_password = ref("");
 const sk = ref(false);
+const errors = ref({});
 
 const handleSubmit = () => {
-  console.log("Login attempt with:", {
+  const rules = {
+    nama: {
+      required: true,
+      label: "Nama",
+      maxLength: 50,
+      minLength: 5,
+    },
+    email: {
+      required: true,
+      type: "email",
+      label: "Email",
+    },
+    password: {
+      required: true,
+      minLength: 8,
+      pattern: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).*$/,
+      label: "Password",
+    },
+    confirm_password: {
+      required: true,
+      matchesField: "password",
+      label: "Konfirmasi Password",
+    },
+    sk: {
+      required: true,
+      label: "Syarat & Ketentuan",
+    },
+  };
+
+  const formData = {
+    nama: nama.value,
     email: email.value,
     password: password.value,
-    rememberMe: rememberMe.value,
-  });
+    confirm_password: confirm_password.value,
+    sk: sk.value,
+  };
+
+  const validation = validateForm(formData, rules);
+
+  if (validation.isValid) {
+    console.log("Register successfully", formData);
+    errors.value = {};
+  } else {
+    errors.value = validation.errors;
+  }
 };
 </script>
 
@@ -29,10 +75,12 @@ const handleSubmit = () => {
         <FormInput
           id="nama"
           label="Nama"
-          type="nama"
+          type="text"
           v-model="nama"
+          required
           placeholder="Masukkan nama lengkap"
         />
+        <FormError :message="errors.nama" v-if="errors.nama" />
       </div>
 
       <div class="mb-4">
@@ -41,8 +89,10 @@ const handleSubmit = () => {
           label="Email"
           type="email"
           v-model="email"
+          required
           placeholder="nama@gmail.com"
         />
+        <FormError :message="errors.email" v-if="errors.email" />
       </div>
 
       <div class="mb-4">
@@ -51,11 +101,14 @@ const handleSubmit = () => {
           label="Password"
           type="password"
           v-model="password"
+          required
           placeholder="••••••••"
         />
         <p class="text-gray-500 text-[0.7rem] mt-1">
           Minimal 8 karakter, kombinasi huruf besar, huruf kecil, dan angka.
         </p>
+
+        <FormError :message="errors.password" v-if="errors.password" />
       </div>
 
       <div class="mb-4">
@@ -64,7 +117,13 @@ const handleSubmit = () => {
           label="Konfirmasi Password"
           type="password"
           v-model="confirm_password"
+          required
           placeholder="••••••••"
+        />
+
+        <FormError
+          :message="errors.confirm_password"
+          v-if="errors.confirm_password"
         />
       </div>
 
@@ -74,26 +133,29 @@ const handleSubmit = () => {
             type="checkbox"
             v-model="sk"
             class="rounded border-gray-300 text-tertiary focus:text-tertiary"
+            required
           />
           <span class="ml-2 text-gray-700 text-base">Saya menyetujui</span>
           <span class="ml-1 text-tertiary text-base"> Syarat & Kentuan </span>
         </label>
+
+        <FormError :message="errors.sk" v-if="errors.sk" />
       </div>
 
       <button
         type="submit"
         class="w-full text-base bg-slate-600 hover:bg-slate-700 text-white font-semibold py-2 px-4 rounded-md transition duration-200"
       >
-        Masuk
+        Daftar
       </button>
 
       <div class="mt-6 text-center">
         <p class="text-gray-600 text-base">
           Sudah punya akun?
-          <a
-            href="#"
+          <router-link
+            to="/login"
             class="text-tertiary text-base font-medium hover:underline"
-            >Masuk</a
+            >Masuk</router-link
           >
         </p>
       </div>

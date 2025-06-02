@@ -32,6 +32,10 @@ defineProps({
     type: Boolean,
     default: true,
   },
+  autocomplete: {
+    type: String,
+    default: "off",
+  },
 });
 
 defineEmits(["update:modelValue"]);
@@ -55,6 +59,7 @@ defineEmits(["update:modelValue"]);
       :step="type === 'number' ? step : null"
       :required="required"
       :autofocus="autofocus"
+      :autocomplete="autocomplete"
     />
   </div>
 </template>
