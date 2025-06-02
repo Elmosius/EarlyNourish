@@ -243,7 +243,9 @@ const chartOptions = computed(() => ({
           class="w-3 h-3 rounded-full"
           :style="{ backgroundColor: legend.color }"
         ></div>
-        <span class="text-gray-600">{{ legend.name }}</span>
+        <span class="text-gray-600 text-base md:text-sm">{{
+          legend.name
+        }}</span>
       </div>
     </div>
   </div>
