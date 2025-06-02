@@ -131,7 +131,9 @@ const shareChart = () => {
           >
             <component :is="chartType.icon" class="h-5 w-5" />
             <div class="text-left">
-              <div class="font-medium text-sm">{{ chartType.title }}</div>
+              <div class="font-medium text-base md:text-sm">
+                {{ chartType.title }}
+              </div>
               <div class="text-xs opacity-75">{{ chartType.description }}</div>
             </div>
           </button>
