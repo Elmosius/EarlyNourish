@@ -1,11 +1,15 @@
 <script setup>
 import { ref } from "vue";
 import { InfoIcon, UserIcon } from "lucide-vue-next";
-import FormInput from "../ui/FormInput.vue";
-import FormSelect from "../ui/FormSelect.vue";
-import FormTextArea from "../ui/FormTextArea.vue";
+import { validateForm } from "../../utils/validation.js";
 
-const profilePhoto = ref(null);
+import FormInput from "../ui/FormInput.vue";
+import FormTextArea from "../ui/FormTextArea.vue";
+import FormError from "../ui/FormError.vue";
+
+const profilePhotoUrl = ref(null);
+const profilePhotoFile = ref(null);
+
 const fullName = ref("");
 const role = ref("");
 const email = ref("");
@@ -16,22 +20,49 @@ const birthWeight = ref("");
 const birthHeight = ref("");
 const headCircumference = ref("");
 
-const roles = [
-  { value: "parent", label: "Orang Tua" },
-  { value: "guardian", label: "Wali" },
-  { value: "caregiver", label: "Pengasuh" },
-];
+const errors = ref({});
 
 const handlePhotoUpload = (event) => {
   const file = event.target.files[0];
   if (file) {
-    profilePhoto.value = file;
+    profilePhotoFile.value = file;
+    profilePhotoUrl.value = URL.createObjectURL(file);
   }
 };
 
 const handleSubmit = () => {
+  const rules = {
+    fullName: {
+      label: "Nama Lengkap",
+      minLength: 5,
+      maxLength: 100,
+    },
+    email: { type: "email", label: "Email" },
+    address: { label: "Alamat", minLength: 10 },
+    childName: { label: "Nama Anak", minLength: 5 },
+    birthDate: { label: "Tanggal Lahir" },
+    birthWeight: {
+      type: "number",
+      label: "Berat Lahir",
+      min: 0.1,
+      max: 10,
+    },
+    birthHeight: {
+      type: "number",
+      label: "Tinggi Lahir",
+      min: 20,
+      max: 100,
+    },
+    headCircumference: {
+      type: "number",
+      label: "Lingkar Kepala",
+      min: 10,
+      max: 60,
+    },
+  };
+
   const formData = {
-    profilePhoto: profilePhoto.value,
+    profilePhoto: profilePhotoFile.value,
     fullName: fullName.value,
     role: role.value,
     email: email.value,
@@ -43,7 +74,14 @@ const handleSubmit = () => {
     headCircumference: headCircumference.value,
   };
 
-  console.log("Complete form submitted with data:", formData);
+  const validation = validateForm(formData, rules);
+
+  if (validation.isValid) {
+    console.log("Complete form submitted with data:", formData);
+    errors.value = {};
+  } else {
+    errors.value = validation.errors;
+  }
 };
 </script>
 
@@ -60,15 +98,21 @@ const handleSubmit = () => {
         <div class="flex flex-col items-center">
           <div class="relative mb-4">
             <div
-              class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center border-4 border-white shadow-lg"
+              class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center border-4 border-white shadow-lg overflow-hidden"
             >
-              <UserIcon class="h-12 w-12 text-tertiary" />
+              <img
+                v-if="profilePhotoUrl"
+                :src="profilePhotoUrl"
+                alt="Profile Photo"
+                class="w-full h-full object-cover"
+              />
+              <UserIcon v-else class="h-12 w-12 text-tertiary" />
             </div>
           </div>
 
           <label
             for="photoUpload"
-            class="border border-gray-500 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-50 transition duration-300 cursor-pointer"
+            class="border border-gray-500 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-quaternary transition duration-300 cursor-pointer"
           >
             Edit Foto
           </label>
@@ -93,34 +137,28 @@ const handleSubmit = () => {
           </h2>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <FormInput
-              id="fullName"
-              label="Nama Lengkap"
-              v-model="fullName"
-              placeholder="Masukkan nama Anda"
-              required
-            />
+            <div>
+              <FormInput
+                id="fullName"
+                label="Nama Lengkap"
+                v-model="fullName"
+                placeholder="Masukkan nama Anda"
+                autofocus
+              />
+              <FormError :message="errors.fullName" v-if="errors.fullName" />
+            </div>
 
             <div>
-              <FormSelect
-                id="role"
-                :options="roles"
-                label="Peran"
-                v-model="role"
-                disabled-option-text="Pilih peran"
-                required
+              <FormInput
+                id="email"
+                label="Email"
+                type="email"
+                v-model="email"
+                placeholder="Masukkan email Anda"
+                autofocus
               />
+              <FormError :message="errors.email" v-if="errors.email" />
             </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormInput
-              id="email"
-              label="Email"
-              type="email"
-              v-model="email"
-              placeholder="Masukkan email Anda"
-            />
 
             <div>
               <FormTextArea
@@ -128,9 +166,10 @@ const handleSubmit = () => {
                 v-model="address"
                 placeholder="Masukkan Alamat Anda"
                 rows="3"
-                required
                 label="Alamat"
+                autofocus
               />
+              <FormError :message="errors.address" v-if="errors.address" />
             </div>
           </div>
         </div>
@@ -142,22 +181,30 @@ const handleSubmit = () => {
           </h2>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <FormInput
-              id="childName"
-              label="Nama Anak"
-              v-model="childName"
-              placeholder="Masukkan nama anak Anda"
-            />
+            <div>
+              <FormInput
+                id="childName"
+                label="Nama Anak"
+                v-model="childName"
+                placeholder="Masukkan nama anak Anda"
+              />
+              <FormError :message="errors.childName" v-if="errors.childName" />
+            </div>
 
-            <FormInput
-              id="birthWeight"
-              type="number"
-              v-model="birthWeight"
-              placeholder="Contoh : 3.2"
-              step="0.1"
-              label="Berat Lahir (kg)"
-              required
-            />
+            <div>
+              <FormInput
+                id="birthWeight"
+                type="number"
+                v-model="birthWeight"
+                placeholder="Contoh : 3.2"
+                step="0.1"
+                label="Berat Lahir (kg)"
+              />
+              <FormError
+                :message="errors.birthWeight"
+                v-if="errors.birthWeight"
+              />
+            </div>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -166,28 +213,35 @@ const handleSubmit = () => {
               label="Tanggal Lahir"
               type="date"
               v-model="birthDate"
-              required
             />
 
-            <FormInput
-              id="birthHeight"
-              type="number"
-              v-model="birthHeight"
-              placeholder="Contoh : 50"
-              label="Tinggi Lahir (cm)"
-              required
-            />
-          </div>
+            <div>
+              <FormInput
+                id="birthHeight"
+                type="number"
+                v-model="birthHeight"
+                placeholder="Contoh : 50"
+                label="Tinggi Lahir (cm)"
+              />
+              <FormError
+                :message="errors.birthHeight"
+                v-if="errors.birthHeight"
+              />
+            </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormInput
-              id="headCircumference"
-              type="number"
-              v-model="headCircumference"
-              placeholder="Contoh : 34"
-              label="Lingkar Kepala ketika Lahir (cm)"
-              required
-            />
+            <div>
+              <FormInput
+                id="headCircumference"
+                type="number"
+                v-model="headCircumference"
+                placeholder="Contoh : 34"
+                label="Lingkar Kepala ketika Lahir (cm)"
+              />
+              <FormError
+                :message="errors.headCircumference"
+                v-if="errors.headCircumference"
+              />
+            </div>
           </div>
         </div>
 
