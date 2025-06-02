@@ -27,10 +27,7 @@ const testimonials = [
 </script>
 
 <template>
-  <section
-    id="testimoni-home"
-    class="py-12 md:px-14 px-8 bg-gray-50 lg:py-20 lg:px-38"
-  >
+  <section class="py-12 md:px-14 px-8 bg-gray-50 lg:py-20 lg:px-38">
     <div class="container mx-auto">
       <div class="text-center mb-12">
         <h1

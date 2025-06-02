@@ -1,8 +1,12 @@
 <script setup>
 import { ref } from "vue";
-import FormInput from "../ui/FormInput.vue";
 import { validateForm } from "../../utils/validation.js";
+import { useRouter } from "vue-router";
+
+import FormInput from "../ui/FormInput.vue";
 import FormError from "../ui/FormError.vue";
+
+const router = useRouter();
 
 const email = ref("");
 const password = ref("");
@@ -82,6 +86,7 @@ const handleSubmit = () => {
           v-model="password"
           placeholder="••••••••"
           autocomplete="current-password"
+          required
         />
         <FormError :message="errors.password" v-if="errors.password" />
       </div>
@@ -107,10 +112,10 @@ const handleSubmit = () => {
       <div class="mt-6 text-center">
         <p class="text-gray-600 text-base">
           Belum punya akun?
-          <a
-            href="#"
+          <router-link
+            to="/register"
             class="text-tertiary text-base font-medium hover:underline"
-            >Daftar Sekarang</a
+            >Daftar Sekarang</router-link
           >
         </p>
       </div>

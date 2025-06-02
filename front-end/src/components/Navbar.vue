@@ -44,10 +44,17 @@ onUnmounted(() => {
   document.removeEventListener("click", handleClickOutside);
 });
 
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+};
+
 const profileMenuItems = [
-  { icon: UserIcon, label: "Informasi Pribadi", href: "/profile" },
-  { icon: History, label: "Riwayat Asesmen", href: "/riwayat" },
-  { icon: LogOutIcon, label: "Keluar", href: "/logout", isLogout: true },
+  { icon: UserIcon, label: "Informasi Pribadi", to: "/profile" },
+  { icon: History, label: "Riwayat Asesmen", to: "/riwayat" },
+  { icon: LogOutIcon, label: "Keluar", to: "/logout", isLogout: true },
 ];
 </script>
 
@@ -59,10 +66,14 @@ const profileMenuItems = [
     <div
       class="container mx-auto py-3 flex items-center px-6 lg:px-0 justify-between"
     >
-      <a href="#" class="flex items-center">
+      <router-link
+        :to="{ path: $route.path }"
+        @click="scrollToTop"
+        class="flex items-center"
+      >
         <img src="/logo.png" alt="Early Nourish" class="h-8 w-8" />
         <span class="ml-2 font-semibold text-gray-800">Early Nourish</span>
-      </a>
+      </router-link>
 
       <div class="flex items-center">
         <button
@@ -75,30 +86,30 @@ const profileMenuItems = [
         </button>
 
         <nav class="hidden lg:flex items-center">
-          <a
-            href="/#"
+          <router-link
+            to="/"
             class="text-gray-700 hover:text-tertiary font-medium px-6"
-            >Beranda</a
+            >Beranda</router-link
           >
-          <a
-            href="/#about-home"
+          <router-link
+            :to="{ path: '/', hash: '#about-home' }"
             class="text-gray-700 hover:text-tertiary font-medium px-6"
-            >Tentang Kami</a
+            >Tentang Kami</router-link
           >
-          <a
-            href="/#feature-home"
+          <router-link
+            :to="{ path: '/', hash: '#feature-home' }"
             class="text-gray-700 hover:text-tertiary font-medium px-6"
-            >Layanan</a
+            >Layanan</router-link
           >
-          <a
-            href="/#carakerja-home"
+          <router-link
+            :to="{ path: '/', hash: '#carakerja-home' }"
             class="text-gray-700 hover:text-tertiary font-medium px-6"
-            >Cara Kerja</a
+            >Cara Kerja</router-link
           >
-          <a
-            href="/#testimoni-home"
+          <router-link
+            :to="{ path: '/', hash: '#testimoni-home' }"
             class="text-gray-700 hover:text-tertiary font-medium px-6"
-            >Testimoni</a
+            >Testimoni</router-link
           >
           <div class="ml-6 relative profile-menu-container">
             <button
@@ -128,17 +139,17 @@ const profileMenuItems = [
                   <p class="text-sm text-gray-500">elmosius@example.com</p>
                 </div>
                 <div class="py-1">
-                  <a
+                  <router-link
                     v-for="item in profileMenuItems"
                     :key="item.label"
-                    :href="item.href"
+                    :to="item.to"
                     class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                     :class="{ 'text-red-600 hover:bg-red-50': item.isLogout }"
                     @click="closeProfileModal"
                   >
                     <component :is="item.icon" class="h-4 w-4 mr-3" />
                     {{ item.label }}
-                  </a>
+                  </router-link>
                 </div>
               </div>
             </transition>
@@ -155,35 +166,35 @@ const profileMenuItems = [
       >
         <div class="container mx-auto px-4 py-3">
           <nav class="flex flex-col space-y-3">
-            <a
-              href="/"
+            <router-link
+              to="/"
               class="text-gray-700 hover:text-tertiary font-medium py-2"
               @click="isMenuOpen = false"
-              >Beranda</a
+              >Beranda</router-link
             >
-            <a
-              href="/#about-home"
+            <router-link
+              :to="{ path: '/', hash: '#about-home' }"
               class="text-gray-700 hover:text-tertiary font-medium py-2"
               @click="isMenuOpen = false"
-              >Tentang Kami</a
+              >Tentang Kami</router-link
             >
-            <a
-              href="/#feature-home"
+            <router-link
+              :to="{ path: '/', hash: '#feature-home' }"
               class="text-gray-700 hover:text-tertiary font-medium py-2"
               @click="isMenuOpen = false"
-              >Layanan</a
+              >Layanan</router-link
             >
-            <a
-              href="/#carakerja-home"
+            <router-link
+              :to="{ path: '/', hash: '#carakerja-home' }"
               class="text-gray-700 hover:text-tertiary font-medium py-2"
               @click="isMenuOpen = false"
-              >Cara Kerja</a
+              >Cara Kerja</router-link
             >
-            <a
-              href="/#testimoni-home"
+            <router-link
+              :to="{ path: '/', hash: '#testimoni-home' }"
               class="text-gray-700 hover:text-tertiary font-medium py-2"
               @click="isMenuOpen = false"
-              >Testimoni</a
+              >Testimoni</router-link
             >
 
             <!-- Mobile Profile Section -->
@@ -204,17 +215,17 @@ const profileMenuItems = [
 
               <!-- Mobile Profile Menu Items -->
               <div class="space-y-1 mt-2">
-                <a
+                <router-link
                   v-for="item in profileMenuItems"
                   :key="item.label"
-                  :href="item.href"
+                  :to="item.to"
                   class="flex items-center px-2 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
                   :class="{ 'text-red-600 hover:bg-red-50': item.isLogout }"
                   @click="isMenuOpen = false"
                 >
                   <component :is="item.icon" class="h-4 w-4 mr-3" />
                   {{ item.label }}
-                </a>
+                </router-link>
               </div>
             </div>
           </nav>

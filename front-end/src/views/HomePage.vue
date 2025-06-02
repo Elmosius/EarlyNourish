@@ -10,11 +10,11 @@ const counter = useCounterStore();
 </script>
 
 <template>
-  <HeroSection />
-  <AboutSection />
-  <FeatureSection />
-  <CaraKerjaSection />
-  <TestimoniSection />
+  <HeroSection id="home-hero" />
+  <AboutSection id="about-home" />
+  <FeatureSection id="feature-home" />
+  <CaraKerjaSection id="carakerja-home" />
+  <TestimoniSection id="testimoni-home" />
 </template>
 
 <style scoped></style>

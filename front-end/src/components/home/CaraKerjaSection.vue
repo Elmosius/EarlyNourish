@@ -28,7 +28,7 @@ const steps = [
 </script>
 
 <template>
-  <section id="carakerja-home" class="py-10 lg:py-20 px-8 md:px-14 lg:px-38">
+  <section class="py-10 lg:py-20 px-8 md:px-14 lg:px-38">
     <div class="container mx-auto">
       <div class="text-center mb-12">
         <h1
@@ -63,12 +63,12 @@ const steps = [
       </div>
 
       <div class="mt-6 text-center">
-        <a
-          href="/assessment"
+        <router-link
+          to="/assessment"
           class="bg-linear-to-r from-[#4E586B] to-[#4ADE80] hover:opacity-85 text-white font-medium py-3 px-4 rounded-4xl transition duration-300 shadow-xl"
         >
           Mulai Penilaian Sekarang
-        </a>
+        </router-link>
       </div>
     </div>
   </section>

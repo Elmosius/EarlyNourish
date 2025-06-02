@@ -1,7 +1,7 @@
 <script setup></script>
 
 <template>
-  <section id="home-hero" class="py-12 px-8 md:px-14 lg:px-38 z-10 bg-gray-50">
+  <section class="py-12 px-8 md:px-14 lg:px-38 z-10 bg-gray-50">
     <div class="container mx-auto">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         <div class="order-2 md:order-1">
@@ -15,18 +15,18 @@
             nutrisi yang disesuaikan, kami bantu si Kecil berkembang optimal!
           </p>
           <div class="flex flex-row gap-4">
-            <a
-              href="/assessment"
+            <router-link
+              to="/assessment"
               class="bg-linear-to-r from-[#4E586B] to-[#4ADE80] hover:opacity-85 text-white font-medium px-4 py-2 rounded-4xl transition duration-300 shadow-lg"
             >
               Mulai Penilaian
-            </a>
-            <a
-              href="#carakerja-home"
-              class="border border-green-600 text-green-600 hover:bg-green-50 font-medium px-4 py-2 rounded-4xl transition duration-300 shadow-lg"
+            </router-link>
+            <router-link
+              :to="{ path: '/', hash: '#carakerja-home' }"
+              class="border border-tertiary text-tertiary hover:bg-green-50 font-medium px-4 py-2 rounded-4xl transition duration-300 shadow-lg"
             >
               Selengkapnya
-            </a>
+            </router-link>
           </div>
           <div class="mt-8 flex items-center">
             <div class="flex -space-x-2">

@@ -50,10 +50,7 @@ const features = [
 </script>
 
 <template>
-  <section
-    id="feature-home"
-    class="py-12 md:px-14 bg-gray-50 px-8 lg:py-20 lg:px-38"
-  >
+  <section class="py-12 md:px-14 bg-gray-50 px-8 lg:py-20 lg:px-38">
     <div class="container mx-auto">
       <div class="text-center mb-12">
         <h1

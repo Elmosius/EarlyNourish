@@ -24,10 +24,7 @@ const items = [
 </script>
 
 <template>
-  <section
-    id="about-home"
-    class="py-12 px-8 md:px-14 lg:py-20 lg:pb-25 lg:px-38"
-  >
+  <section class="py-12 px-8 md:px-14 lg:py-20 lg:pb-25 lg:px-38">
     <div class="container mx-auto">
       <div class="text-center mb-12">
         <h1
