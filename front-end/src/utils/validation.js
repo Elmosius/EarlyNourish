@@ -23,20 +23,20 @@ export const validateForm = (formData, rules) => {
       value &&
       !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
     ) {
-      errors[field] = `${rule.label || field} must be a valid email.`;
+      errors[field] = `* ${rule.label || field} harus email yang valid`;
     }
 
     if (rule.type === "number" && value) {
       const numericValue = parseFloat(value);
       if (isNaN(numericValue)) {
-        errors[field] = `${rule.label || field} harus angka.`;
+        errors[field] = `* ${rule.label || field} harus angka.`;
       } else {
         if (rule.min !== undefined && numericValue < rule.min) {
-          errors[field] = `${rule.label || field} harus minimal ${rule.min}.`;
+          errors[field] = `* ${rule.label || field} harus minimal ${rule.min}.`;
         }
         if (rule.max !== undefined && numericValue > rule.max) {
           errors[field] =
-            `${rule.label || field} harus kurang dari ${rule.max}.`;
+            `* ${rule.label || field} harus kurang dari ${rule.max}.`;
         }
       }
     }
