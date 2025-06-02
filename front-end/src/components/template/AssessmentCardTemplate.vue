@@ -1,6 +1,4 @@
 <script setup>
-import { MoreVertical } from "lucide-vue-next";
-
 const props = defineProps({
   assessment: {
     type: Object,
@@ -45,7 +43,7 @@ const formatDate = (dateString) => {
       <div class="flex justify-between items-start mb-6">
         <div class="flex-1">
           <div class="flex items-center gap-3 mb-2">
-            <h3 class="font-bold text-gray-800">
+            <h3 class="text-base md:text-sm font-bold text-gray-800">
               {{ assessment.ageLabel }}
             </h3>
             <span
@@ -76,40 +74,39 @@ const formatDate = (dateString) => {
             Lihat Rincian
           </a>
         </div>
-
-        <button
-          @click="$emit('show-menu', assessment)"
-          class="text-gray-400 hover:text-gray-600 p-2 transition-colors"
-        >
-          <MoreVertical class="h-5 w-5" />
-        </button>
       </div>
 
-      <div class="grid grid-cols-2 gap-6">
+      <div class="grid grid-cols-2 gap-6 wrap-anywhere">
         <!-- Height -->
         <div class="space-y-1 rounded-xl p-3 bg-gray-50">
           <div class="flex items-center gap-2">
             <p class="text-gray-500 text-base">Tinggi</p>
           </div>
-          <p class="font-bold text-gray-800">{{ assessment.height }} cm</p>
+          <p class="font-bold text-gray-800 text-base md:text-sm">
+            {{ assessment.height }} cm
+          </p>
         </div>
 
         <!-- Weight -->
         <div class="space-y-1 rounded-xl p-3 bg-gray-50">
           <p class="text-gray-500 text-base">Berat</p>
-          <p class="font-bold text-gray-800">{{ assessment.weight }} kg</p>
+          <p class="font-bold text-gray-800 text-base md:text-sm">
+            {{ assessment.weight }} kg
+          </p>
         </div>
 
         <!-- Height by Age -->
         <div class="space-y-1 rounded-xl p-3 bg-gray-50">
           <p class="text-gray-500 text-base">Tinggi Berdasarkan Umur</p>
-          <p class="font-bold text-gray-800">{{ assessment.heightByAge }} SD</p>
+          <p class="font-bold text-gray-800 text-base md:text-sm">
+            {{ assessment.heightByAge }} SD
+          </p>
         </div>
 
         <!-- Risk Level -->
         <div class="space-y-1 rounded-xl p-3 bg-gray-50">
           <p class="text-gray-500 text-base">Level Risiko</p>
-          <p class="font-bold text-gray-800">
+          <p class="font-bold text-gray-800 text-base md:text-sm">
             {{ assessment.riskPercentage }}%
           </p>
         </div>
