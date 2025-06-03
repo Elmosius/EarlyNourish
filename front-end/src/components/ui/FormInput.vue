@@ -36,6 +36,10 @@ defineProps({
     type: String,
     default: "off",
   },
+  readonly: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 defineEmits(["update:modelValue"]);
@@ -60,6 +64,7 @@ defineEmits(["update:modelValue"]);
       :required="required"
       :autofocus="autofocus"
       :autocomplete="autocomplete"
+      :readonly="readonly"
     />
   </div>
 </template>
