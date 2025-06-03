@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from "vue";
+import { validateForm } from "../../utils/validation.js";
 import FormInput from "../ui/FormInput.vue";
+import FormError from "../ui/FormError.vue";
 
 const childName = ref("");
 const birthDate = ref("");
@@ -8,14 +10,32 @@ const gender = ref("");
 const parentName = ref("");
 const email = ref("");
 
+const errors = ref({});
+
 const submitForm = () => {
-  console.log({
+  const rules = {
+    childName: { label: "Nama Anak", minLength: 5, maxLength: 50 },
+    birthDate: { label: "Tanggal Lahir", required: true },
+    gender: { required: true },
+    parentName: { label: "Nama Orang Tua", minLength: 5, maxLength: 50 },
+    email: { type: "email", label: "Email", required: true },
+  };
+
+  const formData = {
     childName: childName.value,
     birthDate: birthDate.value,
     gender: gender.value,
     parentName: parentName.value,
     email: email.value,
-  });
+  };
+
+  const validation = validateForm(formData, rules);
+  if (validation.isValid) {
+    console.log("Complete form submitted with data:", formData);
+    errors.value = {};
+  } else {
+    errors.value = validation.errors;
+  }
 };
 </script>
 
@@ -50,14 +70,22 @@ const submitForm = () => {
         <form @submit.prevent="submitForm" class="p-6">
           <div class="space-y-6 flex flex-col">
             <div class="lg:flex gap-6">
-              <FormInput
-                id="childName"
-                label="Nama Anak"
-                v-model="childName"
-                placeholder="Masukkan nama anak"
-                class="w-full"
-              />
-              <div class="mt-4 w-full lg:mt-0">
+              <div class="w-full mb-2">
+                <FormInput
+                  id="childName"
+                  label="Nama Anak"
+                  v-model="childName"
+                  placeholder="Masukkan nama anak"
+                  class="w-full"
+                  required
+                />
+                <FormError
+                  :message="errors.childName"
+                  v-if="errors.childName"
+                />
+              </div>
+
+              <div class="w-full">
                 <FormInput
                   id="birthDate"
                   label="Tanggal Lahir"
@@ -66,57 +94,81 @@ const submitForm = () => {
                   placeholder="mm/dd/yyyy"
                   required
                 />
+                <FormError
+                  :message="errors.birthDate"
+                  v-if="errors.birthDate"
+                />
               </div>
             </div>
 
-            <label class="text-gray-700 mb-1 text-base font-semibold"
-              >Jenis Kelamin</label
-            >
-            <div class="lg:flex gap-6">
-              <div
-                class="w-full border border-gray-300 rounded-md px-4 py-2 mb-2 lg:mb-0"
+            <div>
+              <label class="text-gray-700 mb-1 text-base font-semibold"
+                >Jenis Kelamin</label
               >
-                <label class="flex items-center cursor-pointer">
-                  <input
-                    id="male"
-                    type="radio"
-                    name="gender"
-                    value="male"
-                    v-model="gender"
-                    class="h-4 w-4 text-tertiary focus:ring-tertiary"
-                  />
-                  <span class="ml-2 text-gray-700 text-base">Laki-laki</span>
-                </label>
+              <div class="lg:flex gap-6">
+                <div
+                  class="w-full border border-gray-300 rounded-md px-4 py-2 mb-2 lg:mb-0"
+                >
+                  <label class="flex items-center cursor-pointer">
+                    <input
+                      id="male"
+                      type="radio"
+                      name="gender"
+                      value="male"
+                      v-model="gender"
+                      class="h-4 w-4 text-tertiary focus:ring-tertiary"
+                    />
+                    <span class="ml-2 text-gray-700 text-base">Laki-laki</span>
+                  </label>
+                </div>
+                <div class="w-full border border-gray-300 rounded-md px-4 py-2">
+                  <label class="flex items-center cursor-pointer">
+                    <input
+                      id="female"
+                      type="radio"
+                      name="gender"
+                      value="female"
+                      v-model="gender"
+                      class="h-4 w-4 text-green-600 focus:ring-green-500"
+                    />
+                    <span class="ml-2 text-gray-700 text-base">Perempuan</span>
+                  </label>
+                </div>
               </div>
-              <div class="w-full border border-gray-300 rounded-md px-4 py-2">
-                <label class="flex items-center cursor-pointer">
-                  <input
-                    id="female"
-                    type="radio"
-                    name="gender"
-                    value="female"
-                    v-model="gender"
-                    class="h-4 w-4 text-green-600 focus:ring-green-500"
-                  />
-                  <span class="ml-2 text-gray-700 text-base">Perempuan</span>
-                </label>
-              </div>
+              <FormError
+                :message="errors.gender"
+                v-if="errors.gender"
+                class="block"
+              />
             </div>
 
-            <FormInput
-              id="parentName"
-              label="Nama Orang Tua"
-              v-model="parentName"
-              placeholder="Masukkan nama Anda"
-            />
+            <div>
+              <FormInput
+                id="parentName"
+                label="Nama Orang Tua"
+                v-model="parentName"
+                placeholder="Masukkan nama Anda"
+                required
+              />
 
-            <FormInput
-              id="email"
-              label="Email"
-              type="email"
-              v-model="email"
-              placeholder="Masukkan Email Anda"
-            />
+              <FormError
+                :message="errors.parentName"
+                v-if="errors.parentName"
+              />
+            </div>
+
+            <div>
+              <FormInput
+                id="email"
+                label="Email"
+                type="email"
+                v-model="email"
+                placeholder="Masukkan Email Anda"
+                required
+              />
+
+              <FormError :message="errors.email" v-if="errors.email" />
+            </div>
           </div>
           <div class="mt-5 border-t border-gray-300">
             <div class="mt-4 flex justify-end">
