@@ -8,7 +8,6 @@ const emit = defineEmits(["feedback-submitted"]);
 
 const formData = ref({
   fullName: "",
-  role: "",
   rating: 0,
   testimonial: "",
 });
@@ -19,7 +18,6 @@ const showSuccessMessage = ref(false);
 const isFormValid = computed(() => {
   return (
     formData.value.fullName.trim() !== "" &&
-    formData.value.role !== "" &&
     formData.value.rating > 0 &&
     formData.value.testimonial.trim() !== "" &&
     formData.value.testimonial.length <= 500
@@ -79,7 +77,7 @@ const submitFeedback = async () => {
 const resetForm = () => {
   formData.value = {
     fullName: "",
-    role: "",
+
     rating: 0,
     testimonial: "",
   };
@@ -108,27 +106,8 @@ const resetForm = () => {
           placeholder="Masukkan nama Anda"
           v-model="formData.fullName"
           :autofocus="false"
+          readonly
         />
-
-        <div>
-          <label
-            for="role"
-            class="block text-gray-700 mb-1 text-base font-semibold"
-          >
-            Peran
-          </label>
-          <select
-            id="role"
-            v-model="formData.role"
-            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary focus:border-tertiary text-base bg-white"
-            required
-          >
-            <option value="" disabled>Pilih</option>
-            <option value="parent">Orang Tua</option>
-            <option value="guardian">Wali</option>
-            <option value="caregiver">Pengasuh</option>
-          </select>
-        </div>
 
         <div>
           <label
