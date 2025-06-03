@@ -9,6 +9,7 @@ import {
   ChevronDownIcon,
 } from "lucide-vue-next";
 
+const isLoggedIn = ref(false);
 const isMenuOpen = ref(false);
 const isProfileModalOpen = ref(false);
 const scrolled = ref(false);
@@ -111,7 +112,7 @@ const profileMenuItems = [
             class="text-gray-700 hover:text-tertiary font-medium px-6"
             >Testimoni</router-link
           >
-          <div class="ml-6 relative profile-menu-container">
+          <div v-if="isLoggedIn" class="ml-6 relative profile-menu-container">
             <button
               @click="toggleProfileModal"
               class="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-full font-medium transition-colors"
@@ -121,6 +122,7 @@ const profileMenuItems = [
               >
                 <span class="text-sm">El</span>
               </div>
+
               <span>Elmosius Suli</span>
               <ChevronDownIcon
                 class="h-4 w-4 transition-transform duration-300"
@@ -153,6 +155,15 @@ const profileMenuItems = [
                 </div>
               </div>
             </transition>
+          </div>
+          <div v-else class="ml-6 relative profile-menu-container">
+            <router-link
+              to="/login"
+              class="block text-gray-700 hover:text-tertiary font-medium py-2 px-2 rounded-md transition-colors"
+              @click="isMenuOpen = false"
+            >
+              Masuk
+            </router-link>
           </div>
         </nav>
       </div>
@@ -198,7 +209,7 @@ const profileMenuItems = [
             >
 
             <!-- Mobile Profile Section -->
-            <div class="py-2 border-t border-gray-200 mt-2">
+            <div v-if="isLoggedIn" class="py-2 border-t border-gray-200 mt-2">
               <div class="flex items-center space-x-3 px-2 py-3">
                 <div
                   class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center"
@@ -227,6 +238,15 @@ const profileMenuItems = [
                   {{ item.label }}
                 </router-link>
               </div>
+            </div>
+            <div v-else class="py-2 border-t border-gray-200 mt-2">
+              <router-link
+                to="/login"
+                class="block text-gray-700 hover:text-tertiary font-medium py-2 px-2 rounded-md transition-colors"
+                @click="isMenuOpen = false"
+              >
+                Masuk
+              </router-link>
             </div>
           </nav>
         </div>
