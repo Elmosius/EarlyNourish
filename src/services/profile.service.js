@@ -1,7 +1,7 @@
 const User = require('../models/user.model');
 
 const getUserById = async (userId) => {
-  return User.findById(userId).populate('roleId', 'name');
+  return User.findById(userId).populate('roleId', 'nama');
 };
 
 const updateUserProfile = async (userId, profileData) => {

@@ -1,63 +1,90 @@
 const mongoose = require('mongoose');
 const profileService = require('../../services/profile.service');
-const Joi = require('joi');
+const ProfileValidator = require('../../validator/profile');
+const InvariantError = require('../../exceptions/InvariantError');
+const NotFoundError = require('../../exceptions/NotFoundError');
+const ClientError = require('../../exceptions/ClientError');
 
-const profileSchema = Joi.object({
-  email: Joi.string().email().required(),
-  fullName: Joi.string().required(),
-  namaAnak: Joi.string().optional().allow(''),
-  jenisKelamin: Joi.string().valid('male', 'female').optional(),
-  namaOrangTua: Joi.string().optional().allow(''),
-  tanggalLahir: Joi.date().optional(),
-  beratBadan: Joi.number().optional(),
-  tinggiBadan: Joi.number().optional(),
-});
-
-const getProfileHandler = async (request, h) => {
+const getProfileHandlerImpl = async (request, h) => {
   const { userId } = request.params;
   if (!mongoose.Types.ObjectId.isValid(userId)) {
-    return h.response({ error: true, message: 'User ID tidak valid' }).code(400);
+    throw new InvariantError('User ID tidak valid');
   }
+
+  const user = await profileService.getUserById(userId);
+  if (!user) {
+    throw new NotFoundError('User tidak ditemukan');
+  }
+
+  return h.response({
+    Error: false,
+    Message: 'success',
+    profile: user,
+  }).code(200);
+};
+
+const getProfileHandler = async (request, h) => {
   try {
-    const user = await profileService.getUserById(userId);
-    if (!user) {
-      return h.response({ error: true, message: 'User tidak ditemukan' }).code(404);
-    }
-    return {
-      error: false,
-      message: 'success',
-      profile: user,
-    };
+    return await getProfileHandlerImpl(request, h);
   } catch (err) {
+    if (err instanceof ClientError) {
+      return h.response({ Error: true, Message: err.message }).code(err.statusCode);
+    }
     console.error(err);
-    return h.response({ error: true, message: 'Gagal mengambil profil' }).code(500);
+    return h.response({ Error: true, Message: 'Gagal mengambil profil' }).code(500);
   }
 };
 
-const updateProfileHandler = async (request, h) => {
+const updateProfileHandlerImpl = async (request, h) => {
   const { userId } = request.params;
   if (!mongoose.Types.ObjectId.isValid(userId)) {
-    return h.response({ error: true, message: 'User ID tidak valid' }).code(400);
+    throw new InvariantError('User ID tidak valid');
   }
 
-  const { error, value } = profileSchema.validate(request.payload);
-  if (error) {
-    return h.response({ error: true, message: error.details[0].message }).code(400);
+  ProfileValidator.validatePutProfilePayload(request.payload);
+
+  const {
+    email,
+    fullName,
+    namaAnak,
+    jenisKelamin,
+    namaOrangTua,
+    tanggalLahir,
+    beratBadan,
+    tinggiBadan,
+  } = request.payload;
+
+  const updatedUser = await profileService.updateUserProfile(userId, {
+    email,
+    fullName,
+    namaAnak,
+    jenisKelamin,
+    namaOrangTua,
+    tanggalLahir,
+    beratBadan,
+    tinggiBadan,
+  });
+
+  if (!updatedUser) {
+    throw new NotFoundError('User tidak ditemukan');
   }
 
+  return h.response({
+    Error: false,
+    Message: 'success',
+    profile: updatedUser,
+  }).code(200);
+};
+
+const updateProfileHandler = async (request, h) => {
   try {
-    const updatedUser = await profileService.updateUserProfile(userId, value);
-    if (!updatedUser) {
-      return h.response({ error: true, message: 'User tidak ditemukan' }).code(404);
-    }
-    return {
-      error: false,
-      message: 'success',
-      profile: updatedUser,
-    };
+    return await updateProfileHandlerImpl(request, h);
   } catch (err) {
+    if (err instanceof ClientError) {
+      return h.response({ Error: true, Message: err.message }).code(err.statusCode);
+    }
     console.error(err);
-    return h.response({ error: true, message: 'Gagal memperbarui profil' }).code(500);
+    return h.response({ Error: true, Message: 'Gagal memperbarui profil' }).code(500);
   }
 };
 

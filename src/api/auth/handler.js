@@ -1,72 +1,65 @@
-const Joi = require('joi');
 const { nanoid } = require('nanoid');
 const authService = require('../../services/auth.service');
+const AuthenticationsValidator = require('../../validator/auth');
+const InvariantError = require('../../exceptions/InvariantError');
+const AuthenticationError = require('../../exceptions/AuthenticationError');
+const ClientError = require('../../exceptions/ClientError');
 
-const registerSchema = Joi.object({
-  email: Joi.string().email().required(),
-  password: Joi.string().min(8).required(),
-  fullName: Joi.string().required(),
-});
+const loginHandlerImpl = async (request, h) => {
+  AuthenticationsValidator.validateLoginPayload(request.payload);
 
-const loginSchema = Joi.object({
-  email: Joi.string().email().required(),
-  password: Joi.string().min(8).required(),
-});
-
-const registerHandler = async (request, h) => {
-  try {
-    const { error, value } = registerSchema.validate(request.payload);
-    if (error) {
-      return h
-        .response({ error: true, message: error.details[0].message })
-        .code(400);
-    }
-
-    const generatedUserId = `user-${nanoid(16)}`;
-    await authService.registerUser({ ...value, userId: generatedUserId });
-
-    return h
-      .response({ error: false, message: 'User created' })
-      .code(201);
-  } catch (err) {
-    console.error(err);
-    return h
-      .response({ error: true, message: err.message })
-      .code(500);
+  const { email, password } = request.payload;
+  const { user, token } = await authService.loginUser({ email, password });
+  if (!user) {
+    throw new AuthenticationError('Email atau password salah');
   }
+
+  return h.response({
+    Error: false,
+    Message: 'success',
+    loginResult: {
+      userId: user._id.toString(),
+      name: user.fullName,
+      token,
+    },
+  }).code(200);
 };
 
 const loginHandler = async (request, h) => {
   try {
-    const { error, value } = loginSchema.validate(request.payload);
-    if (error) {
-      return h
-        .response({ error: true, message: error.details[0].message })
-        .code(400);
-    }
-
-    const { user, token } = await authService.loginUser(value);
-
-    return h
-      .response({
-        error: false,
-        message: 'success',
-        loginResult: {
-          userId: user.userId,
-          name: user.fullName,
-          token,
-        },
-      })
-      .code(200);
+    return await loginHandlerImpl(request, h);
   } catch (err) {
+    if (err instanceof ClientError) {
+      return h.response({ Error: true, Message: err.message }).code(err.statusCode);
+    }
     console.error(err);
-    return h
-      .response({ error: true, message: err.message })
-      .code(500);
+    return h.response({ Error: true, Message: 'Internal Server Error' }).code(500);
+  }
+};
+
+const registerHandlerImpl = async (request, h) => {
+  AuthenticationsValidator.validateRegisterPayload(request.payload);
+
+  const { email, password, fullName } = request.payload;
+  const generatedUserId = `user-${nanoid(16)}`;
+  await authService.registerUser({ email, password, fullName, userId: generatedUserId });
+
+  return h.response({ Error: false, Message: 'User created' }).code(201);
+};
+
+const registerHandler = async (request, h) => {
+  try {
+    return await registerHandlerImpl(request, h);
+  } catch (err) {
+    if (err instanceof ClientError) {
+      return h.response({ Error: true, Message: err.message }).code(err.statusCode);
+    }
+    console.error(err);
+    return h.response({ Error: true, Message: 'Internal Server Error' }).code(500);
   }
 };
 
 module.exports = {
-  registerHandler,
   loginHandler,
+  registerHandler,
 };

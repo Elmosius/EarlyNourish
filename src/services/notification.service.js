@@ -1,30 +1,33 @@
-const Notification = require('../models/notification.model');
+const Subscription = require('../models/subscription.model');
 
-const getNotificationsByUserId = async (userId) => {
-  return Notification.find({ userId });
-};
+async function saveSubscription({ userId, endpoint, keys }) {
+  const existing = await Subscription.findOne({ userId, endpoint });
+  if (existing) {
+    existing.keys = keys;
+    await existing.save();
+    return existing._id;
+  }
 
-const createNotification = async ({ userId, type, message }) => {
-  const notification = new Notification({
-    userId,
-    type,
-    message,
-    read: false,
-  });
-  await notification.save();
-  return notification._id.toString();
-};
+  const sub = new Subscription({ userId, endpoint, keys });
+  await sub.save();
+  return sub._id;
+}
 
-const markNotificationRead = async (id) => {
-  const notification = await Notification.findById(id);
-  if (!notification) return null;
-  notification.read = true;
-  await notification.save();
-  return true;
-};
+async function deleteSubscription({ userId, endpoint }) {
+  await Subscription.deleteOne({ userId, endpoint });
+}
+
+async function deleteSubscriptionByEndpoint(endpoint) {
+  await Subscription.deleteMany({ endpoint });
+}
+
+async function getSubscriptionsByUserId(userId) {
+  return Subscription.find({ userId }).lean();
+}
 
 module.exports = {
-  getNotificationsByUserId,
-  createNotification,
-  markNotificationRead,
+  saveSubscription,
+  deleteSubscription,
+  deleteSubscriptionByEndpoint,
+  getSubscriptionsByUserId,
 };

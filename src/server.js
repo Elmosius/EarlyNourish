@@ -10,11 +10,11 @@ const authPlugin = require('./api/auth');
 const usersPlugin = require('./api/users');
 const predictionsPlugin = require('./api/predictions');
 const recommendationsPlugin = require('./api/recommendations');
-const notificationsPlugin = require('./api/notifications');
+const notificationsPlugin = require('./api/notification');
 const feedbackPlugin = require('./api/feedback');
 const profilePlugin = require('./api/profile');
-const riwayatPlugin = require('./api/riwayat');
-
+const riwayatPlugin = require('./api/history');
+const healthCheckPlugin = require('./api/healthCheck');
 
 
 const init = async () => {
@@ -66,6 +66,7 @@ const init = async () => {
         feedbackPlugin,
         profilePlugin,
         riwayatPlugin,
+        healthCheckPlugin,
     ]);
 
     await server.start();

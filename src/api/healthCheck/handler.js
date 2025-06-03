@@ -1,13 +1,19 @@
-const healthCheckHandler = async (request, h) => {
-    return {
-        error: false,
-        message: 'success',
-        result: {
-        server: 'running',
-        database: 'connected',
-        timestamp: new Date().toISOString(),
-        },
-    };
+const getHealthCheckHandler = async (request, h) => {
+  const result = {
+    database: 'connected',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  };
+
+  return h
+    .response({
+      Error: false,
+      Message: 'success',
+      result,
+    })
+    .code(200);
 };
 
-module.exports = { healthCheckHandler };
+module.exports = {
+  getHealthCheckHandler,
+};

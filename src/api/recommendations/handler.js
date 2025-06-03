@@ -1,47 +1,77 @@
+// sudah tidak dipakai
 const mongoose = require('mongoose');
-const recommendationService = require('../../services/recommendation.service');
+const Recommendation = require('../../models/recommendation.model');
+const History = require('../../models/history.model');
+const InvariantError = require('../../exceptions/InvariantError');
+const NotFoundError = require('../../exceptions/NotFoundError');
+const ClientError = require('../../exceptions/ClientError');
 
-const getRecommendationByPredictionHandler = async (request, h) => {
-  const { predId } = request.params;
-  if (!mongoose.Types.ObjectId.isValid(predId)) {
-    return h.response({ error: true, message: 'ID prediksi tidak valid' }).code(400);
+const getRecommendationByPredictionIdHandlerImpl = async (request, h) => {
+  const { predID } = request.params;
+  if (!mongoose.Types.ObjectId.isValid(predID)) {
+    throw new InvariantError('ID prediksi tidak valid');
   }
+
+  const history = await History.findById(predID);
+  if (!history) {
+    throw new NotFoundError('Prediksi tidak ditemukan');
+  }
+
+  const recommendation = await Recommendation.findOne({ historyId: predID });
+  if (!recommendation) {
+    throw new NotFoundError('Rekomendasi tidak ditemukan');
+  }
+
+  return h.response({
+    Error: false,
+    Message: 'success',
+    recommendation,
+  }).code(200);
+};
+
+const getRecommendationByPredictionIdHandler = async (request, h) => {
   try {
-    const recommendation = await recommendationService.getRecommendationByPredictionId(predId);
-    if (!recommendation) {
-      return h.response({ error: true, message: 'Rekomendasi tidak ditemukan' }).code(404);
-    }
-    return {
-      error: false,
-      message: 'success',
-      recommendation,
-    };
+    return await getRecommendationByPredictionIdHandlerImpl(request, h);
   } catch (err) {
+    if (err instanceof ClientError) {
+      return h.response({ Error: true, Message: err.message }).code(err.statusCode);
+    }
     console.error(err);
-    return h.response({ error: true, message: 'Gagal mengambil rekomendasi' }).code(500);
+    return h.response({ Error: true, Message: 'Gagal mengambil rekomendasi nutrisi' }).code(500);
   }
 };
 
-const getRecommendationsByRiskHandler = async (request, h) => {
+const getRecommendationByRiskLevelHandlerImpl = async (request, h) => {
   const { riskLevel } = request.params;
-  const validRisks = ['low', 'medium', 'high'];
-  if (!validRisks.includes(riskLevel)) {
-    return h.response({ error: true, message: 'Risk level tidak valid' }).code(400);
+  if (!['low', 'medium', 'high'].includes(riskLevel)) {
+    throw new InvariantError('Risk level tidak valid');
   }
+
+  const recommendations = await Recommendation.find({ stuntingRisk: riskLevel });
+  if (!recommendations.length) {
+    throw new NotFoundError('Rekomendasi tidak ditemukan');
+  }
+
+  return h.response({
+    Error: false,
+    Message: 'success',
+    recommendation: recommendations,
+  }).code(200);
+};
+
+const getRecommendationByRiskLevelHandler = async (request, h) => {
   try {
-    const recommendations = await recommendationService.getRecommendationsByRiskLevel(riskLevel);
-    return {
-      error: false,
-      message: 'success',
-      recommendations,
-    };
+    return await getRecommendationByRiskLevelHandlerImpl(request, h);
   } catch (err) {
+    if (err instanceof ClientError) {
+      return h.response({ Error: true, Message: err.message }).code(err.statusCode);
+    }
     console.error(err);
-    return h.response({ error: true, message: 'Gagal mengambil rekomendasi' }).code(500);
+    return h.response({ Error: true, Message: 'Gagal mengambil rekomendasi nutrisi' }).code(500);
   }
 };
 
 module.exports = {
-  getRecommendationByPredictionHandler,
-  getRecommendationsByRiskHandler,
+  getRecommendationByPredictionIdHandler,
+  getRecommendationByRiskLevelHandler,
 };

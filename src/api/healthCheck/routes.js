@@ -1,10 +1,10 @@
-const { healthCheckHandler } = require('./handler');
+const { getHealthCheckHandler } = require('./handler');
 
 module.exports = [
     {
         method: 'GET',
         path: '/healthCheck',
-        handler: healthCheckHandler,
+        handler: getHealthCheckHandler,
         options: { auth: false },
     },
 ];

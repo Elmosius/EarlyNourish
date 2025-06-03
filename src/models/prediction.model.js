@@ -1,12 +1,17 @@
 const mongoose = require('mongoose');
 
-const predictionSchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    gender: { type: String, enum: ['male', 'female'], required: true },
-    age: { type: Number, required: true }, 
-    weight: { type: Number, required: true },
-    height: { type: Number, required: true },
-    stuntingRisk: { type: String, enum: ['low', 'medium', 'high'], required: true }
-}, { timestamps: true });
+const predictionSchema = new mongoose.Schema(
+    {
+        historyId: { type: mongoose.Schema.Types.ObjectId, ref: 'History', required: true },
+        jenisKelamin: { type: String, enum: ['pria', 'wanita'], required: true },
+        usia: { type: Number, required: true }, 
+        bbLahir: { type: Number, required: true }, 
+        tbLahir: { type: Number, required: true },
+        beratBadan: { type: Number, required: true }, 
+        tinggiBadan: { type: Number, required: true }, 
+        stuntingRisk: { type: String, enum: ['low', 'medium', 'high'], required: true }
+    },
+    { timestamps: true }
+);
 
 module.exports = mongoose.model('Prediction', predictionSchema);

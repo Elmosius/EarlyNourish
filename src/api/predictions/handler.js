@@ -1,70 +1,120 @@
-const Joi = require('joi');
 const mongoose = require('mongoose');
-const predictionService = require('../../services/prediction.service');
+const History = require('../../models/history.model');
+const Prediction = require('../../models/prediction.model');
+const User = require('../../models/user.model');
+const PredictionsValidator = require('../../validator/predictions');
+const InvariantError = require('../../exceptions/InvariantError');
+const NotFoundError = require('../../exceptions/NotFoundError');
+const ClientError = require('../../exceptions/ClientError');
 
-const predictionSchema = Joi.object({
-  gender: Joi.string().valid('male', 'female').required(),
-  age: Joi.number().integer().min(0).required(),
-  weight: Joi.number().min(0).required(),
-  height: Joi.number().min(0).required(),
-  stuntingRisk: Joi.string().valid('low', 'medium', 'high').optional(),
-});
+const createPredictionHandlerImpl = async (request, h) => {
+  PredictionsValidator.validatePostPredictionPayload(request.payload);
+
+  const { jenisKelamin, usia, bbLahir, tbLahir, beratBadan, tinggiBadan } = request.payload;
+  const userIdString = request.auth.credentials.userId; 
+  const userDoc = await User.findOne({ userId: userIdString });
+  if (!userDoc) {
+    throw new InvariantError('User tidak ditemukan');
+  }
+  const userObjectId = userDoc._id;
+  const newHistory = await new History({ userId: userObjectId }).save();
+
+  const stuntingRisk = await _calculateStuntingRisk({
+    jenisKelamin,
+    usia,
+    bbLahir,
+    tbLahir,
+    beratBadan,
+    tinggiBadan,
+  });
+
+  const prediction = new Prediction({
+    historyId: newHistory._id,
+    jenisKelamin,
+    usia,
+    bbLahir,
+    tbLahir,
+    beratBadan,
+    tinggiBadan,
+    stuntingRisk,
+  });
+  await prediction.save();
+
+  return h.response({
+    Error: false,
+    Message: 'success',
+    Result: {
+      stuntingRisk: prediction.stuntingRisk,
+    },
+  }).code(201);
+};
 
 const createPredictionHandler = async (request, h) => {
-  const { error, value } = predictionSchema.validate(request.payload);
-  if (error) {
-    return h.response({ error: true, message: error.details[0].message }).code(400);
-  }
   try {
-    const prediction = await predictionService.createPrediction(value, request.auth.credentials.userId);
-    return h.response({
-      error: false,
-      message: 'success',
-      result: prediction,
-    }).code(201);
+    return await createPredictionHandlerImpl(request, h);
   } catch (err) {
+    if (err instanceof ClientError) {
+      return h.response({ Error: true, Message: err.message }).code(err.statusCode);
+    }
     console.error(err);
-    return h.response({ error: true, message: 'Gagal menyimpan prediksi' }).code(500);
+    return h.response({ Error: true, Message: 'Gagal menyimpan prediksi' }).code(500);
   }
 };
 
-const getAllPredictionsHandler = async (request, h) => {
-  try {
-    const predictions = await predictionService.getAllPredictions(request.auth.credentials.userId);
-    return {
-      error: false,
-      message: 'success',
-      result: predictions,
-    };
-  } catch (err) {
-    console.error(err);
-    return h.response({ error: true, message: 'Gagal mengambil prediksi' }).code(500);
+const getPredictionByIdHandlerImpl = async (request, h) => {
+  const { idUser, idPredict } = request.params;
+  if (!mongoose.Types.ObjectId.isValid(idUser) || !mongoose.Types.ObjectId.isValid(idPredict)) {
+    throw new InvariantError('ID tidak valid');
   }
+
+  const history = await History.findOne({ _id: idPredict, userId: idUser });
+  if (!history) {
+    throw new NotFoundError('Data prediksi tidak ditemukan');
+  }
+
+  const prediction = await Prediction.findOne({ historyId: idPredict });
+  if (!prediction) {
+    throw new NotFoundError('Data prediksi tidak ditemukan');
+  }
+
+  return h.response({
+    Error: false,
+    Message: 'success',
+    Result: {
+      Id: prediction._id,
+      jenisKelamin: prediction.jenisKelamin,
+      Usia: prediction.usia,
+      bbLahir: prediction.bbLahir,
+      tbLahir: prediction.tbLahir,
+      beratBadan: prediction.beratBadan,
+      tinggiBadan: prediction.tinggiBadan,
+      stuntingRisk: prediction.stuntingRisk,
+      createdAt: prediction.createdAt,
+      updatedAt: prediction.updatedAt,
+    },
+  }).code(200);
 };
 
 const getPredictionByIdHandler = async (request, h) => {
-  const { id } = request.params;
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return h.response({ error: true, message: 'ID tidak valid' }).code(400);
-  }
   try {
-    const prediction = await predictionService.getPredictionById(id);
-    if (!prediction) {
-      return h.response({ error: true, message: 'Data prediksi tidak ditemukan' }).code(404);
-    }
-    return {
-      error: false,
-      message: 'success',
-      result: prediction,
-    };
+    return await getPredictionByIdHandlerImpl(request, h);
   } catch (err) {
+    if (err instanceof ClientError) {
+      return h.response({ Error: true, Message: err.message }).code(err.statusCode);
+    }
     console.error(err);
-    return h.response({ error: true, message: 'Gagal mengambil data prediksi' }).code(500);
+    return h.response({ Error: true, Message: 'Gagal mengambil data prediksi' }).code(500);
   }
 };
 
+async function _calculateStuntingRisk({ jenisKelamin, usia, bbLahir, tbLahir, beratBadan, tinggiBadan }) {
+  const ratio = beratBadan / (usia || 1);
+  if (ratio < 0.5) return 'high';
+  if (ratio < 0.8) return 'medium';
+  return 'low';
+}
+
 module.exports = {
   createPredictionHandler,
-  getAllPredictionsHandler,
   getPredictionByIdHandler,
 };
