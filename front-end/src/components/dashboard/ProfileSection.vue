@@ -35,11 +35,12 @@ defineProps({
         </div>
       </div>
       <div class="flex justify-end">
-        <button
+        <router-link
+          to="/assessment"
           class="bg-linear-65 from-[#4ADE80] to-[#22C55E] shadow-xl inset-shadow-xs inset-shadow-gray-300 text-white text-xs px-4 py-2 md:px-6 rounded-lg hover:opacity-85 transition-opacity lg:px-10"
         >
           Cek Ulang
-        </button>
+        </router-link>
       </div>
     </div>
   </section>

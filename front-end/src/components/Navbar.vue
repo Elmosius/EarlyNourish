@@ -7,6 +7,7 @@ import {
   History,
   LogOutIcon,
   ChevronDownIcon,
+  LogInIcon,
 } from "lucide-vue-next";
 
 const isLoggedIn = ref(false);
@@ -163,6 +164,7 @@ const profileMenuItems = [
               @click="isMenuOpen = false"
             >
               Masuk
+              <LogInIcon class="h-4 w-4 inline-block ml-2" />
             </router-link>
           </div>
         </nav>
@@ -246,6 +248,7 @@ const profileMenuItems = [
                 @click="isMenuOpen = false"
               >
                 Masuk
+                <LogInIcon class="h-4 w-4 inline-block ml-2" />
               </router-link>
             </div>
           </nav>
