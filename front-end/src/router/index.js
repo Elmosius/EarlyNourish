@@ -35,7 +35,7 @@ const routes = [
     meta: { layout: "MainLayout" },
   },
   {
-    path: "/riwayat",
+    path: "/history",
     component: RiwayatPage,
     meta: { layout: "MainLayout" },
   },

@@ -55,7 +55,7 @@ const scrollToTop = () => {
 
 const profileMenuItems = [
   { icon: UserIcon, label: "Informasi Pribadi", to: "/profile" },
-  { icon: History, label: "Riwayat Asesmen", to: "/riwayat" },
+  { icon: History, label: "Riwayat Asesmen", to: "/history" },
   { icon: LogOutIcon, label: "Keluar", to: "/logout", isLogout: true },
 ];
 </script>
