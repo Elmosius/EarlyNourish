@@ -12,12 +12,12 @@ const routes = [
   {
     path: "/login",
     component: LoginPage,
-    meta: { layout: "DefaultLayout" },
+    meta: { layout: "AuthLayout" },
   },
   {
     path: "/register",
     component: RegisterPage,
-    meta: { layout: "DefaultLayout" },
+    meta: { layout: "AuthLayout" },
   },
   {
     path: "/",
