@@ -43,7 +43,7 @@ export const register = async (userInfo) => {
   try {
     const response = await axios.get(USERS_DATA_URL);
     const users = response.data;
-    const existingUser = users.find((u) => u.username === userInfo.username);
+    const existingUser = users.find((u) => u.email === userInfo.email);
 
     if (existingUser) {
       throw {
@@ -56,9 +56,9 @@ export const register = async (userInfo) => {
 
     const newUser = {
       id: `user${Date.now()}`,
+      nama: userInfo.nama,
       email: userInfo.email,
       password: userInfo.password,
-      fullName: userInfo.fullName,
     };
 
     console.log("Simulated new user registration:", newUser);
@@ -67,7 +67,7 @@ export const register = async (userInfo) => {
       data: {
         user: {
           id: newUser.id,
-          fullName: userInfo.fullName,
+          nama: userInfo.nama,
           email: userInfo.email,
         },
         token: `dummy-auth-token-for-${newUser.id}`,

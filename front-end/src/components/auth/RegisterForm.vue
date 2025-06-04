@@ -4,8 +4,13 @@ import { validateForm } from "../../utils/validation.js";
 import FormInput from "../ui/FormInput.vue";
 import FormError from "../ui/FormError.vue";
 import { useRouter } from "vue-router";
+import { useAuthStore } from "../../stores/index.js";
+import { storeToRefs } from "pinia";
+import LoadingSpinner2 from "../ui/LoadingSpinner2.vue";
 
 const router = useRouter();
+const authStore = useAuthStore();
+const { loading, error: authError } = storeToRefs(authStore);
 
 const nama = ref("");
 const email = ref("");
@@ -14,7 +19,10 @@ const confirm_password = ref("");
 const sk = ref(false);
 const errors = ref({});
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
+  errors.value = {};
+  authStore.error = null;
+
   const rules = {
     nama: {
       required: true,
@@ -55,8 +63,15 @@ const handleSubmit = () => {
   const validation = validateForm(formData, rules);
 
   if (validation.isValid) {
-    console.log("Register successfully", formData);
-    errors.value = {};
+    await authStore.register({
+      nama: nama.value,
+      email: email.value,
+      password: password.value,
+    });
+
+    if (!authError.value) {
+      await router.push("/login");
+    }
   } else {
     errors.value = validation.errors;
   }
@@ -69,6 +84,13 @@ const handleSubmit = () => {
     <p class="text-gray-500 mb-6 text-center text-base">
       Silahkan isi data berikut untuk mendaftar
     </p>
+
+    <div
+      v-if="authError"
+      class="mb-4 p-3 text-xs md:text-base bg-red-100 text-red-700 rounded"
+    >
+      * Registration failed: {{ authError }}
+    </div>
 
     <form @submit.prevent="handleSubmit">
       <div class="mb-4">
@@ -143,10 +165,12 @@ const handleSubmit = () => {
       </div>
 
       <button
+        :disabled="loading"
         type="submit"
         class="w-full text-base bg-slate-600 hover:bg-slate-700 text-white font-semibold py-2 px-4 rounded-md transition duration-200"
       >
-        Daftar
+        <LoadingSpinner2 v-if="loading" />
+        <span v-else>Daftar</span>
       </button>
 
       <div class="mt-6 text-center">
