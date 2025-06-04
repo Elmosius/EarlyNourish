@@ -11,13 +11,14 @@ const createPredictionHandlerImpl = async (request, h) => {
   PredictionsValidator.validatePostPredictionPayload(request.payload);
 
   const { jenisKelamin, usia, bbLahir, tbLahir, beratBadan, tinggiBadan } = request.payload;
-  const userIdString = request.auth.credentials.userId; 
-  const userDoc = await User.findOne({ userId: userIdString });
+  const userIdString = request.auth.credentials.userId;
+
+  const userDoc = await User.findById(userIdString);
   if (!userDoc) {
     throw new InvariantError('User tidak ditemukan');
   }
-  const userObjectId = userDoc._id;
-  const newHistory = await new History({ userId: userObjectId }).save();
+
+  const newHistory = await new History({ userId: userDoc._id }).save();
 
   const stuntingRisk = await _calculateStuntingRisk({
     jenisKelamin,

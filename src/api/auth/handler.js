@@ -1,4 +1,3 @@
-const { nanoid } = require('nanoid');
 const authService = require('../../services/auth.service');
 const AuthenticationsValidator = require('../../validator/auth');
 const InvariantError = require('../../exceptions/InvariantError');
@@ -9,7 +8,7 @@ const loginHandlerImpl = async (request, h) => {
   AuthenticationsValidator.validateLoginPayload(request.payload);
 
   const { email, password } = request.payload;
-  const { user, token } = await authService.loginUser({ email, password });
+  const { user, accessToken, refreshToken } = await authService.loginUser({ email, password });
   if (!user) {
     throw new AuthenticationError('Email atau password salah');
   }
@@ -20,7 +19,8 @@ const loginHandlerImpl = async (request, h) => {
     loginResult: {
       userId: user._id.toString(),
       name: user.fullName,
-      token,
+      accessToken,
+      refreshToken,
     },
   }).code(200);
 };
@@ -41,8 +41,7 @@ const registerHandlerImpl = async (request, h) => {
   AuthenticationsValidator.validateRegisterPayload(request.payload);
 
   const { email, password, fullName } = request.payload;
-  const generatedUserId = `user-${nanoid(16)}`;
-  await authService.registerUser({ email, password, fullName, userId: generatedUserId });
+  await authService.registerUser({ email, password, fullName });
 
   return h.response({ Error: false, Message: 'User created' }).code(201);
 };
@@ -59,7 +58,34 @@ const registerHandler = async (request, h) => {
   }
 };
 
+const refreshTokenHandlerImpl = async (request, h) => {
+  const { refreshToken } = request.payload;
+  if (!refreshToken) {
+    throw new ClientError('refreshToken wajib diisi', 400);
+  }
+
+  const newAccessToken = await authService.refreshAccessToken(refreshToken);
+  return h.response({
+    Error: false,
+    Message: 'Success refresh access token',
+    accessToken: newAccessToken,
+  }).code(200);
+};
+
+const refreshTokenHandler = async (request, h) => {
+  try {
+    return await refreshTokenHandlerImpl(request, h);
+  } catch (err) {
+    if (err instanceof ClientError) {
+      return h.response({ Error: true, Message: err.message }).code(err.statusCode);
+    }
+    console.error(err);
+    return h.response({ Error: true, Message: 'Internal Server Error' }).code(500);
+  }
+};
+
 module.exports = {
   loginHandler,
   registerHandler,
+  refreshTokenHandler,
 };

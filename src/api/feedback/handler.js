@@ -2,10 +2,10 @@ const Feedback = require('../../models/feedback.model');
 const mongoose = require('mongoose');
 const FeedbackValidator = require('../../validator/feedback');
 const InvariantError = require('../../exceptions/InvariantError');
+const NotFoundError = require('../../exceptions/NotFoundError');
 const ClientError = require('../../exceptions/ClientError');
 
-const getAllFeedbackHandlerImpl = async (request, h) => {
-  const feedbacks = await Feedback.find().sort({ createdAt: -1 });
+const getAllFeedbackHandlerImpl = async (request, h) => {  const feedbacks = await Feedback.find().sort({ createdAt: -1 });
   return h.response({
     Error: false,
     Message: 'success',
@@ -34,7 +34,7 @@ const createFeedbackHandlerImpl = async (request, h) => {
   FeedbackValidator.validatePostFeedbackPayload(request.payload);
 
   const { rating, description } = request.payload;
-  const feedback = new Feedback({ rating, description });
+  const feedback = new Feedback({ userId, rating, description });
   await feedback.save();
 
   return h.response({

@@ -33,7 +33,7 @@ const init = async () => {
     await server.register(Jwt);
 
     server.auth.strategy('jwt', 'jwt', {
-        keys: config.jwtSecret,
+        keys: process.env.ACCESS_TOKEN_KEY,
         verify: {
         aud: false,
         iss: false,
