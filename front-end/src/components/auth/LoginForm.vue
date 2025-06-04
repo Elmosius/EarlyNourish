@@ -5,15 +5,22 @@ import { useRouter } from "vue-router";
 
 import FormInput from "../ui/FormInput.vue";
 import FormError from "../ui/FormError.vue";
+import { useAuthStore } from "../../stores/index.js";
+import { storeToRefs } from "pinia";
+import LoadingSpinner2 from "../ui/LoadingSpinner2.vue";
 
 const router = useRouter();
+const authStore = useAuthStore();
+const { loading, error: authError } = storeToRefs(authStore);
 
 const email = ref("");
 const password = ref("");
 const rememberMe = ref(false);
 const errors = ref({});
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
+  errors.value = {};
+
   const rules = {
     email: {
       required: true,
@@ -29,13 +36,16 @@ const handleSubmit = () => {
   const formData = {
     email: email.value,
     password: password.value,
-    rememberMe: rememberMe.value,
   };
 
   const validation = validateForm(formData, rules);
 
   if (validation.isValid) {
-    console.log("Login attempt with:", formData);
+    await authStore.login(formData);
+
+    if (!authStore.error) {
+      await router.push("/");
+    }
     errors.value = {};
   } else {
     errors.value = validation.errors;
@@ -49,6 +59,13 @@ const handleSubmit = () => {
     <p class="text-gray-500 mb-6 text-center text-base">
       Silahkan masuk untuk melanjutkan
     </p>
+
+    <div
+      v-if="authError"
+      class="mb-4 p-3 text-xs md:text-base bg-red-100 text-red-700 rounded"
+    >
+      * Login failed: {{ authError }}
+    </div>
 
     <form
       @submit.prevent="handleSubmit"
@@ -103,10 +120,12 @@ const handleSubmit = () => {
       </div>
 
       <button
+        :disabled="loading"
         type="submit"
         class="w-full text-base bg-slate-600 hover:bg-slate-700 text-white font-semibold py-2 px-4 rounded-md transition duration-200"
       >
-        Masuk
+        <LoadingSpinner2 v-if="loading" />
+        <span v-else>Masuk</span>
       </button>
 
       <div class="mt-6 text-center">
