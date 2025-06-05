@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const axios = require('axios');
 const History = require('../../models/history.model');
 const Prediction = require('../../models/prediction.model');
 const User = require('../../models/user.model');
@@ -10,34 +11,99 @@ const ClientError = require('../../exceptions/ClientError');
 const createPredictionHandlerImpl = async (request, h) => {
   PredictionsValidator.validatePostPredictionPayload(request.payload);
 
-  const { jenisKelamin, usia, bbLahir, tbLahir, beratBadan, tinggiBadan } = request.payload;
-  const userIdString = request.auth.credentials.userId;
+  const {
+    provinsi,
+    jenisKelamin,
+    usiaBayiBulan,
+    bbLahir,
+    tbLahir,
+    asiEksklusifBulan,
+    lingkarKepala,
+    lahirPrematur,
+    usiaIbu,
+    tinggiIbu,
+    bmiIbu,
+    pendidikanIbu,
+    sanitasiLayak,
+    airMinumLayak,
+    statusImunisasi,
+  } = request.payload;
 
+  const userIdString = request.auth.credentials.userId;
   const userDoc = await User.findById(userIdString);
   if (!userDoc) {
     throw new InvariantError('User tidak ditemukan');
   }
 
-  const newHistory = await new History({ userId: userDoc._id }).save();
+  const mlApiUrl = process.env.ML_API_URL;
+  if (!mlApiUrl || mlApiUrl.trim() === '') {
+    throw new ClientError('Variabel ML_API_URL belum di‐set di .env', 400);
+  }
 
-  const stuntingRisk = await _calculateStuntingRisk({
+  const mlPayload = {
+    provinsi,
     jenisKelamin,
-    usia,
+    usiaBayiBulan,
     bbLahir,
     tbLahir,
-    beratBadan,
-    tinggiBadan,
-  });
+    asiEksklusifBulan,
+    lingkarKepala,
+    lahirPrematur,
+    usiaIbu,
+    tinggiIbu,
+    bmiIbu,
+    pendidikanIbu,
+    sanitasiLayak,
+    airMinumLayak,
+    statusImunisasi,
+  };
+
+  let mlResult;
+  try {
+    const mlResponse = await axios.post(
+      mlApiUrl,
+      mlPayload,
+      {
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 10000, 
+      }
+    );
+    mlResult = mlResponse.data;
+    if (
+      !mlResult ||
+      typeof mlResult.stuntingRisk !== 'string' ||
+      !Array.isArray(mlResult.rekomendasi) ||
+      !Array.isArray(mlResult.nutrisi)
+    ) {
+      throw new Error('ML API merespons format yang tidak sesuai');
+    }
+  } catch (err) {
+    console.error('Error saat memanggil ML API:', err.message || err);
+    throw new ClientError('Gagal memproses prediksi ke ML API', 400);
+  }
+
+  const newHistory = await new History({ userId: userDoc._id }).save();
 
   const prediction = new Prediction({
     historyId: newHistory._id,
+    provinsi,
     jenisKelamin,
-    usia,
+    usiaBayiBulan,
     bbLahir,
     tbLahir,
-    beratBadan,
-    tinggiBadan,
-    stuntingRisk,
+    asiEksklusifBulan,
+    lingkarKepala,
+    lahirPrematur,
+    usiaIbu,
+    tinggiIbu,
+    bmiIbu,
+    pendidikanIbu,
+    sanitasiLayak,
+    airMinumLayak,
+    statusImunisasi,
+    stuntingRisk: mlResult.stuntingRisk,
+    rekomendasi: mlResult.rekomendasi,
+    nutrisi: mlResult.nutrisi,
   });
   await prediction.save();
 
@@ -46,6 +112,8 @@ const createPredictionHandlerImpl = async (request, h) => {
     Message: 'success',
     Result: {
       stuntingRisk: prediction.stuntingRisk,
+      rekomendasi: prediction.rekomendasi,
+      nutrisi: prediction.nutrisi,
     },
   }).code(201);
 };
@@ -56,6 +124,9 @@ const createPredictionHandler = async (request, h) => {
   } catch (err) {
     if (err instanceof ClientError) {
       return h.response({ Error: true, Message: err.message }).code(err.statusCode);
+    }
+    if (err instanceof InvariantError || err instanceof NotFoundError) {
+      return h.response({ Error: true, Message: err.message }).code(400);
     }
     console.error(err);
     return h.response({ Error: true, Message: 'Gagal menyimpan prediksi' }).code(500);
@@ -70,12 +141,12 @@ const getPredictionByIdHandlerImpl = async (request, h) => {
 
   const history = await History.findOne({ _id: idPredict, userId: idUser });
   if (!history) {
-    throw new NotFoundError('Data prediksi tidak ditemukan');
+    return h.response({ Error: true, Message: 'Data prediksi tidak ditemukan' }).code(404);
   }
 
   const prediction = await Prediction.findOne({ historyId: idPredict });
   if (!prediction) {
-    throw new NotFoundError('Data prediksi tidak ditemukan');
+    return h.response({ Error: true, Message: 'Data prediksi tidak ditemukan' }).code(404);
   }
 
   return h.response({
@@ -83,13 +154,24 @@ const getPredictionByIdHandlerImpl = async (request, h) => {
     Message: 'success',
     Result: {
       Id: prediction._id,
+      provinsi: prediction.provinsi,
       jenisKelamin: prediction.jenisKelamin,
-      Usia: prediction.usia,
+      usiaBayiBulan: prediction.usiaBayiBulan,
       bbLahir: prediction.bbLahir,
       tbLahir: prediction.tbLahir,
-      beratBadan: prediction.beratBadan,
-      tinggiBadan: prediction.tinggiBadan,
+      asiEksklusifBulan: prediction.asiEksklusifBulan,
+      lingkarKepala: prediction.lingkarKepala,
+      lahirPrematur: prediction.lahirPrematur,
+      usiaIbu: prediction.usiaIbu,
+      tinggiIbu: prediction.tinggiIbu,
+      bmiIbu: prediction.bmiIbu,
+      pendidikanIbu: prediction.pendidikanIbu,
+      sanitasiLayak: prediction.sanitasiLayak,
+      airMinumLayak: prediction.airMinumLayak,
+      statusImunisasi: prediction.statusImunisasi,
       stuntingRisk: prediction.stuntingRisk,
+      rekomendasi: prediction.rekomendasi,
+      nutrisi: prediction.nutrisi,
       createdAt: prediction.createdAt,
       updatedAt: prediction.updatedAt,
     },
@@ -100,20 +182,13 @@ const getPredictionByIdHandler = async (request, h) => {
   try {
     return await getPredictionByIdHandlerImpl(request, h);
   } catch (err) {
-    if (err instanceof ClientError) {
-      return h.response({ Error: true, Message: err.message }).code(err.statusCode);
+    if (err instanceof InvariantError) {
+      return h.response({ Error: true, Message: err.message }).code(400);
     }
     console.error(err);
     return h.response({ Error: true, Message: 'Gagal mengambil data prediksi' }).code(500);
   }
 };
-
-async function _calculateStuntingRisk({ jenisKelamin, usia, bbLahir, tbLahir, beratBadan, tinggiBadan }) {
-  const ratio = beratBadan / (usia || 1);
-  if (ratio < 0.5) return 'high';
-  if (ratio < 0.8) return 'medium';
-  return 'low';
-}
 
 module.exports = {
   createPredictionHandler,
