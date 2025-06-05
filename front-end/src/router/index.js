@@ -7,6 +7,7 @@ import AssessmentPage from "../views/AssessmentPage.vue";
 import ProfilePage from "../views/ProfilePage.vue";
 import DashboardPage from "../views/DashboardPage.vue";
 import HistoryPage from "../views/HistoryPage.vue";
+import ComingSoonPage from "../views/ComingSoonPage.vue";
 
 const routes = [
   {
@@ -17,6 +18,11 @@ const routes = [
   {
     path: "/register",
     component: RegisterPage,
+    meta: { layout: "AuthLayout" },
+  },
+  {
+    path: "/forgot-password",
+    component: ComingSoonPage,
     meta: { layout: "AuthLayout" },
   },
   {
