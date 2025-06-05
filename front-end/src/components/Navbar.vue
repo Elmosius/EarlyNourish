@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import {
   MenuIcon,
   XIcon,
@@ -9,6 +9,13 @@ import {
   ChevronDownIcon,
   LogInIcon,
 } from "lucide-vue-next";
+import { useAuthStore } from "../stores/index.js";
+import { storeToRefs } from "pinia";
+import { useRouter } from "vue-router";
+
+const authStore = useAuthStore();
+const { isAuthenticated, user } = storeToRefs(authStore);
+const router = useRouter();
 
 const isLoggedIn = ref(false);
 const isMenuOpen = ref(false);
@@ -53,11 +60,39 @@ const scrollToTop = () => {
   });
 };
 
-const profileMenuItems = [
-  { icon: UserIcon, label: "Informasi Pribadi", to: "/profile" },
-  { icon: History, label: "Riwayat Asesmen", to: "/history" },
-  { icon: LogOutIcon, label: "Keluar", to: "/logout", isLogout: true },
-];
+const handleLogout = () => {
+  authStore.logout();
+  closeProfileModal();
+  isMenuOpen.value = false;
+  router.push("/login");
+};
+
+const profileMenuItems = computed(() => [
+  {
+    icon: UserIcon,
+    label: "Informasi Pribadi",
+    to: "/profile",
+    action: closeProfileModal,
+  },
+  {
+    icon: History,
+    label: "Riwayat Asesmen",
+    to: "/history",
+    action: closeProfileModal,
+  },
+  { icon: LogOutIcon, label: "Keluar", action: handleLogout, isLogout: true },
+]);
+
+const userInitials = computed(() => {
+  if (user.value && user.value.nama) {
+    return user.value.nama.substring(0, 2).toUpperCase();
+  }
+  return "GU";
+});
+
+const userDisplayName = computed(() => {
+  return user.value?.nama || "Guest User";
+});
 </script>
 
 <template>
@@ -113,7 +148,10 @@ const profileMenuItems = [
             class="text-gray-700 hover:text-tertiary font-medium px-6"
             >Testimoni</router-link
           >
-          <div v-if="isLoggedIn" class="ml-6 relative profile-menu-container">
+          <div
+            v-if="isAuthenticated"
+            class="ml-6 relative profile-menu-container"
+          >
             <button
               @click="toggleProfileModal"
               class="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-full font-medium transition-colors"
@@ -121,10 +159,10 @@ const profileMenuItems = [
               <div
                 class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center"
               >
-                <span class="text-sm">El</span>
+                <span class="text-sm">{{ userInitials }}</span>
               </div>
 
-              <span>Elmosius Suli</span>
+              <span>{{ userDisplayName }}</span>
               <ChevronDownIcon
                 class="h-4 w-4 transition-transform duration-300"
                 :class="{ 'rotate-180': isProfileModalOpen }"
@@ -138,21 +176,24 @@ const profileMenuItems = [
                 class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
               >
                 <div class="px-4 py-3 border-b border-gray-100">
-                  <p class="text-sm font-medium text-gray-900">Elmosius Suli</p>
-                  <p class="text-sm text-gray-500">elmosius@example.com</p>
+                  <p class="text-sm font-medium text-gray-900">
+                    {{ userDisplayName }}
+                  </p>
+                  <p class="text-sm text-gray-500">{{ user?.email }}</p>
                 </div>
                 <div class="py-1">
-                  <router-link
+                  <component
                     v-for="item in profileMenuItems"
                     :key="item.label"
                     :to="item.to"
+                    :is="item.to ? 'router-link' : 'button'"
                     class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                     :class="{ 'text-red-600 hover:bg-red-50': item.isLogout }"
                     @click="closeProfileModal"
                   >
                     <component :is="item.icon" class="h-4 w-4 mr-3" />
                     {{ item.label }}
-                  </router-link>
+                  </component>
                 </div>
               </div>
             </transition>
@@ -211,34 +252,43 @@ const profileMenuItems = [
             >
 
             <!-- Mobile Profile Section -->
-            <div v-if="isLoggedIn" class="py-2 border-t border-gray-200 mt-2">
+            <div
+              v-if="isAuthenticated"
+              class="py-2 border-t border-gray-200 mt-2"
+            >
               <div class="flex items-center space-x-3 px-2 py-3">
                 <div
                   class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center"
                 >
-                  <span class="text-sm font-medium">El</span>
+                  <span class="text-sm font-medium">{{ userInitials }}</span>
                 </div>
                 <div>
                   <p class="text-sm font-semibold text-gray-900">
-                    Elmosius Suli
+                    {{ userDisplayName }}
                   </p>
-                  <p class="text-xs text-gray-500">elmosius@example.com</p>
+                  <p class="text-xs text-gray-500">{{ user?.email }}</p>
                 </div>
               </div>
 
               <!-- Mobile Profile Menu Items -->
               <div class="space-y-1 mt-2">
-                <router-link
+                <component
                   v-for="item in profileMenuItems"
                   :key="item.label"
                   :to="item.to"
+                  :is="item.to ? 'router-link' : 'button'"
                   class="flex items-center px-2 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
                   :class="{ 'text-red-600 hover:bg-red-50': item.isLogout }"
-                  @click="isMenuOpen = false"
+                  @click="
+                    () => {
+                      item.action();
+                      isMenuOpen = false;
+                    }
+                  "
                 >
                   <component :is="item.icon" class="h-4 w-4 mr-3" />
                   {{ item.label }}
-                </router-link>
+                </component>
               </div>
             </div>
             <div v-else class="py-2 border-t border-gray-200 mt-2">

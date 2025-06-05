@@ -14,7 +14,7 @@ export const login = async (credentials) => {
     if (user) {
       return {
         data: {
-          user: { id: user.id, email: user.email, name: user.name }, // ensure username is returned as API might expect it
+          user: { id: user.id, email: user.email, nama: user.nama }, // ensure username is returned as API might expect it
           token: `dummy-auth-token-for-${user.id}`,
         },
       };
