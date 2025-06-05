@@ -2,16 +2,16 @@
   {
     "id": "fb1",
     "userId": "user1",
-    "nama": "John Doe",
-    "description": "This application is incredibly helpful for tracking my child's early development. The UI is intuitive too!",
+    "nama": "Fatimah Salim",
+    "description": "Early Nourish telah mengubah cara kami menangani gizi anak. Analitik prediktifnya membantu kami mengidentifikasi anak-anak yang berisiko beberapa bulan lebih awal dibandingkan metode tradisional.",
     "rating": 5,
     "createdAt": "2023-10-27T10:00:00Z"
   },
   {
     "id": "fb2",
     "userId": "user2",
-    "nama": "Jane Smith",
-    "description": "Found a small bug in the profile update section, but overall a great experience. The assessment tools are very thorough.",
+    "nama": "Dewi Pramita",
+    "description": "Rencana nutrisi yang dipersonalisasi membantu putri saya mengejar pertumbuhannya. Aplikasi ini memudahkan saya untuk melacak perkembangan dan menyesuaikan pola makannya sesuai kebutuhan.",
     "rating": 4,
     "createdAt": "2023-11-05T14:30:00Z"
   },
@@ -27,7 +27,7 @@
     "id": "fb4",
     "userId": "user3",
     "nama": "Alice Johnson",
-    "description": "As a developer, I appreciate the clean codebase and the use of modern technologies. Keep up the good work!",
+    "description": "The community support feature is fantastic! It’s great to connect with other parents and share experiences.",
     "rating": 5,
     "createdAt": "2023-12-01T12:00:00Z"
   }

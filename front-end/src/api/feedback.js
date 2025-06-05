@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const FEEDBACKS_DATA_URL = "/src/api/dummy-data/feedbacks.json";
+const FEEDBACKS_DATA_URL = "/src/api/dummy/feedbacks.json";
 
 export const getFeedbacks = async (/* token is no longer passed */) => {
   try {

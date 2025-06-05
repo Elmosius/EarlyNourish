@@ -1,5 +1,44 @@
 <script setup>
 import { Quote } from "lucide-vue-next";
+import { computed, onMounted, ref } from "vue";
+import LoadingSpinner from "../ui/LoadingSpinner.vue";
+import { getFeedbacks } from "../../api/feedback.js";
+
+const allFeedbacks = ref([]);
+const isLoading = ref(false);
+const error = ref(null);
+
+const fetchAllFeedbacks = async () => {
+  isLoading.value = true;
+  error.value = null;
+  try {
+    const response = await getFeedbacks();
+    // Dari API kamu, response.data.feedbacks adalah array-nya
+    allFeedbacks.value = response.data.feedbacks || [];
+  } catch (err) {
+    console.error("Gagal mengambil testimoni:", err);
+    error.value =
+      err.response?.data?.message || "Tidak dapat memuat testimoni.";
+    allFeedbacks.value = []; // Pastikan array kosong jika error
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Ambil data saat komponen pertama kali dimuat
+onMounted(() => {
+  fetchAllFeedbacks();
+});
+
+// Computed property untuk mendapatkan 3 feedback terbaik
+// Asumsi 'rating' adalah properti untuk menentukan "terbaik" dan nilainya lebih tinggi lebih baik
+// Jika tidak ada rating, kamu bisa ambil 3 terbaru atau acak.
+const topThreeFeedbacks = computed(() => {
+  // Buat salinan array agar tidak mengubah state asli
+  return [...allFeedbacks.value]
+    .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+    .slice(0, 3);
+});
 </script>
 
 <template>
@@ -20,9 +59,14 @@ import { Quote } from "lucide-vue-next";
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <LoadingSpinner v-if="isLoading" />
+      <div v-if="error" class="error-message">
+        <p>{{ error }}</p>
+        <button @click="fetchAllFeedbacks">Coba Lagi</button>
+      </div>
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <div
-          v-for="(testimonial, index) in testimonials"
+          v-for="(testimonial, index) in topThreeFeedbacks"
           :key="index"
           class="bg-white p-6 rounded-lg shadow-md"
         >
@@ -44,19 +88,19 @@ import { Quote } from "lucide-vue-next";
             <Quote class="text-secondary opacity-60" />
           </div>
           <p class="text-gray-600 mb-6 text-base italic leading-loose">
-            {{ testimonial.content }}
+            {{ testimonial.description }}
           </p>
           <div class="flex">
             <div
               class="bg-[#DCFCE7] inset-shadow-sm inset-shadow-gray-300 w-10 h-10 rounded-full flex items-center justify-center mr-3"
             >
               <span class="text-tertiary font-bold">{{
-                testimonial.name.charAt(0)
+                testimonial.nama.charAt(0)
               }}</span>
             </div>
             <div>
-              <h4 class="font-semibold">{{ testimonial.name }}</h4>
-              <p class="text-sm text-gray-500">{{ testimonial.role }}</p>
+              <h4 class="font-semibold">{{ testimonial.nama }}</h4>
+              <p class="text-sm text-gray-500">Orang tua</p>
             </div>
           </div>
         </div>
