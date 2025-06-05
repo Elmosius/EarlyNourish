@@ -1,29 +1,5 @@
 <script setup>
 import { Quote } from "lucide-vue-next";
-
-const testimonials = [
-  {
-    name: "Fatimah Salim",
-    role: "Orang tua",
-    content:
-      '"Early Nourish telah mengubah cara kami menangani gizi anak. Analitik prediktifnya membantu kami mengidentifikasi anak-anak yang berisiko beberapa bulan lebih awal dibandingkan metode tradisional."',
-    rating: 5,
-  },
-  {
-    name: "Dewi Pramita",
-    role: "Orang tua",
-    content:
-      '"Rencana nutrisi yang dipersonalisasi membantu putri saya mengejar pertumbuhannya. Aplikasi ini memudahkan saya untuk melacak perkembangan dan menyesuaikan pola makannya sesuai kebutuhan."',
-    rating: 5,
-  },
-  {
-    name: "Diana Permata",
-    role: "Orang tua",
-    content:
-      '"Sangat mudah digunakan dan memberikan informasi yang jelas. Saya jadi lebih memahami pentingnya nutrisi untuk mencegah stunting"',
-    rating: 4,
-  },
-];
 </script>
 
 <template>
