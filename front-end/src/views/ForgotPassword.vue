@@ -3,5 +3,5 @@ import ComingSoon from "../components/ComingSoon.vue";
 </script>
 
 <template>
-  <ComingSoonn />
+  <ComingSoon />
 </template>
