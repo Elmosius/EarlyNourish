@@ -3,12 +3,13 @@ import { onMounted, ref, watch } from "vue";
 import { InfoIcon, UserIcon } from "lucide-vue-next";
 import { validateForm } from "../../utils/validation.js";
 
-import FormInput from "../ui/FormInput.vue";
-import FormTextArea from "../ui/FormTextArea.vue";
-import FormError from "../ui/FormError.vue";
 import { useProfileStore } from "../../stores/profile.js";
 import { useAuthStore } from "../../stores/index.js";
 import { storeToRefs } from "pinia";
+
+import FormInput from "../ui/FormInput.vue";
+import FormTextArea from "../ui/FormTextArea.vue";
+import FormError from "../ui/FormError.vue";
 import LoadingSpinner from "../ui/LoadingSpinner.vue";
 import ErrorMessage from "../ui/ErrorMessage.vue";
 import LoadingSpinner2 from "../ui/LoadingSpinner2.vue";

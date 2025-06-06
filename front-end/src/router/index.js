@@ -7,9 +7,16 @@ import AssessmentPage from "../views/AssessmentPage.vue";
 import ProfilePage from "../views/ProfilePage.vue";
 import DashboardPage from "../views/DashboardPage.vue";
 import HistoryPage from "../views/HistoryPage.vue";
-import ComingSoonPage from "../views/ComingSoonPage.vue";
+import ForgotPassword from "../views/ForgotPassword.vue";
+import SkPage from "../views/SkPage.vue";
+import ContactSupport from "../views/ContactSupport.vue";
 
 const routes = [
+  {
+    path: "/",
+    component: HomePage,
+    meta: { layout: "MainLayout" },
+  },
   {
     path: "/login",
     component: LoginPage,
@@ -22,19 +29,20 @@ const routes = [
   },
   {
     path: "/forgot-password",
-    component: ComingSoonPage,
-    meta: { layout: "AuthLayout" },
+    component: ForgotPassword,
+    meta: { layout: "DefaultLayout" },
   },
   {
-    path: "/",
-    component: HomePage,
-    meta: { layout: "MainLayout" },
+    path: "/sk",
+    component: SkPage,
+    meta: { layout: "DefaultLayout" },
   },
   {
     path: "/profile",
     component: ProfilePage,
     meta: { layout: "MainLayout" },
   },
+
   {
     path: "/assessment",
     component: AssessmentPage,
@@ -49,6 +57,11 @@ const routes = [
     path: "/dashboard",
     component: DashboardPage,
     meta: { layout: "MainLayout" },
+  },
+  {
+    path: "/contact-support",
+    component: ContactSupport,
+    meta: { layout: "DefaultLayout" },
   },
   {
     path: "/:pathMatch(.*)*",

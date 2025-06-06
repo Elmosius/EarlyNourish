@@ -19,13 +19,13 @@ import { HelpCircleIcon, ChevronRightIcon } from "lucide-vue-next";
             Jika Anda memiliki pertanyaan atau ingin bantuan dalam mengisi
             formulir, tim kami siap membantu.
           </p>
-          <a
-            href="#"
+          <router-link
+            to="/contact-support"
             class="text-tertiary font-medium flex items-center text-sm"
           >
             Contact Support
             <ChevronRightIcon class="h-4 w-4 ml-1" />
-          </a>
+          </router-link>
         </div>
       </div>
     </div>

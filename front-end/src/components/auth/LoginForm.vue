@@ -87,10 +87,10 @@ const handleSubmit = async () => {
             class="block text-gray-700 mb-1 text-base font-semibold"
             >Password</label
           >
-          <a
-            href="#"
+          <router-link
+            to="/forgot-password"
             class="text-tertiary text-base hover:underline font-medium"
-            >Lupa kata sandi?</a
+            >Lupa kata sandi?</router-link
           >
         </div>
 

@@ -155,7 +155,12 @@ const handleSubmit = async () => {
             required
           />
           <span class="ml-2 text-gray-700 text-base">Saya menyetujui</span>
-          <span class="ml-1 text-tertiary text-base"> Syarat & Kentuan </span>
+          <router-link
+            to="sk"
+            class="ml-1 text-tertiary text-base cursor-pointer"
+          >
+            Syarat & Kentuan
+          </router-link>
         </label>
 
         <FormError :message="errors.sk" v-if="errors.sk" />
