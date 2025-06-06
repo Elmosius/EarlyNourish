@@ -37,7 +37,7 @@ const items = [
         >
           Tentang Early Nourish
         </h2>
-        <p class="text-gray-600 max-w-2xl mx-auto text-base">
+        <p class="text-gray-600 max-w-2xl mx-auto text-base md:text-sm">
           Kami berkomitmen untuk membantu orang tua memantau pertumbuhan anak
           dan mencegah stunting sejak dini.
         </p>

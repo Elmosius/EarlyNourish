@@ -3,27 +3,27 @@
 <template>
   <section class="py-12 px-8 md:px-14 lg:px-38 z-10 bg-gray-50">
     <div class="container mx-auto">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-20 items-center">
         <div class="order-2 md:order-1">
           <h1
-            class="text-4xl md:text-4xl lg:text-5xl font font-bold text-gray-800 mb-4 font-montserrat"
+            class="text-4xl lg:text-4xl xl:text-5xl font font-bold text-gray-800 mb-4 font-montserrat"
           >
             Deteksi Dini <span class="text-secondary">Risiko Stunting</span>
           </h1>
-          <p class="text-gray-600 mb-8">
+          <p class="text-gray-600 mb-8 text-base md:text-sm">
             Tumbuh sehat dimulai dari sekarang! Dengan analisis data pintar dan
             nutrisi yang disesuaikan, kami bantu si Kecil berkembang optimal!
           </p>
           <div class="flex flex-row gap-4">
             <router-link
               to="/assessment"
-              class="bg-linear-to-r from-[#4E586B] to-[#4ADE80] hover:opacity-85 text-white font-medium px-4 py-2 rounded-4xl transition duration-300 shadow-lg"
+              class="text-base md:text-sm bg-linear-to-r from-[#4E586B] to-[#4ADE80] hover:opacity-85 text-white font-medium px-4 py-2 rounded-4xl transition duration-300 shadow-lg"
             >
               Mulai Penilaian
             </router-link>
             <router-link
               :to="{ path: '/', hash: '#carakerja-home' }"
-              class="border border-tertiary text-tertiary hover:bg-green-50 font-medium px-4 py-2 rounded-4xl transition duration-300 shadow-lg"
+              class="text-base md:text-sm border border-tertiary text-tertiary hover:bg-green-50 font-medium px-4 py-2 rounded-4xl transition duration-300 shadow-lg"
             >
               Selengkapnya
             </router-link>
@@ -63,7 +63,7 @@
           <img
             src="../../assets/card-home-tab-desktop.png"
             alt="App Preview"
-            class="w-20xl md:max-w-xl relative z-10 hidden md:block"
+            class="w-20xl md:max-w-xl lg:max-w-md xl:max-w-xl relative z-10 hidden md:block"
           />
           <img
             src="../../assets/card-home-mobile.png"

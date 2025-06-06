@@ -63,7 +63,7 @@ const features = [
         >
           Fitur Utama
         </h2>
-        <p class="text-gray-600 max-w-2xl mx-auto text-base">
+        <p class="text-gray-600 max-w-2xl mx-auto text-base md:text-sm">
           Platform kami menawarkan alat yang komprehensif untuk membantu tenaga
           kesehatan, orang tua, dan komunitas dalam mengatasi stunting pada anak
           secara efektif.

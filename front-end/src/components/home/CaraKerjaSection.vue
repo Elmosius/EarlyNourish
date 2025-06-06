@@ -39,7 +39,7 @@ const steps = [
         <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
           Cara Kerja
         </h2>
-        <p class="text-gray-600 max-w-2xl mx-auto text-base">
+        <p class="text-gray-600 max-w-2xl mx-auto text-base md:text-sm">
           Proses sederhana kami membantu mengidentifikasi anak-anak yang
           berisiko dan memberikan intervensi yang dipersonalisasi untuk mencegah
           stunting.
@@ -65,7 +65,7 @@ const steps = [
       <div class="mt-6 text-center">
         <router-link
           to="/assessment"
-          class="bg-linear-to-r from-[#4E586B] to-[#4ADE80] hover:opacity-85 text-white font-medium py-3 px-4 rounded-4xl transition duration-300 shadow-xl"
+          class="text-base md:text-sm bg-linear-to-r from-[#4E586B] to-[#4ADE80] hover:opacity-85 text-white font-medium py-3 px-4 rounded-4xl transition duration-300 shadow-xl"
         >
           Mulai Penilaian Sekarang
         </router-link>

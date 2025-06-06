@@ -53,7 +53,7 @@ const topThreeFeedbacks = computed(() => {
         <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
           Apa Kata Mereka
         </h2>
-        <p class="text-base text-gray-600 max-w-2xl mx-auto">
+        <p class="text-base md:text-sm text-gray-600 max-w-2xl mx-auto">
           Dengarkan dari orang tua yang telah menggunakan Early Nourish untuk
           meningkatkan hasil kesehatan dan tumbuh kembang anak.
         </p>
