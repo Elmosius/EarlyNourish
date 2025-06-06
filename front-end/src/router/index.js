@@ -57,7 +57,7 @@ const routes = [
   {
     path: "/dashboard/:id",
     component: DashboardPage,
-    meta: { layout: "MainLayout", requiresAuth: true },
+    meta: { layout: "MainLayout", requiresAuth: false },
   },
   {
     path: "/contact-support",
