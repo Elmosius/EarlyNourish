@@ -10,6 +10,7 @@ import HistoryPage from "../views/HistoryPage.vue";
 import ForgotPassword from "../views/ForgotPassword.vue";
 import SkPage from "../views/SkPage.vue";
 import ContactSupport from "../views/ContactSupport.vue";
+import { useAuthStore } from "../stores/index.js";
 
 const routes = [
   {
@@ -40,28 +41,28 @@ const routes = [
   {
     path: "/profile",
     component: ProfilePage,
-    meta: { layout: "MainLayout" },
+    meta: { layout: "MainLayout", requiresAuth: true },
   },
 
   {
     path: "/assessment",
     component: AssessmentPage,
-    meta: { layout: "MainLayout" },
+    meta: { layout: "MainLayout", requiresAuth: true },
   },
   {
     path: "/history",
     component: HistoryPage,
-    meta: { layout: "MainLayout" },
+    meta: { layout: "MainLayout", requiresAuth: true },
   },
   {
-    path: "/dashboard",
+    path: "/dashboard/:id",
     component: DashboardPage,
-    meta: { layout: "MainLayout" },
+    meta: { layout: "MainLayout", requiresAuth: true },
   },
   {
     path: "/contact-support",
     component: ContactSupport,
-    meta: { layout: "DefaultLayout" },
+    meta: { layout: "DefaultLayout", requiresAuth: true },
   },
   {
     path: "/:pathMatch(.*)*",
@@ -89,4 +90,20 @@ const router = createRouter({
   },
 });
 
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore();
+
+  if (to.meta.requiresAuth) {
+    if (authStore.isAuthenticated) {
+      next();
+    } else {
+      next({
+        path: "/login",
+        query: { redirect: to.fullPath },
+      });
+    }
+  } else {
+    next();
+  }
+});
 export default router;
