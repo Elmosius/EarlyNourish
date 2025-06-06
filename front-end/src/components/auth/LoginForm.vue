@@ -8,6 +8,7 @@ import FormError from "../ui/FormError.vue";
 import { useAuthStore } from "../../stores/index.js";
 import { storeToRefs } from "pinia";
 import LoadingSpinner2 from "../ui/LoadingSpinner2.vue";
+import ErrorMessage from "../ui/ErrorMessage.vue";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -17,6 +18,7 @@ const email = ref("");
 const password = ref("");
 const rememberMe = ref(false);
 const errors = ref({});
+authStore.error = null;
 
 const handleSubmit = async () => {
   errors.value = {};
@@ -60,12 +62,7 @@ const handleSubmit = async () => {
       Silahkan masuk untuk melanjutkan
     </p>
 
-    <div
-      v-if="authError"
-      class="mb-4 p-3 text-xs md:text-base bg-red-100 text-red-700 rounded"
-    >
-      * Login failed: {{ authError }}
-    </div>
+    <ErrorMessage v-if="authError" :message="authError" />
 
     <form
       @submit.prevent="handleSubmit"

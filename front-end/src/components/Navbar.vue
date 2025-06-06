@@ -188,8 +188,10 @@ const userDisplayName = computed(() => {
                     :to="item.to"
                     :is="item.to ? 'router-link' : 'button'"
                     class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                    :class="{ 'text-red-600 hover:bg-red-50': item.isLogout }"
-                    @click="closeProfileModal"
+                    :class="{
+                      'text-red-600 hover:bg-red-50 w-full': item.isLogout,
+                    }"
+                    @click="item.action"
                   >
                     <component :is="item.icon" class="h-4 w-4 mr-3" />
                     {{ item.label }}
@@ -278,7 +280,9 @@ const userDisplayName = computed(() => {
                   :to="item.to"
                   :is="item.to ? 'router-link' : 'button'"
                   class="flex items-center px-2 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-                  :class="{ 'text-red-600 hover:bg-red-50': item.isLogout }"
+                  :class="{
+                    'text-red-600 hover:bg-red-50 w-full': item.isLogout,
+                  }"
                   @click="
                     () => {
                       item.action();

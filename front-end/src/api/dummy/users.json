@@ -4,6 +4,13 @@
     "email": "user@example.com",
     "password": "password",
     "nama": "User Biasa",
+    "namaAnak": "Anak User",
+    "alamat" : "Jl. Contoh No. 123",
+    "tanggalLahir": "2023-01-01",
+    "bbLahir": 20,
+    "tbLahir": 30,
+    "lingkarKepala" : 40,
+    "fotoProfil": "https://th.bing.com/th/id/R.bb292bc31597a6ad93ee1bf5c514d5b1?rik=sNOQgCVK6kF8%2fA&riu=http%3a%2f%2fimages.unsplash.com%2fphoto-1529665253569-6d01c0eaf7b6%3fixlib%3drb-1.2.1%26q%3d80%26fm%3djpg%26crop%3dentropy%26cs%3dtinysrgb%26w%3d1080%26fit%3dmax%26ixid%3deyJhcHBfaWQiOjEyMDd9&ehk=ehAiI047tOUe6tNkdDeZmOuZcCO0hKC030nagdxXcss%3d&risl=&pid=ImgRaw&r=0",
     "token": "dummyToken123abc"
   },
   {
@@ -11,6 +18,12 @@
     "email": "admin@example.com",
     "password": "password",
     "nama": "Admin Kece",
+    "alamat" : "Jl. Admin No. 456",
+    "tanggalLahir": "2023-01-01",
+    "bbLahir": 25,
+    "tbLahir": 35,
+    "lingkarKepala" : 45,
+    "fotoProfil": "https://th.bing.com/th/id/R.bb292bc31597a6ad93ee1bf5c514d5b1?rik=sNOQgCVK6kF8%2fA&riu=http%3a%2f%2fimages.unsplash.com%2fphoto-1529665253569-6d01c0eaf7b6%3fixlib%3drb-1.2.1%26q%3d80%26fm%3djpg%26crop%3dentropy%26cs%3dtinysrgb%26w%3d1080%26fit%3dmax%26ixid%3deyJhcHBfaWQiOjEyMDd9&ehk=ehAiI047tOUe6tNkdDeZmOuZcCO0hKC030nagdxXcss%3d&risl=&pid=ImgRaw&r=0",
     "token": "dummyAdminToken456xyz"
   }
 ]

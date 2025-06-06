@@ -1,17 +1,32 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { InfoIcon, UserIcon } from "lucide-vue-next";
 import { validateForm } from "../../utils/validation.js";
 
 import FormInput from "../ui/FormInput.vue";
 import FormTextArea from "../ui/FormTextArea.vue";
 import FormError from "../ui/FormError.vue";
+import { useProfileStore } from "../../stores/profile.js";
+import { useAuthStore } from "../../stores/index.js";
+import { storeToRefs } from "pinia";
+import LoadingSpinner from "../ui/LoadingSpinner.vue";
+import ErrorMessage from "../ui/ErrorMessage.vue";
+import LoadingSpinner2 from "../ui/LoadingSpinner2.vue";
 
-const profilePhotoUrl = ref(null);
+const profileStore = useProfileStore();
+const authStore = useAuthStore();
+
+const {
+  profile,
+  loading: profileLoading,
+  error: profileError,
+} = storeToRefs(profileStore);
+const { user: authUser } = storeToRefs(authStore);
+
+const profilePhotoUrl = ref(profile.value?.fotoProfil || null);
 const profilePhotoFile = ref(null);
 
 const fullName = ref("");
-const role = ref("");
 const email = ref("");
 const address = ref("");
 const childName = ref("");
@@ -30,7 +45,40 @@ const handlePhotoUpload = (event) => {
   }
 };
 
-const handleSubmit = () => {
+const populateForm = (profileData) => {
+  if (profileData) {
+    fullName.value = profileData.name || "";
+    email.value = profileData.email || "";
+    // address.value = profileData.address || ""; // Example if API provided it
+    // childName.value = profileData.childName || ""; // Example
+  }
+};
+
+onMounted(async () => {
+  if (authUser.value && authUser.value.id) {
+    await profileStore.fetchProfile(authUser.value.id);
+    populateForm(profile.value);
+  }
+});
+
+// Watch for changes in the profile store (e.g., after an update or initial fetch)
+watch(profile, (newProfileData) => {
+  populateForm(newProfileData);
+});
+
+// Watch for user to be available (e.g. after login and redirect)
+watch(authUser, async (newUser) => {
+  if (newUser && newUser.id && !profile.value) {
+    // Fetch only if no profile yet and user is available
+    await profileStore.fetchProfile(newUser.id);
+    // populateForm will be called by the 'profile' watcher
+  }
+});
+
+const handleSubmit = async () => {
+  errors.value = {};
+  profileStore.error = null;
+
   const rules = {
     fullName: {
       label: "Nama Lengkap",
@@ -64,7 +112,6 @@ const handleSubmit = () => {
   const formData = {
     profilePhoto: profilePhotoFile.value,
     fullName: fullName.value,
-    role: role.value,
     email: email.value,
     address: address.value,
     childName: childName.value,
@@ -77,7 +124,11 @@ const handleSubmit = () => {
   const validation = validateForm(formData, rules);
 
   if (validation.isValid) {
-    console.log("Complete form submitted with data:", formData);
+    if (authUser.value && authUser.value.id) {
+      await profileStore.updateUserProfile(authUser.value.id, formData);
+    } else {
+      profileStore.error = "User tidak ditemukan. Silakan masuk kembali.";
+    }
     errors.value = {};
   } else {
     errors.value = validation.errors;
@@ -94,7 +145,11 @@ const handleSubmit = () => {
         Informasi Pribadi
       </h1>
 
-      <form @submit.prevent="handleSubmit" class="space-y-8">
+      <ErrorMessage :message="profileError" v-if="profileError" />
+      <div v-if="profileLoading">
+        <LoadingSpinner />
+      </div>
+      <form v-else @submit.prevent="handleSubmit" class="space-y-8">
         <div class="flex flex-col items-center">
           <div class="relative mb-4">
             <div
@@ -143,6 +198,7 @@ const handleSubmit = () => {
                 label="Nama Lengkap"
                 v-model="fullName"
                 placeholder="Masukkan nama Anda"
+                :model-value="profile?.nama"
                 autofocus
               />
               <FormError :message="errors.fullName" v-if="errors.fullName" />
@@ -155,6 +211,7 @@ const handleSubmit = () => {
                 type="email"
                 v-model="email"
                 placeholder="Masukkan email Anda"
+                :model-value="profile?.email"
                 autofocus
               />
               <FormError :message="errors.email" v-if="errors.email" />
@@ -165,9 +222,10 @@ const handleSubmit = () => {
                 id="address"
                 v-model="address"
                 placeholder="Masukkan Alamat Anda"
-                rows="3"
+                :rows="3"
                 label="Alamat"
                 autofocus
+                :model-value="profile?.alamat"
               />
               <FormError :message="errors.address" v-if="errors.address" />
             </div>
@@ -187,6 +245,7 @@ const handleSubmit = () => {
                 label="Nama Anak"
                 v-model="childName"
                 placeholder="Masukkan nama anak Anda"
+                :model-value="profile?.namaAnak"
               />
               <FormError :message="errors.childName" v-if="errors.childName" />
             </div>
@@ -199,6 +258,7 @@ const handleSubmit = () => {
                 placeholder="Contoh : 3.2"
                 step="0.1"
                 label="Berat Lahir (kg)"
+                :model-value="profile?.bbLahir"
               />
               <FormError
                 :message="errors.birthWeight"
@@ -213,6 +273,7 @@ const handleSubmit = () => {
               label="Tanggal Lahir"
               type="date"
               v-model="birthDate"
+              :model-value="profile?.tanggalLahir"
             />
 
             <div>
@@ -220,6 +281,7 @@ const handleSubmit = () => {
                 id="birthHeight"
                 type="number"
                 v-model="birthHeight"
+                :model-value="profile?.tbLahir"
                 placeholder="Contoh : 50"
                 label="Tinggi Lahir (cm)"
               />
@@ -234,6 +296,7 @@ const handleSubmit = () => {
                 id="headCircumference"
                 type="number"
                 v-model="headCircumference"
+                :model-value="profile?.lingkarKepala"
                 placeholder="Contoh : 34"
                 label="Lingkar Kepala ketika Lahir (cm)"
               />
@@ -266,10 +329,14 @@ const handleSubmit = () => {
         <!-- Submit Button -->
         <div class="flex justify-center">
           <button
+            :disabled="profileLoading"
             type="submit"
-            class="bg-linear-65 from-[#4ADE80] to-[#22C55E] shadow-xl inset-shadow-xs inset-shadow-gray-500 hover:opacity-85 text-white font-medium py-2 px-6 rounded-full transition duration-300"
+            class="bg-linear-65 from-[#4ADE80] to-[#22C55E] shadow-xl inset-shadow-xs inset-shadow-gray-500 hover:opacity-85 text-white font-medium text-base md:text-sm py-2 px-6 rounded-full transition duration-300 disabled:opacity-50"
           >
-            Simpan
+            <span v-if="profileLoading" class="flex items-center">
+              <LoadingSpinner2 />
+            </span>
+            <span v-else>Simpan Perubahan</span>
           </button>
         </div>
       </form>

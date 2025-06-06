@@ -7,6 +7,7 @@ import { useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/index.js";
 import { storeToRefs } from "pinia";
 import LoadingSpinner2 from "../ui/LoadingSpinner2.vue";
+import ErrorMessage from "../ui/ErrorMessage.vue";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -18,6 +19,7 @@ const password = ref("");
 const confirm_password = ref("");
 const sk = ref(false);
 const errors = ref({});
+authStore.error = null;
 
 const handleSubmit = async () => {
   errors.value = {};
@@ -85,12 +87,7 @@ const handleSubmit = async () => {
       Silahkan isi data berikut untuk mendaftar
     </p>
 
-    <div
-      v-if="authError"
-      class="mb-4 p-3 text-xs md:text-base bg-red-100 text-red-700 rounded"
-    >
-      * Registration failed: {{ authError }}
-    </div>
+    <ErrorMessage v-if="authError" :message="authError" />
 
     <form @submit.prevent="handleSubmit">
       <div class="mb-4">
