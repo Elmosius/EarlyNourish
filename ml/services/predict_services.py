@@ -1,51 +1,84 @@
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+import joblib
 from schemas.predict_schemas import StuntingInput, StuntingOutput
-import random 
+from core.config import settings
 
-# Di sinilah nanti akan memuat model TensorFlow
-# Contoh:
-# try:
-#     model = tensorflow.keras.models.load_model('path/to/your/model.h5')
-# except Exception as e:
-#     # Handle error pemuatan model, mungkin log atau raise exception khusus
-#     print(f"Error loading ML model: {e}")
-#     model = None
+try:
+    model = tf.keras.models.load_model(settings.MODEL_STUNTING_H5_PATH)
+    scaler = joblib.load(settings.SCALER_STUNTING_PKL_PATH)
+    status_encoder = joblib.load(settings.STATUS_ENCODER_PKL_PATH)
+    print("Models and encoders loaded successfully!")
+except Exception as e:
+    print(f"Error loading models/encoders: {e}")
+    model = None
+    scaler = None
+    status_encoder = None
 
 async def get_stunting_prediction(data: StuntingInput) -> StuntingOutput:
-    print(f"Menerima data untuk prediksi: {data.model_dump()}") # model_dump() untuk Pydantic V2
+    if not all([model, scaler, status_encoder]):
+        return StuntingOutput(
+            risikoStunting="Error: Model tidak dimuat", 
+            tindakan=["Silakan periksa log server untuk masalah pemuatan model."],
+            nutrisi=["Tidak ada saran nutrisi karena model tidak dapat diakses."]
+        )
 
-    # --- MULAI LOGIKA MOCK ---
-    # Logika ini hanya contoh, ganti dengan pemanggilan model ML nanti.
+    print(f"Menerima data untuk prediksi: {data.model_dump()}")
 
-    risk_category = "Normal"
-    recommendations = [
+    # 1. Preprocess input data
+    jk_encoded = 0 if data.jk.upper() == "P" else 1
+
+    nama_kolom = ["JK", "BB_Lahir", "TB_Lahir", "Umur", "Berat", "Tinggi"]
+    
+    fitur_input_df = pd.DataFrame([[
+        jk_encoded,
+        data.bbLahir,
+        data.tbLahir,
+        data.umur,  
+        data.bb,  
+        data.tb   
+    ]], columns=nama_kolom)
+
+    # 2. Scale features
+    fitur_scaled = scaler.transform(fitur_input_df)
+
+    # 3. Make prediction
+    pred = model.predict(fitur_scaled)
+    pred_label = np.argmax(pred, axis=1)
+
+    # 4. Decode prediction
+    status_prediksi = status_encoder.inverse_transform(pred_label)
+    
+    print(f"✅ Prediksi status stunting: {status_prediksi[0]}")
+
+    tindakan_list = [
         "Lanjutkan pemantauan tumbuh kembang anak secara rutin.",
         "Pastikan asupan gizi seimbang dan adekuat sesuai usia.",
         "Berikan stimulasi yang sesuai untuk perkembangan optimal."
     ]
-
-    if data.height_cm < 70 and data.age_months > 12:
-        risk_category = "Beresiko Stunting (Pendek)"
-        recommendations = [
+    if "Stunting" in status_prediksi[0] or "Gizi Kurang" in status_prediksi[0]:
+         tindakan_list = [
             "Segera konsultasikan dengan dokter anak atau ahli gizi.",
             "Perlu evaluasi lebih lanjut mengenai status gizi dan tinggi badan.",
             "Tingkatkan asupan protein hewani dan mikronutrien penting (zat besi, zinc, kalsium)."
         ]
-    elif data.weight_kg < (data.age_months * 0.5) and data.age_months > 6: # Contoh logika sangat sederhana
-        risk_category = "Gizi Kurang / Beresiko Stunting"
-        recommendations = [
-            "Segera konsultasikan dengan dokter anak atau ahli gizi untuk evaluasi status gizi.",
-            "Perbaiki kualitas dan kuantitas asupan makanan.",
-            "Pastikan mendapat imunisasi lengkap dan penanganan jika ada penyakit infeksi."
-        ]
 
-    if random.choice([True, False]) and risk_category == "Normal":
-         if data.age_months > 24:
-            recommendations.append("Pertimbangkan untuk variasi makanan keluarga.")
-
-    # --- AKHIR LOGIKA MOCK ---
-    # Pastikan output sesuai dengan skema StuntingOutput
+    # Nutrition advice
+    nutrisi_list = [
+        "Pastikan asupan Energi (kalori) cukup sesuai kebutuhan usia anak.",
+        "Berikan Protein terutama sumber hewani (telur, ikan, daging, ayam, susu dan produk olahannya) setiap hari.",
+        "Lengkapi dengan sumber Lemak sehat (contoh: alpukat, ikan salmon/kembung).",
+        "Pastikan asupan Vitamin dan Mineral penting (Zat Besi, Kalsium, Vitamin A, Vitamin D, Zinc) dari beragam sayur, buah, dan sumber lainnya."
+    ]
+    if "Stunting" in status_prediksi[0] or "Gizi Kurang" in status_prediksi[0]:
+        nutrisi_list.extend([
+            "Konsultasikan lebih lanjut dengan dokter atau ahli gizi untuk kemungkinan adanya defisiensi mikronutrien spesifik dan kebutuhan suplementasi.",
+            "Fokus pada pemberian Makanan Pendamping ASI (MPASI) yang kaya gizi jika anak masih dalam periode MPASI, atau makanan keluarga yang padat gizi."
+        ])
+    
     return StuntingOutput(
-        risk_category=risk_category,
-        recommendations=recommendations
+        risikoStunting=status_prediksi[0],
+        tindakan=tindakan_list,
+        nutrisi=nutrisi_list
     )
-

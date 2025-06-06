@@ -2,31 +2,41 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 
 class StuntingInput(BaseModel):
-    age_months: int = Field(..., example=12, description="Usia anak dalam bulan", gt=0)
-    weight_kg: float = Field(..., example=8.5, description="Berat badan anak dalam kilogram", gt=0)
-    height_cm: float = Field(..., example=70.0, description="Tinggi badan anak dalam sentimeter", gt=0)
+    jk: str = Field(..., example="L", description="Jenis Kelamin (L/P)")
+    bbLahir: float = Field(..., example=3.0, description="Berat Badan Lahir (kg)", gt=0)
+    tbLahir: float = Field(..., example=50.0, description="Tinggi Badan Lahir (cm)", gt=0)
+    umur: int = Field(..., example=12, description="Usia anak dalam bulan", gt=0)
+    bb: float = Field(..., example=8.5, description="Berat badan anak dalam kilogram", gt=0)
+    tb: float = Field(..., example=70.0, description="Tinggi badan anak dalam sentimeter", gt=0)
     
     class Config:
         json_schema_extra = {
             "example": {
-                "age_months": 24,
-                "weight_kg": 10.2,
-                "height_cm": 80.5,
+                "jk": "L",
+                "bbLahir": 3.0,
+                "tbLahir": 50.0,
+                "umur": 24,
+                "bb": 10.2,
+                "tb": 80.5,
             }
         }
         
 class StuntingOutput(BaseModel):
-    risk_category: str = Field(..., example="Normal", description="Kategori risiko stunting")
-    recommendations: List[str] = Field(..., example=["Lanjutkan ASI eksklusif", "Pantau pertumbuhan rutin"], description="Saran atau rekomendasi") 
+    risikoStunting: str = Field(..., example="Normal", description="Prediksi risiko stunting anak")
+    tindakan: List[str] = Field(..., example=["Lanjutkan pemantauan tumbuh kembang.", "Pastikan asupan gizi seimbang."], description="Saran tindakan yang direkomendasikan")
+    nutrisi: List[str] = Field(..., example=["Pastikan asupan kalori cukup.", "Perbanyak sumber protein hewani dan nabati."], description="Saran nutrisi spesifik")
     
     class Config:
         json_schema_extra = {
             "example": {
-                "risk_category": "Beresiko Stunting",
-                "recommendations": [
-                    "Segera konsultasikan dengan dokter anak atau ahli gizi.",
-                    "Perbaiki asupan nutrisi sesuai anjuran.",
-                    "Pastikan mendapat imunisasi lengkap."
+                "risikoStunting": "Normal",
+                "tindakan": [
+                    "Lanjutkan pemantauan tumbuh kembang anak secara rutin.",
+                    "Pastikan asupan gizi seimbang dan adekuat sesuai usia."
+                ],
+                "nutrisi": [
+                    "Pastikan asupan Energi (kalori) sesuai kebutuhan usia.",
+                    "Berikan Protein terutama hewani (telur, ikan, ayam, daging, susu) setiap hari."
                 ]
             }
         }
