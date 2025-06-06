@@ -1,10 +1,17 @@
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import { Star, CheckCircle } from "lucide-vue-next";
-import FormInput from "../ui/FormInput.vue";
+
+import { postFeedback } from "../../api/feedback.js";
+import { useAuthStore } from "../../stores/auth.js";
+
 import FormTextArea from "../ui/FormTextArea.vue";
+import FormInput from "../ui/FormInput.vue";
+import ErrorMessage from "../ui/ErrorMessage.vue";
+import LoadingSpinner2 from "../ui/LoadingSpinner2.vue";
 
 const emit = defineEmits(["feedback-submitted"]);
+const authStore = useAuthStore();
 
 const formData = ref({
   fullName: "",
@@ -13,7 +20,18 @@ const formData = ref({
 });
 
 const isSubmitting = ref(false);
-const showSuccessMessage = ref(false);
+const feedbackSubmitted = ref(false);
+const errorMessage = ref("");
+
+onMounted(() => {
+  if (authStore.user && authStore.user.fullName) {
+    formData.value.fullName = authStore.user.fullName;
+  }
+  //   buat dummy
+  else {
+    formData.value.fullName = "John Doe";
+  }
+});
 
 const isFormValid = computed(() => {
   return (
@@ -35,7 +53,6 @@ const getRatingText = (rating) => {
   return texts[rating] || "";
 };
 
-// Watch testimonial length
 watch(
   () => formData.value.testimonial,
   (newValue) => {
@@ -49,39 +66,39 @@ const submitFeedback = async () => {
   if (!isFormValid.value || isSubmitting.value) return;
 
   isSubmitting.value = true;
+  errorMessage.value = "";
 
   try {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    const feedbackData = {
+      fullName: formData.value.fullName,
+      rating: formData.value.rating,
+      comment: formData.value.testimonial,
+    };
 
-    // Emit the feedback data
+    const userId = authStore.user.id;
+    const response = await postFeedback(userId, feedbackData);
+
+    console.log("Feedback berhasil dikirim:", response.data.newFeedback);
+
     emit("feedback-submitted", {
       ...formData.value,
-      submittedAt: new Date().toISOString(),
+      userId: userId,
+      feedbackId: response.data.newFeedback.id,
     });
 
-    // Show success message
-    showSuccessMessage.value = true;
-
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      resetForm();
-    }, 3000);
+    feedbackSubmitted.value = true;
   } catch (error) {
     console.error("Error submitting feedback:", error);
+
+    if (error.response?.data?.message) {
+      errorMessage.value = error.response.data.message;
+    } else {
+      errorMessage.value =
+        "Terjadi kesalahan saat mengirim feedback. Silakan coba lagi.";
+    }
   } finally {
     isSubmitting.value = false;
   }
-};
-
-const resetForm = () => {
-  formData.value = {
-    fullName: "",
-
-    rating: 0,
-    testimonial: "",
-  };
-  showSuccessMessage.value = false;
 };
 </script>
 
@@ -90,6 +107,7 @@ const resetForm = () => {
     <div
       class="container max-w-4xl mx-auto bg-[#EEF2FF] rounded-xl shadow-xl mb-4 p-6"
     >
+      <!-- Header tetap ditampilkan -->
       <h2 class="font-bold text-gray-800 mb-3">
         Bagikan Cerita Early Nourish Anda
       </h2>
@@ -98,103 +116,96 @@ const resetForm = () => {
         perjalanan mereka memastikan nutrisi terbaik untuk anak-anak mereka.
       </p>
 
-      <form @submit.prevent="submitFeedback" class="space-y-6">
-        <FormInput
-          label="Nama Lengkap"
-          type="text"
-          id="fullName"
-          placeholder="Masukkan nama Anda"
-          v-model="formData.fullName"
-          :autofocus="false"
-          readonly
-        />
-
-        <div>
-          <label
-            class="block text-gray-700 mb-3 text-base md:text-sm font-semibold"
-          >
-            Seberapa puas Anda dengan pengalaman Anda bersama Early Nourish?
-          </label>
-          <div class="flex justify-center md:justify-start gap-2">
-            <button
-              v-for="rating in 5"
-              :key="rating"
-              type="button"
-              @click="formData.rating = rating"
-              class="p-1 transition-colors focus:outline-none"
-            >
-              <Star
-                :class="
-                  formData.rating >= rating
-                    ? 'text-yellow-400 fill-yellow-400'
-                    : 'text-gray-700 fill-white'
-                "
-                class="h-6 w-6 transition-colors hover:text-yellow-400 cursor-pointer"
-              />
-            </button>
-          </div>
-          <p
-            v-if="formData.rating > 0"
-            class="text-center md:text-left text-xs md:text-base text-gray-600 mt-2"
-          >
-            {{ getRatingText(formData.rating) }}
-          </p>
-        </div>
-
-        <div>
-          <FormTextArea
-            id="testimonial"
-            v-model="formData.testimonial"
-            placeholder="Masukkan pengalaman Anda"
-            :rows="5"
-            :max-length="500"
+      <div v-if="!feedbackSubmitted">
+        <form @submit.prevent="submitFeedback" class="space-y-6">
+          <FormInput
+            label="Nama Lengkap"
+            type="text"
+            id="fullName"
+            placeholder="Masukkan nama Anda"
+            v-model="formData.fullName"
+            :autofocus="false"
+            :readonly="true"
           />
 
-          <p class="text-xs text-gray-500 mt-1">
-            {{ formData.testimonial.length }}/500 karakter
-          </p>
-        </div>
+          <div>
+            <label
+              class="block text-gray-700 mb-3 text-base md:text-sm font-semibold"
+            >
+              Seberapa puas Anda dengan pengalaman Anda bersama Early Nourish?
+            </label>
+            <div class="flex justify-center md:justify-start gap-2">
+              <button
+                v-for="rating in 5"
+                :key="rating"
+                type="button"
+                @click="formData.rating = rating"
+                class="p-1 transition-colors focus:outline-none"
+              >
+                <Star
+                  :class="
+                    formData.rating >= rating
+                      ? 'text-yellow-400 fill-yellow-400'
+                      : 'text-gray-700 fill-white'
+                  "
+                  class="h-6 w-6 hover:text-yellow-400 cursor-pointer transition-colors hover:scale-110"
+                />
+              </button>
+            </div>
+            <p
+              v-if="formData.rating > 0"
+              class="text-center md:text-left text-xs md:text-base text-gray-600 mt-2"
+            >
+              {{ getRatingText(formData.rating) }}
+            </p>
+          </div>
 
-        <div class="flex justify-center pt-4">
-          <button
-            type="submit"
-            :disabled="!isFormValid || isSubmitting"
-            :class="
-              isFormValid && !isSubmitting
-                ? 'bg-gray-800 hover:bg-gray-900'
-                : 'bg-gray-400 cursor-not-allowed'
-            "
-            class="text-white font-medium py-2 px-6 rounded-full transition-colors text-base md:text-sm"
-          >
-            {{ isSubmitting ? "Mengirim..." : "Kirim" }}
-          </button>
-        </div>
-      </form>
+          <div>
+            <FormTextArea
+              id="testimonial"
+              v-model="formData.testimonial"
+              placeholder="Masukkan pengalaman Anda"
+              :rows="5"
+              :max-length="500"
+            />
 
-      <!-- Success Message -->
-      <div
-        v-if="showSuccessMessage"
-        class="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg"
-      >
-        <div class="flex items-center">
-          <CheckCircle class="h-5 w-5 text-tertiary mr-2" />
-          <p class="text-tertiary text-sm md:text-base font-medium">
-            Terima kasih! Testimoni Anda telah berhasil dikirim.
-          </p>
+            <p class="text-xs text-gray-500 mt-1">
+              {{ formData.testimonial.length }}/500 karakter
+            </p>
+          </div>
+
+          <ErrorMessage v-if="errorMessage" :message="errorMessage" />
+
+          <div class="flex justify-center pt-4">
+            <button
+              type="submit"
+              :disabled="!isFormValid || isSubmitting"
+              :class="
+                isFormValid && !isSubmitting
+                  ? 'bg-gray-800 hover:bg-gray-600'
+                  : 'bg-gray-400 cursor-not-allowed'
+              "
+              class="text-white font-medium py-2 px-6 rounded-full transition-colors text-base md:text-sm"
+            >
+              <LoadingSpinner2 v-if="isSubmitting" />
+              <span v-else>Kirim</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div v-else class="text-center py-8">
+        <div class="flex justify-center mb-4">
+          <CheckCircle class="h-8 w-8 text-tertiary" />
         </div>
+        <h3 class="font-bold text-gray-800 mb-3">
+          Terima Kasih atas Feedback Anda!
+        </h3>
+        <p class="text-gray-600 text-base leading-relaxed max-w-md mx-auto">
+          Testimoni Anda sangat berharga bagi kami dan akan membantu orang tua
+          lain dalam perjalanan mereka bersama Early Nourish.
+        </p>
       </div>
     </div>
   </section>
 </template>
-
-<style scoped>
-.star-hover:hover {
-  transform: scale(1.1);
-}
-
-.transition-colors {
-  transition:
-    color 0.2s ease-in-out,
-    background-color 0.2s ease-in-out;
-}
-</style>
