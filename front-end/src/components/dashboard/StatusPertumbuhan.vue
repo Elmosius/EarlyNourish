@@ -1,35 +1,38 @@
 <script setup>
-defineProps({
+import { computed } from "vue";
+
+const props = defineProps({
   growthStatuses: {
     type: Array,
     default: () => [
-      {
-        name: "Tinggi Berdasarkan Umur",
-        value: "x",
-        percentage: 75,
-        color: "yellow",
-      },
-      {
-        name: "Berat Berdasarkan Umur",
-        value: "x",
-        percentage: 95,
-        color: "red",
-      },
-      {
-        name: "Berat Berdasarkan Tinggi",
-        value: "x",
-        percentage: 85,
-        color: "green",
-      },
-      {
-        name: "Lingkar Kepala",
-        value: "x",
-        percentage: 90,
-        color: "green",
-      },
+      { name: "Tinggi Berdasarkan Umur", value: -1.5, color: "yellow" },
+      { name: "Berat Berdasarkan Umur", value: 2.3, color: "red" },
+      { name: "Berat Berdasarkan Tinggi", value: 0.5, color: "green" },
+      { name: "Lingkar Kepala", value: -2.5, color: "green" },
     ],
   },
 });
+
+function zScoreToPercent(z) {
+  if (z <= -2) return 0;
+  if (z >= 2) return 100;
+  return ((z + 2) / 4) * 100;
+}
+
+function getGrowthCategory(z) {
+  if (z < -2) return "Pertumbuhan terhambat";
+  if (z > 2) return "Pertumbuhan lebih";
+  return "Pertumbuhan normal";
+}
+
+// bangun array baru dengan percentage & category
+const computedStatuses = computed(() =>
+  props.growthStatuses.map((s) => ({
+    ...s,
+    percentage: Math.round(zScoreToPercent(s.value)),
+    category: getGrowthCategory(s.value),
+  })),
+);
 
 const getProgressBarClass = (color) => {
   switch (color) {
@@ -52,13 +55,13 @@ const getProgressBarClass = (color) => {
     >
       <h2 class="font-bold text-gray-800 mb-3">Status Pertumbuhan</h2>
 
-      <div v-for="status in growthStatuses" :key="status.name" class="mb-3 p-1">
+      <div v-for="status in computedStatuses" :key="status.name" class="mb-4">
         <div class="flex justify-between mb-1">
-          <span class="text-base md:text-sm font-medium">
-            {{ status.name }}
-          </span>
+          <span class="text-base md:text-sm font-medium">{{
+            status.name
+          }}</span>
           <span class="text-base md:text-sm font-medium text-tertiary">
-            {{ status.value }}
+            {{ status.value }} SD
           </span>
         </div>
         <div class="w-full bg-gray-200 rounded-full h-2.5">
@@ -68,6 +71,8 @@ const getProgressBarClass = (color) => {
             :style="{ width: status.percentage + '%' }"
           ></div>
         </div>
+        <!-- keterangan kategori -->
+        <p class="text-sm text-gray-600 mt-1">{{ status.category }}</p>
       </div>
     </div>
   </section>
