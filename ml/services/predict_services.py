@@ -50,7 +50,7 @@ async def get_stunting_prediction(data: StuntingInput) -> StuntingOutput:
     # 4. Decode prediction
     status_prediksi = status_encoder.inverse_transform(pred_label)
     
-    print(f"✅ Prediksi status stunting: {status_prediksi[0]}")
+    print(f"Prediksi status stunting: {status_prediksi[0]}")
 
     tindakan_list = [
         "Lanjutkan pemantauan tumbuh kembang anak secara rutin.",
