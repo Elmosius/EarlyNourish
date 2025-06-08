@@ -1,5 +1,9 @@
 <script setup>
 import { Clipboard } from "lucide-vue-next";
+
+const exportData = () => {
+  alert("Export belum tersedia masih dalam pengembangan :)");
+};
 </script>
 
 <template>
@@ -21,12 +25,12 @@ import { Clipboard } from "lucide-vue-next";
           </div>
         </div>
         <div class="my-auto mt-5 md:mt-auto ml-auto">
-          <a
-            href=""
+          <button
+            @click="exportData"
             class="bg-linear-65 from-[#4ADE80] to-[#22C55E] shadow-xl inset-shadow-xs inset-shadow-gray-300 text-white text-xs px-4 py-2 md:text-sm rounded-lg hover:opacity-85 transition-opacity lg:px-6"
           >
             Export Data
-          </a>
+          </button>
         </div>
       </div>
     </div>
