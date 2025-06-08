@@ -14,7 +14,6 @@ const fetchAllFeedbacks = async () => {
   try {
     const response = await getFeedbacks();
     allFeedbacks.value = response.feedback || [];
-    console.log("Testimoni:", allFeedbacks.value);
   } catch (err) {
     console.error("Gagal mengambil testimoni:", err);
     error.value =
