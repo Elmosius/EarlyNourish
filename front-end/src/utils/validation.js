@@ -5,6 +5,21 @@ export const validateForm = (formData, rules) => {
     const value = formData[field];
     const rule = rules[field];
 
+    if (rule.type === "file" && value) {
+      if (rule.maxSize && value.size > rule.maxSize) {
+        const maxSizeMB = rule.maxSize / 1048576;
+        errors[field] =
+          `${rule.label || field} harus kurang dari ${maxSizeMB} MB.`;
+        continue;
+      }
+
+      if (rule.allowedTypes && !rule.allowedTypes.includes(value.type)) {
+        errors[field] =
+          `${rule.label || field} harus berformat ${rule.allowedTypes.join(", ")}.`;
+        continue;
+      }
+    }
+
     if (rule.required) {
       if (typeof value === "boolean" && !value) {
         errors[field] = `${rule.label || field} harus disetujui.`;
