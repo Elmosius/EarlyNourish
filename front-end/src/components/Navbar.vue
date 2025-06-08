@@ -17,7 +17,6 @@ const authStore = useAuthStore();
 const { isAuthenticated, user } = storeToRefs(authStore);
 const router = useRouter();
 
-const isLoggedIn = ref(false);
 const isMenuOpen = ref(false);
 const isProfileModalOpen = ref(false);
 const scrolled = ref(false);
@@ -84,14 +83,14 @@ const profileMenuItems = computed(() => [
 ]);
 
 const userInitials = computed(() => {
-  if (user.value && user.value.nama) {
-    return user.value.nama.substring(0, 2).toUpperCase();
+  if (user.value && user.value.name) {
+    return user.value.name.substring(0, 2).toUpperCase();
   }
   return "GU";
 });
 
 const userDisplayName = computed(() => {
-  return user.value?.nama || "Guest User";
+  return user.value?.name || "Guest User";
 });
 </script>
 
