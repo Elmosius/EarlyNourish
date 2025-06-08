@@ -13,6 +13,7 @@ import FormError from "../ui/FormError.vue";
 import LoadingSpinner from "../ui/LoadingSpinner.vue";
 import ErrorMessage from "../ui/ErrorMessage.vue";
 import LoadingSpinner2 from "../ui/LoadingSpinner2.vue";
+import FormSelect from "../ui/FormSelect.vue";
 
 const profileStore = useProfileStore();
 const authStore = useAuthStore();
@@ -24,55 +25,55 @@ const {
 } = storeToRefs(profileStore);
 const { user: authUser } = storeToRefs(authStore);
 
-const profilePhotoUrl = ref(profile.value?.fotoProfil || null);
-const profilePhotoFile = ref(null);
+const fotoProfil = ref(profile.value?.fotoProfil || null);
+const fotoProfilFile = ref(null);
 
 const fullName = ref("");
 const email = ref("");
-const address = ref("");
-const childName = ref("");
-const birthDate = ref("");
-const birthWeight = ref("");
-const birthHeight = ref("");
-const headCircumference = ref("");
+const alamat = ref("");
+const namaAnak = ref("");
+const jenisKelamin = ref("");
+const tanggalLahir = ref("");
+const bbLahir = ref("");
+const tbLahir = ref("");
 
 const errors = ref({});
 
 const handlePhotoUpload = (event) => {
   const file = event.target.files[0];
   if (file) {
-    profilePhotoFile.value = file;
-    profilePhotoUrl.value = URL.createObjectURL(file);
+    fotoProfilFile.value = file;
+    fotoProfil.value = URL.createObjectURL(file);
   }
 };
 
 const populateForm = (profileData) => {
   if (profileData) {
-    fullName.value = profileData.name || "";
+    fullName.value = profileData.fullName || "";
     email.value = profileData.email || "";
-    // address.value = profileData.address || ""; // Example if API provided it
-    // childName.value = profileData.childName || ""; // Example
+    alamat.value = profileData.alamat || "";
+    namaAnak.value = profileData.namaAnak || "";
+    jenisKelamin.value = profileData.jenisKelamin || "";
+    tanggalLahir.value = profileData.tanggalLahir || "";
+    bbLahir.value = profileData.bbLahir || "";
+    tbLahir.value = profileData.tbLahir || "";
   }
 };
 
 onMounted(async () => {
-  if (authUser.value && authUser.value.id) {
-    await profileStore.fetchProfile(authUser.value.id);
+  if (authUser.value && authUser.value.userId) {
+    await profileStore.fetchProfile(authUser.value.userId);
     populateForm(profile.value);
   }
 });
 
-// Watch for changes in the profile store (e.g., after an update or initial fetch)
 watch(profile, (newProfileData) => {
   populateForm(newProfileData);
 });
 
-// Watch for user to be available (e.g. after login and redirect)
 watch(authUser, async (newUser) => {
-  if (newUser && newUser.id && !profile.value) {
-    // Fetch only if no profile yet and user is available
-    await profileStore.fetchProfile(newUser.id);
-    // populateForm will be called by the 'profile' watcher
+  if (newUser && newUser.userId && !profile.value) {
+    await profileStore.fetchProfile(newUser.userId);
   }
 });
 
@@ -81,52 +82,47 @@ const handleSubmit = async () => {
   profileStore.error = null;
 
   const rules = {
-    fullName: {
+    namaLengkap: {
       label: "Nama Lengkap",
       minLength: 5,
       maxLength: 100,
     },
     email: { type: "email", label: "Email" },
-    address: { label: "Alamat", minLength: 10 },
-    childName: { label: "Nama Anak", minLength: 5 },
-    birthDate: { label: "Tanggal Lahir" },
-    birthWeight: {
+    alamat: { label: "Alamat", minLength: 10 },
+    namaAnak: { label: "Nama Anak", minLength: 2 },
+    jenisKelamin: { label: "Jenis Kelamin" },
+    tanggalLahir: { label: "Tanggal Lahir" },
+    bbLahir: {
       type: "number",
       label: "Berat Lahir",
       min: 0.1,
       max: 10,
     },
-    birthHeight: {
+    tbLahir: {
       type: "number",
       label: "Tinggi Lahir",
       min: 20,
       max: 100,
     },
-    headCircumference: {
-      type: "number",
-      label: "Lingkar Kepala",
-      min: 10,
-      max: 60,
-    },
   };
 
   const formData = {
-    profilePhoto: profilePhotoFile.value,
-    fullName: fullName.value,
+    fotoProfil: fotoProfilFile.value,
+    namaLengkap: namaLengkap.value,
     email: email.value,
-    address: address.value,
-    childName: childName.value,
-    birthDate: birthDate.value,
-    birthWeight: birthWeight.value,
-    birthHeight: birthHeight.value,
-    headCircumference: headCircumference.value,
+    alamat: alamat.value,
+    namaAnak: namaAnak.value,
+    jenisKelamin: jenisKelamin.value,
+    tanggalLahir: tanggalLahir.value,
+    bbLahir: bbLahir.value,
+    tbLahir: tbLahir.value,
   };
 
   const validation = validateForm(formData, rules);
 
   if (validation.isValid) {
-    if (authUser.value && authUser.value.id) {
-      await profileStore.updateUserProfile(authUser.value.id, formData);
+    if (authUser.value && authUser.value.userId) {
+      await profileStore.updateUserProfile(authUser.value.userId, formData);
     } else {
       profileStore.error = "User tidak ditemukan. Silakan masuk kembali.";
     }
@@ -157,8 +153,8 @@ const handleSubmit = async () => {
               class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center border-4 border-white shadow-lg overflow-hidden"
             >
               <img
-                v-if="profilePhotoUrl"
-                :src="profilePhotoUrl"
+                v-if="fotoProfil"
+                :src="fotoProfil"
                 alt="Profile Photo"
                 class="w-full h-full object-cover"
               />
@@ -198,11 +194,14 @@ const handleSubmit = async () => {
                 id="fullName"
                 label="Nama Lengkap"
                 v-model="fullName"
-                placeholder="Masukkan nama Anda"
-                :model-value="profile?.nama"
+                placeholder="Masukkan nama lengkap Anda"
+                :model-value="profile?.fullName"
                 autofocus
               />
-              <FormError :message="errors.fullName" v-if="errors.fullName" />
+              <FormError
+                :message="errors.namaLengkap"
+                v-if="errors.namaLengkap"
+              />
             </div>
 
             <div>
@@ -213,22 +212,22 @@ const handleSubmit = async () => {
                 v-model="email"
                 placeholder="Masukkan email Anda"
                 :model-value="profile?.email"
-                autofocus
+                readonly
+                class="bg-gray-50 cursor-not-allowed"
               />
               <FormError :message="errors.email" v-if="errors.email" />
             </div>
 
-            <div>
+            <div class="md:col-span-2">
               <FormTextArea
-                id="address"
-                v-model="address"
-                placeholder="Masukkan Alamat Anda"
+                id="alamat"
+                v-model="alamat"
+                placeholder="Masukkan alamat lengkap Anda"
                 :rows="3"
                 label="Alamat"
-                autofocus
                 :model-value="profile?.alamat"
               />
-              <FormError :message="errors.address" v-if="errors.address" />
+              <FormError :message="errors.alamat" v-if="errors.alamat" />
             </div>
           </div>
         </div>
@@ -242,69 +241,62 @@ const handleSubmit = async () => {
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <FormInput
-                id="childName"
+                id="namaAnak"
                 label="Nama Anak"
-                v-model="childName"
+                v-model="namaAnak"
                 placeholder="Masukkan nama anak Anda"
                 :model-value="profile?.namaAnak"
               />
-              <FormError :message="errors.childName" v-if="errors.childName" />
+              <FormError :message="errors.namaAnak" v-if="errors.namaAnak" />
+            </div>
+
+            <div>
+              <FormSelect
+                id="jenisKelamin"
+                :options="['laki-laki', 'perempuan']"
+                label="Jenis Kelamin"
+                v-model="jenisKelamin"
+                :model-value="profile?.jenisKelamin"
+              />
             </div>
 
             <div>
               <FormInput
-                id="birthWeight"
+                id="tanggalLahir"
+                label="Tanggal Lahir"
+                type="date"
+                v-model="tanggalLahir"
+                :model-value="profile?.tanggalLahir"
+              />
+              <FormError
+                :message="errors.tanggalLahir"
+                v-if="errors.tanggalLahir"
+              />
+            </div>
+
+            <div>
+              <FormInput
+                id="bbLahir"
                 type="number"
-                v-model="birthWeight"
-                placeholder="Contoh : 3.2"
+                v-model="bbLahir"
+                placeholder="Contoh: 3.2"
                 step="0.1"
                 label="Berat Lahir (kg)"
                 :model-value="profile?.bbLahir"
               />
-              <FormError
-                :message="errors.birthWeight"
-                v-if="errors.birthWeight"
-              />
+              <FormError :message="errors.bbLahir" v-if="errors.bbLahir" />
             </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <FormInput
-              id="birthDate"
-              label="Tanggal Lahir"
-              type="date"
-              v-model="birthDate"
-              :model-value="profile?.tanggalLahir"
-            />
 
             <div>
               <FormInput
-                id="birthHeight"
+                id="tbLahir"
                 type="number"
-                v-model="birthHeight"
+                v-model="tbLahir"
                 :model-value="profile?.tbLahir"
-                placeholder="Contoh : 50"
+                placeholder="Contoh: 50"
                 label="Tinggi Lahir (cm)"
               />
-              <FormError
-                :message="errors.birthHeight"
-                v-if="errors.birthHeight"
-              />
-            </div>
-
-            <div>
-              <FormInput
-                id="headCircumference"
-                type="number"
-                v-model="headCircumference"
-                :model-value="profile?.lingkarKepala"
-                placeholder="Contoh : 34"
-                label="Lingkar Kepala ketika Lahir (cm)"
-              />
-              <FormError
-                :message="errors.headCircumference"
-                v-if="errors.headCircumference"
-              />
+              <FormError :message="errors.tbLahir" v-if="errors.tbLahir" />
             </div>
           </div>
         </div>

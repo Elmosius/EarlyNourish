@@ -1,10 +1,8 @@
-import axios from "axios";
-
-const api = import.meta.env.VITE_API_URL;
+import axiosInstance from "../utils/axios.js";
 
 export const getProfile = async (userId) => {
   try {
-    const response = await axios.get(`${api}/profile/${userId}`);
+    const response = await axiosInstance.get(`/profile/${userId}`);
 
     if (!response.data.error) {
       return {
@@ -35,10 +33,9 @@ export const getProfile = async (userId) => {
 
 export const updateProfile = async (userId, profileData) => {
   try {
-    const formData = new FormData();
-
-    const response = await axios.put(`${api}/profile/${userId}`, formData, {
+    const response = await axios.put(`${api}/profile/${userId}`, profileData, {
       headers: {
+        Authorization: `Bearer ${token}`,
         "Content-Type": "multipart/form-data",
       },
     });

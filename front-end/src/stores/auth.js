@@ -1,9 +1,5 @@
 import { defineStore } from "pinia";
-import {
-  login as apiLogin,
-  register as apiRegister,
-  refreshAccessToken,
-} from "../api/auth";
+import { login as apiLogin, register as apiRegister } from "../api/auth";
 import {
   storeTokens,
   getAccessToken,
@@ -83,28 +79,6 @@ export const useAuthStore = defineStore("auth", {
         this.refreshToken = null;
       } finally {
         this.loading = false;
-      }
-    },
-
-    async refreshToken() {
-      try {
-        if (!this.refreshToken) {
-          throw new Error("No refresh token available");
-        }
-
-        const response = await refreshAccessToken(this.refreshToken);
-        this.accessToken = response.data.accessToken;
-
-        if (response.data.refreshToken) {
-          this.refreshToken = response.data.refreshToken;
-        }
-
-        storeTokens(this.accessToken, this.refreshToken);
-
-        return this.accessToken;
-      } catch (error) {
-        this.logout();
-        throw error;
       }
     },
 

@@ -1,10 +1,8 @@
-import axios from "axios";
-
-const api = import.meta.env.VITE_API_URL;
+import axiosInstance from "../utils/axios.js";
 
 export const login = async (credentials) => {
   try {
-    const response = await axios.post(`${api}/login`, credentials);
+    const response = await axiosInstance.post("/login", credentials);
 
     const loginResult = response.data.loginResult;
 
@@ -42,7 +40,7 @@ export const login = async (credentials) => {
 
 export const register = async (userInfo) => {
   try {
-    const response = await axios.post(`${api}/register`, userInfo);
+    const response = await axiosInstance.post("/register", userInfo);
 
     const loginResult = response.data.loginResult;
 
@@ -80,7 +78,7 @@ export const register = async (userInfo) => {
 
 export const refreshAccessToken = async (refreshToken) => {
   try {
-    const response = await axios.post(`${api}/refresh`, {
+    const response = await axiosInstance.post("/refresh", {
       refreshToken: refreshToken,
     });
 
