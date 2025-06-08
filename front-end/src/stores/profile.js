@@ -14,7 +14,7 @@ export const useProfileStore = defineStore("profile", {
 
       try {
         const response = await getProfile(userId);
-        this.profile = response.data.profile;
+        this.profile = response.profile;
         this.error = null;
       } catch (error) {
         this.error =
@@ -32,7 +32,7 @@ export const useProfileStore = defineStore("profile", {
 
       try {
         const response = await updateProfile(userId, profileData);
-        this.profile = response.data.profile;
+        this.profile = response.profile;
         this.error = null;
 
         console.log("Profile updated successfully!");

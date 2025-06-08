@@ -17,7 +17,7 @@ const fetchAllFeedbacks = async () => {
   } catch (err) {
     console.error("Gagal mengambil testimoni:", err);
     error.value =
-      err.response?.data?.Message || "Tidak dapat memuat testimoni.";
+      err.response?.data?.message || "Tidak dapat memuat testimoni.";
     allFeedbacks.value = [];
   } finally {
     isLoading.value = false;

@@ -27,7 +27,7 @@ export const useAuthStore = defineStore("auth", {
       this.error = null;
       try {
         const response = await apiLogin(credentials);
-        const loginResult = response.data.loginResult;
+        const loginResult = response.loginResult;
 
         this.user = {
           userId: loginResult.userId,
@@ -57,7 +57,7 @@ export const useAuthStore = defineStore("auth", {
       this.error = null;
       try {
         const response = await apiRegister(userInfo);
-        const loginResult = response.data.loginResult;
+        const loginResult = response.loginResult;
 
         this.user = {
           userId: loginResult.userId,
