@@ -1,4 +1,8 @@
-<script setup lang="ts"></script>
+<script setup>
+const donwloadHasil = () => {
+  alert("Download belum tersedia masih dalam pengembangan :)");
+};
+</script>
 
 <template>
   <section class="px-8 py-3 md:px-14 lg:px-38">
@@ -14,6 +18,7 @@
 
       <div class="my-auto">
         <button
+          @click="donwloadHasil"
           class="text-sm px-4 py-2 border-1 rounded-lg border-gray-500 hover:bg-black hover:text-white transition-colors duration-300"
         >
           Download Hasil
