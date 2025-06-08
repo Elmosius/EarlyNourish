@@ -14,10 +14,11 @@ const fetchAllFeedbacks = async () => {
   try {
     const response = await getFeedbacks();
     allFeedbacks.value = response.feedback || [];
+    console.log("Testimoni:", allFeedbacks.value);
   } catch (err) {
     console.error("Gagal mengambil testimoni:", err);
     error.value =
-      err.response?.data?.message || "Tidak dapat memuat testimoni.";
+      err.response?.data?.Message || "Tidak dapat memuat testimoni.";
     allFeedbacks.value = [];
   } finally {
     isLoading.value = false;
@@ -60,8 +61,8 @@ const topThreeFeedbacks = computed(() => {
       </div>
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <div
-          v-for="(testimonial, index) in topThreeFeedbacks"
-          :key="testimonial.Id"
+          v-for="testimonial in topThreeFeedbacks"
+          :key="testimonial.id"
           class="bg-white p-6 rounded-lg shadow-md"
         >
           <div class="flex justify-between mb-4">
@@ -89,11 +90,11 @@ const topThreeFeedbacks = computed(() => {
               class="bg-[#DCFCE7] inset-shadow-sm inset-shadow-gray-300 w-10 h-10 rounded-full flex items-center justify-center mr-3"
             >
               <span class="text-tertiary font-bold">{{
-                testimonial.userId.charAt(0)
+                testimonial.namaLengkap.charAt(0)
               }}</span>
             </div>
             <div>
-              <h4 class="font-semibold">{{ testimonial.userId }}</h4>
+              <h4 class="font-semibold">{{ testimonial.namaLengkap }}</h4>
               <p class="text-sm text-gray-500">Orang tua</p>
             </div>
           </div>
