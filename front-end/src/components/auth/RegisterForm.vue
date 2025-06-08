@@ -13,7 +13,7 @@ const router = useRouter();
 const authStore = useAuthStore();
 const { loading, error: authError } = storeToRefs(authStore);
 
-const nama = ref("");
+const namaLengkap = ref("");
 const email = ref("");
 const password = ref("");
 const confirm_password = ref("");
@@ -26,9 +26,9 @@ const handleSubmit = async () => {
   authStore.error = null;
 
   const rules = {
-    nama: {
+    namaLengkap: {
       required: true,
-      label: "Nama",
+      label: "Nama Lengkap",
       maxLength: 50,
       minLength: 5,
     },
@@ -55,7 +55,7 @@ const handleSubmit = async () => {
   };
 
   const formData = {
-    nama: nama.value,
+    namaLengkap: namaLengkap.value,
     email: email.value,
     password: password.value,
     confirm_password: confirm_password.value,
@@ -66,7 +66,7 @@ const handleSubmit = async () => {
 
   if (validation.isValid) {
     await authStore.register({
-      nama: nama.value,
+      namaLengkap: namaLengkap.value,
       email: email.value,
       password: password.value,
     });
@@ -92,14 +92,14 @@ const handleSubmit = async () => {
     <form @submit.prevent="handleSubmit">
       <div class="mb-4">
         <FormInput
-          id="nama"
-          label="Nama"
+          id="namaLengkap"
+          label="Nama Lengkap"
           type="text"
-          v-model="nama"
+          v-model="namaLengkap"
           required
           placeholder="Masukkan nama lengkap"
         />
-        <FormError :message="errors.nama" v-if="errors.nama" />
+        <FormError :message="errors.namaLengkap" v-if="errors.namaLengkap" />
       </div>
 
       <div class="mb-4">
