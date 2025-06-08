@@ -46,16 +46,15 @@ const createPredictionHandlerImpl = async (request, h) => {
 
   const prediction = new Prediction({
     historyId: history._id,
-    jenisKelamin: jk,
+    jk: jk.toLowerCase(), 
     bbLahir,
     tbLahir,
-    usia: umur,
+    umur,
     bb,
     tb,
-    risikoStunting: mlResult.risikoStunting,
-    rekomendasi: mlResult.tindakan, // 🟢 mapping tindakan → rekomendasi
-    nutrisi: mlResult.nutrisi,
+    risikoStunting: mlResult.risikoStunting.toLowerCase(),
   });
+
   await prediction.save();
 
   return h.response({
@@ -63,11 +62,12 @@ const createPredictionHandlerImpl = async (request, h) => {
     Message: 'success',
     Result: {
       risikoStunting: prediction.risikoStunting,
-      rekomendasi: prediction.rekomendasi,
-      nutrisi: prediction.nutrisi,
+      rekomendasi: mlResult.tindakan,
+      nutrisi: mlResult.nutrisi,
     },
   }).code(201);
 };
+
 
 const createPredictionHandler = async (request, h) => {
   try {

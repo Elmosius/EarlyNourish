@@ -2,6 +2,7 @@ const User = require('../models/user.model');
 const Role = require('../models/role.model');
 const bcrypt = require('bcrypt');
 const TokenManager = require('../token/TokenManager');
+const ClientError = require('../exceptions/ClientError');
 
 const SALT_ROUNDS = 10;
 
@@ -13,19 +14,19 @@ const generateTokenPair = (user) => {
     userId: user._id.toString(),
     email: user.email,
     role: user.roleId.nama || user.roleId,
-    fullName: user.fullName,
+    name: user.namaLengkap,
   };
   const refreshPayload = {
     userId: user._id.toString(),
   };
 
-  const accessToken = TokenManager.generateAccessToken(accessPayload);
+  const token = TokenManager.generateAccessToken(accessPayload);
   const refreshToken = TokenManager.generateRefreshToken(refreshPayload);
 
-  return { accessToken, refreshToken };
+  return { token, refreshToken };
 };
 
-const registerUser = async ({ email, password, fullName }) => {
+const registerUser = async ({ email, password, namaLengkap }) => {
   if (await User.findOne({ email })) {
     throw new Error('Email sudah digunakan');
   }
@@ -39,7 +40,7 @@ const registerUser = async ({ email, password, fullName }) => {
   const newUser = new User({
     email,
     passwordHash,
-    fullName,
+    namaLengkap,
     roleId: userRole._id,
   });
 
@@ -47,37 +48,28 @@ const registerUser = async ({ email, password, fullName }) => {
   return newUser;
 };
 
+
 const loginUser = async ({ email, password }) => {
   const user = await User.findOne({ email }).populate('roleId', 'nama');
-  if (!user) throw new Error('Email tidak ditemukan');
+
+  if (!user) {
+    await bcrypt.hash(password, SALT_ROUNDS);
+    throw new ClientError('Email atau password salah', 400); 
+  }
 
   const valid = await verifyPassword(password, user.passwordHash);
-  if (!valid) throw new Error('Password salah');
+  if (!valid) {
+    throw new ClientError('Email atau password salah', 400);
+  }
 
-  const { accessToken, refreshToken } = generateTokenPair(user);
-  return { user, accessToken, refreshToken };
+  const { token, refreshToken } = generateTokenPair(user);
+  return { user, token, refreshToken };
 };
 
-const refreshAccessToken = async (refreshToken) => {
-  const decoded = TokenManager.verifyRefreshToken(refreshToken);
-  const userId = decoded.userId;
-
-  const user = await User.findById(userId).populate('roleId', 'nama');
-  if (!user) throw new Error('User tidak ditemukan');
-
-  const accessPayload = {
-    userId: user._id.toString(),
-    email: user.email,
-    role: user.roleId.nama || user.roleId,
-    fullName: user.fullName,
-  };
-  return TokenManager.generateAccessToken(accessPayload);
-};
 
 module.exports = {
   hashPassword,
   verifyPassword,
   registerUser,
   loginUser,
-  refreshAccessToken,
 };

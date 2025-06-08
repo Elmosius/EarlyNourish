@@ -12,9 +12,7 @@ const getProfileHandlerImpl = async (request, h) => {
   }
 
   const user = await profileService.getUserById(userId);
-  if (!user) {
-    throw new NotFoundError('User tidak ditemukan');
-  }
+  if (!user) throw new NotFoundError('User tidak ditemukan');
 
   return h.response({
     Error: false,
@@ -43,31 +41,11 @@ const updateProfileHandlerImpl = async (request, h) => {
 
   ProfileValidator.validatePutProfilePayload(request.payload);
 
-  const {
-    email,
-    fullName,
-    namaAnak,
-    jenisKelamin,
-    namaOrangTua,
-    tanggalLahir,
-    beratBadan,
-    tinggiBadan,
-  } = request.payload;
+  const updatePayload = { ...request.payload };
+  delete updatePayload.email;
 
-  const updatedUser = await profileService.updateUserProfile(userId, {
-    email,
-    fullName,
-    namaAnak,
-    jenisKelamin,
-    namaOrangTua,
-    tanggalLahir,
-    beratBadan,
-    tinggiBadan,
-  });
-
-  if (!updatedUser) {
-    throw new NotFoundError('User tidak ditemukan');
-  }
+  const updatedUser = await profileService.updateUserProfile(userId, updatePayload);
+  if (!updatedUser) throw new NotFoundError('User tidak ditemukan');
 
   return h.response({
     Error: false,

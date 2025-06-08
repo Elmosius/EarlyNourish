@@ -7,9 +7,7 @@ const Jwt = require('@hapi/jwt');
 const config = require('./config');
 const connectDB = require('./models');
 const authPlugin = require('./api/auth');
-const usersPlugin = require('./api/users');
 const predictionsPlugin = require('./api/predictions');
-const recommendationsPlugin = require('./api/recommendations');
 const notificationsPlugin = require('./api/notification');
 const feedbackPlugin = require('./api/feedback');
 const profilePlugin = require('./api/profile');
@@ -59,9 +57,7 @@ const init = async () => {
 
     await server.register([
         authPlugin,
-        usersPlugin,
         predictionsPlugin,
-        recommendationsPlugin,
         notificationsPlugin,
         feedbackPlugin,
         profilePlugin,

@@ -20,9 +20,8 @@ const subscribeNotificationHandlerImpl = async (request, h) => {
   };
 
   return h.response({
-    error: false,
-    message: 'Success to subscribe web push notification.',
-    data,
+    Error: false,
+    Message: 'Success to subscribe web push notification.',
   }).code(201);
 };
 
@@ -47,8 +46,8 @@ const unsubscribeNotificationHandlerImpl = async (request, h) => {
   }
 
   return h.response({
-    error: false,
-    message: 'Success to unsubscribe web push notification.',
+    Error: false,
+    Message: 'Success to unsubscribe web push notification.',
   }).code(200);
 };
 

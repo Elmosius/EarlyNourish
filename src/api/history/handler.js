@@ -14,34 +14,21 @@ const getHistoryByUserHandlerImpl = async (request, h) => {
 
   const histories = await History.find({ userId: idUser }).sort({ createdAt: -1 });
 
-  if (histories.length === 0) {
-    return h.response({
-      Error: false,
-      Message: 'success',
-      Result: {}, 
-    }).code(200);
-  }
-
-  const result = {};
-  for (const hist of histories) {
+  const result = await Promise.all(histories.map(async (hist) => {
     const prediction = await Prediction.findOne({ historyId: hist._id });
     const recommendation = await Recommendation.findOne({ historyId: hist._id });
 
-    result[hist._id] = {
-      Id: hist._id,
+    return {
+      historyId: hist._id,
       jenisKelamin: prediction?.jenisKelamin ?? null,
-      Usia: prediction?.usia ?? null,
+      usia: prediction?.usia ?? null,
       bbLahir: prediction?.bbLahir ?? null,
-      tbLahir: prediction?.tbLahir ?? null,
-      beratBadan: prediction?.beratBadan ?? null,
-      tinggiBadan: prediction?.tinggiBadan ?? null,
-      stuntingRisk: prediction?.stuntingRisk ?? null,
-      idRecommendation: recommendation?._id ?? null,
-      Makanan: recommendation?.makanan ?? [],
-      createdAt: hist.createdAt,
-      updatedAt: hist.updatedAt,
+      rekomendasiId: recommendation?._id ?? null,
+      nutrisi: recommendation?.nutrisi ?? [],
+      tindakan: recommendation?.tindakan ?? [],
+      createdAt: prediction?.createdAt ?? hist.createdAt,
     };
-  }
+  }));
 
   return h.response({
     Error: false,
