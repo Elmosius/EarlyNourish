@@ -13,13 +13,13 @@ import {
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     user: getUserData(),
-    accessToken: getAccessToken(),
+    token: getAccessToken(),
     refreshToken: getRefreshToken(),
     loading: false,
     error: null,
   }),
   getters: {
-    isAuthenticated: (state) => !!state.user && !!state.accessToken,
+    isAuthenticated: (state) => !!state.user && !!state.token,
   },
   actions: {
     async login(credentials) {
@@ -29,14 +29,16 @@ export const useAuthStore = defineStore("auth", {
         const response = await apiLogin(credentials);
         const loginResult = response.loginResult;
 
+        console.log(loginResult);
+
         this.user = {
           userId: loginResult.userId,
           name: loginResult.name,
         };
-        this.accessToken = loginResult.accessToken;
+        this.token = loginResult.token;
         this.refreshToken = loginResult.refreshToken;
 
-        storeTokens(this.accessToken, this.refreshToken);
+        storeTokens(this.token, this.refreshToken);
         storeUserData(this.user);
 
         this.error = null;
@@ -45,7 +47,7 @@ export const useAuthStore = defineStore("auth", {
           error.response?.data?.Message ||
           "An unexpected login error occurred.";
         this.user = null;
-        this.accessToken = null;
+        this.token = null;
         this.refreshToken = null;
       } finally {
         this.loading = false;
@@ -63,10 +65,10 @@ export const useAuthStore = defineStore("auth", {
           userId: loginResult.userId,
           name: loginResult.name,
         };
-        this.accessToken = loginResult.accessToken;
+        this.token = loginResult.token;
         this.refreshToken = loginResult.refreshToken;
 
-        storeTokens(this.accessToken, this.refreshToken);
+        storeTokens(this.token, this.refreshToken);
         storeUserData(this.user);
 
         this.error = null;
@@ -75,7 +77,7 @@ export const useAuthStore = defineStore("auth", {
           error.response?.data?.Message ||
           "An unexpected registration error occurred.";
         this.user = null;
-        this.accessToken = null;
+        this.token = null;
         this.refreshToken = null;
       } finally {
         this.loading = false;
@@ -84,7 +86,7 @@ export const useAuthStore = defineStore("auth", {
 
     logout() {
       this.user = null;
-      this.accessToken = null;
+      this.token = null;
       this.refreshToken = null;
       removeTokens();
       removeUserData();
