@@ -11,15 +11,8 @@ export const getProfile = async (userId) => {
 
 export const updateProfile = async (userId, profileData) => {
   try {
-    const response = await axiosInstance.put(
-      `/profile/${userId}`,
-      profileData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      },
-    );
+    const response = await axiosInstance.put(`/profile/${userId}`, profileData);
+
     return response.data;
   } catch (error) {
     throw error;

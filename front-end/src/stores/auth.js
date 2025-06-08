@@ -29,8 +29,6 @@ export const useAuthStore = defineStore("auth", {
         const response = await apiLogin(credentials);
         const loginResult = response.loginResult;
 
-        console.log(loginResult);
-
         this.user = {
           userId: loginResult.userId,
           name: loginResult.name,

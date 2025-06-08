@@ -6,6 +6,7 @@ export const useProfileStore = defineStore("profile", {
     profile: null,
     loading: false,
     error: null,
+    success: null,
   }),
   actions: {
     async fetchProfile(userId) {
@@ -34,10 +35,9 @@ export const useProfileStore = defineStore("profile", {
         const response = await updateProfile(userId, profileData);
         this.profile = response.profile;
         this.error = null;
+        this.success = "Profile updated successfully!";
 
         console.log("Profile updated successfully!");
-
-        return response.data.profile;
       } catch (error) {
         this.error =
           error.response?.data?.Message ||

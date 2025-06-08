@@ -14,6 +14,7 @@ import LoadingSpinner from "../ui/LoadingSpinner.vue";
 import ErrorMessage from "../ui/ErrorMessage.vue";
 import LoadingSpinner2 from "../ui/LoadingSpinner2.vue";
 import FormSelect from "../ui/FormSelect.vue";
+import SuccessMessage from "../ui/SuccessMessage.vue";
 
 const profileStore = useProfileStore();
 const authStore = useAuthStore();
@@ -22,6 +23,7 @@ const {
   profile,
   loading: profileLoading,
   error: profileError,
+  success: profileSuccess,
 } = storeToRefs(profileStore);
 const { user: authUser } = storeToRefs(authStore);
 
@@ -87,12 +89,17 @@ const handleSubmit = async () => {
   profileStore.error = null;
 
   const rules = {
+    fotoProfil: {
+      type: "file",
+      label: "Foto Profil",
+      maxSize: 1048576,
+      allowedTypes: ["image/jpeg", "image/jpg", "image/png", "image/webp"],
+    },
     namaLengkap: {
       label: "Nama Lengkap",
       minLength: 5,
       maxLength: 100,
     },
-    email: { type: "email", label: "Email" },
     alamat: { label: "Alamat", minLength: 10 },
     namaAnak: { label: "Nama Anak", minLength: 2 },
     jenisKelamin: { label: "Jenis Kelamin" },
@@ -112,9 +119,8 @@ const handleSubmit = async () => {
   };
 
   const formData = {
-    fotoProfil: fotoProfilFile.value,
+    // fotoProfil: fotoProfilFile.value,
     namaLengkap: namaLengkap.value,
-    email: email.value,
     alamat: alamat.value,
     namaAnak: namaAnak.value,
     jenisKelamin: jenisKelamin.value,
@@ -123,11 +129,28 @@ const handleSubmit = async () => {
     tbLahir: tbLahir.value,
   };
 
-  const validation = validateForm(formData, rules);
+  const filteredFormData = {};
+
+  Object.keys(formData).forEach((key) => {
+    const value = formData[key];
+    if (value !== null && value !== undefined && value !== "") {
+      if (typeof value === "number" && value === 0) {
+        return;
+      }
+      filteredFormData[key] = value;
+    }
+  });
+
+  console.info(filteredFormData);
+
+  const validation = validateForm(filteredFormData, rules);
 
   if (validation.isValid) {
     if (authUser.value && authUser.value.userId) {
-      await profileStore.updateUserProfile(authUser.value.userId, formData);
+      await profileStore.updateUserProfile(
+        authUser.value.userId,
+        filteredFormData,
+      );
     } else {
       profileStore.error = "User tidak ditemukan. Silakan masuk kembali.";
     }
@@ -147,6 +170,7 @@ const handleSubmit = async () => {
         Informasi Pribadi
       </h1>
 
+      <SuccessMessage :message="profileSuccess" v-if="profileSuccess" />
       <ErrorMessage :message="profileError" v-if="profileError" />
       <div v-if="profileLoading">
         <LoadingSpinner />
