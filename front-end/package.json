@@ -12,8 +12,6 @@
     "@tailwindcss/vite": "^4.1.6",
     "apexcharts": "^4.7.0",
     "axios": "^1.9.0",
-    "gsap": "^3.13.0",
-    "idb": "^8.0.3",
     "lucide-vue-next": "^0.510.0",
     "pinia": "^3.0.2",
     "tailwindcss": "^4.1.6",

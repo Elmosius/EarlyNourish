@@ -99,7 +99,7 @@ const handleSubmit = async () => {
           type="password"
           v-model="password"
           placeholder="••••••••"
-          autocomplete="current-password"
+          autocomplete="password"
           required
         />
         <FormError :message="errors.password" v-if="errors.password" />

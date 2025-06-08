@@ -1,27 +1,28 @@
 import axios from "axios";
 
-const USERS_DATA_URL = "/src/api/dummy/users.json";
+const api = import.meta.env.VITE_API_URL;
 
 export const login = async (credentials) => {
   try {
-    const response = await axios.get(USERS_DATA_URL);
-    const users = response.data;
-    const user = users.find(
-      (u) =>
-        u.email === credentials.email && u.password === credentials.password,
-    );
+    const response = await axios.post(`${api}/login`, credentials);
 
-    if (user) {
+    const loginResult = response.data.loginResult;
+
+    if (loginResult) {
       return {
         data: {
-          user: { id: user.id, email: user.email, nama: user.nama }, // ensure username is returned as API might expect it
-          token: `dummy-auth-token-for-${user.id}`,
+          loginResult: {
+            userId: loginResult.userId,
+            name: loginResult.name,
+            accessToken: loginResult.accessToken,
+            refreshToken: loginResult.refreshToken,
+          },
         },
       };
     } else {
       throw {
         response: {
-          data: { message: "Invalid username or password" },
+          data: { message: "Invalid email or password" },
           status: 401,
         },
       };
@@ -41,38 +42,29 @@ export const login = async (credentials) => {
 
 export const register = async (userInfo) => {
   try {
-    const response = await axios.get(USERS_DATA_URL);
-    const users = response.data;
-    const existingUser = users.find((u) => u.email === userInfo.email);
+    const response = await axios.post(`${api}/register`, userInfo);
 
-    if (existingUser) {
+    const loginResult = response.data.loginResult;
+
+    if (loginResult) {
+      return {
+        data: {
+          loginResult: {
+            userId: loginResult.userId,
+            name: loginResult.name,
+            accessToken: loginResult.accessToken,
+            refreshToken: loginResult.refreshToken,
+          },
+        },
+      };
+    } else {
       throw {
         response: {
-          data: { message: "User already exists with this username/email" },
-          status: 409, // Conflict
+          data: { message: "Registration failed" },
+          status: 400,
         },
       };
     }
-
-    const newUser = {
-      id: `user${Date.now()}`,
-      nama: userInfo.nama,
-      email: userInfo.email,
-      password: userInfo.password,
-    };
-
-    console.log("Simulated new user registration:", newUser);
-
-    return {
-      data: {
-        user: {
-          id: newUser.id,
-          nama: userInfo.nama,
-          email: userInfo.email,
-        },
-        token: `dummy-auth-token-for-${newUser.id}`,
-      },
-    };
   } catch (error) {
     if (error.response) {
       throw error;
@@ -83,5 +75,22 @@ export const register = async (userInfo) => {
         status: 500,
       },
     };
+  }
+};
+
+export const refreshAccessToken = async (refreshToken) => {
+  try {
+    const response = await axios.post(`${api}/refresh`, {
+      refreshToken: refreshToken,
+    });
+
+    return {
+      data: {
+        accessToken: response.data.accessToken,
+        refreshToken: response.data.refreshToken,
+      },
+    };
+  } catch (error) {
+    throw error;
   }
 };

@@ -1,16 +1,29 @@
 import { defineStore } from "pinia";
-import { login as apiLogin, register as apiRegister } from "../api/auth";
-import { storeToken, getToken, removeToken } from "../utils/auth.js";
+import {
+  login as apiLogin,
+  register as apiRegister,
+  refreshAccessToken,
+} from "../api/auth";
+import {
+  storeTokens,
+  getAccessToken,
+  getRefreshToken,
+  removeTokens,
+  getUserData,
+  removeUserData,
+  storeUserData,
+} from "../utils/auth.js";
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
-    user: null,
-    token: getToken(),
+    user: getUserData(),
+    accessToken: getAccessToken(),
+    refreshToken: getRefreshToken(),
     loading: false,
     error: null,
   }),
   getters: {
-    isAuthenticated: (state) => !!state.user && !!state.token,
+    isAuthenticated: (state) => !!state.user && !!state.accessToken,
   },
   actions: {
     async login(credentials) {
@@ -18,16 +31,26 @@ export const useAuthStore = defineStore("auth", {
       this.error = null;
       try {
         const response = await apiLogin(credentials);
-        this.user = response.data.user;
-        this.token = response.data.token;
-        storeToken(this.token); // Store the token
+        const loginResult = response.data.loginResult;
+
+        this.user = {
+          userId: loginResult.userId,
+          name: loginResult.name,
+        };
+        this.accessToken = loginResult.accessToken;
+        this.refreshToken = loginResult.refreshToken;
+
+        storeTokens(this.accessToken, this.refreshToken);
+        storeUserData(this.user);
+
         this.error = null;
       } catch (error) {
         this.error =
           error.response?.data?.message ||
           "An unexpected login error occurred.";
         this.user = null;
-        this.token = null;
+        this.accessToken = null;
+        this.refreshToken = null;
       } finally {
         this.loading = false;
       }
@@ -38,25 +61,59 @@ export const useAuthStore = defineStore("auth", {
       this.error = null;
       try {
         const response = await apiRegister(userInfo);
-        this.user = response.data.user;
-        this.token = response.data.token;
-        storeToken(this.token); // Store the token
+        const loginResult = response.data.loginResult;
+
+        this.user = {
+          userId: loginResult.userId,
+          name: loginResult.name,
+        };
+        this.accessToken = loginResult.accessToken;
+        this.refreshToken = loginResult.refreshToken;
+
+        storeTokens(this.accessToken, this.refreshToken);
+        storeUserData(this.user);
+
         this.error = null;
       } catch (error) {
         this.error =
           error.response?.data?.message ||
           "An unexpected registration error occurred.";
         this.user = null;
-        this.token = null;
+        this.accessToken = null;
+        this.refreshToken = null;
       } finally {
         this.loading = false;
       }
     },
 
+    async refreshToken() {
+      try {
+        if (!this.refreshToken) {
+          throw new Error("No refresh token available");
+        }
+
+        const response = await refreshAccessToken(this.refreshToken);
+        this.accessToken = response.data.accessToken;
+
+        if (response.data.refreshToken) {
+          this.refreshToken = response.data.refreshToken;
+        }
+
+        storeTokens(this.accessToken, this.refreshToken);
+
+        return this.accessToken;
+      } catch (error) {
+        this.logout();
+        throw error;
+      }
+    },
+
     logout() {
       this.user = null;
-      this.token = null;
-      removeToken();
+      this.accessToken = null;
+      this.refreshToken = null;
+      removeTokens();
+      removeUserData();
       this.error = null;
     },
   },

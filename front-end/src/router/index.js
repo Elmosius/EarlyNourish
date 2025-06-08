@@ -21,17 +21,17 @@ const routes = [
   {
     path: "/login",
     component: LoginPage,
-    meta: { layout: "AuthLayout" },
+    meta: { layout: "AuthLayout", requiresGuest: true },
   },
   {
     path: "/register",
     component: RegisterPage,
-    meta: { layout: "AuthLayout" },
+    meta: { layout: "AuthLayout", requiresGuest: true },
   },
   {
     path: "/forgot-password",
     component: ForgotPassword,
-    meta: { layout: "DefaultLayout" },
+    meta: { layout: "DefaultLayout", requiresGuest: true },
   },
   {
     path: "/sk",
@@ -52,7 +52,7 @@ const routes = [
   {
     path: "/history",
     component: HistoryPage,
-    meta: { layout: "MainLayout", requiresAuth: true },
+    meta: { layout: "MainLayout", requiresAuth: false },
   },
   {
     path: "/dashboard/:id",
@@ -93,17 +93,16 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
 
-  if (to.meta.requiresAuth) {
-    if (authStore.isAuthenticated) {
-      next();
-    } else {
-      next({
-        path: "/login",
-        query: { redirect: to.fullPath },
-      });
-    }
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+
+  const requiresGuest = to.matched.some((record) => record.meta.requiresGuest);
+  if (requiresAuth && !authStore.isAuthenticated) {
+    next("/login");
+  } else if (requiresGuest && authStore.isAuthenticated) {
+    next("/");
   } else {
     next();
   }
 });
+
 export default router;
