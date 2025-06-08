@@ -13,28 +13,22 @@ const fetchAllFeedbacks = async () => {
   error.value = null;
   try {
     const response = await getFeedbacks();
-    // Dari API kamu, response.data.feedbacks adalah array-nya
-    allFeedbacks.value = response.data.feedbacks || [];
+    allFeedbacks.value = response.feedback || [];
   } catch (err) {
     console.error("Gagal mengambil testimoni:", err);
     error.value =
-      err.response?.data?.message || "Tidak dapat memuat testimoni.";
-    allFeedbacks.value = []; // Pastikan array kosong jika error
+      err.response?.data?.Message || "Tidak dapat memuat testimoni.";
+    allFeedbacks.value = [];
   } finally {
     isLoading.value = false;
   }
 };
 
-// Ambil data saat komponen pertama kali dimuat
 onMounted(() => {
   fetchAllFeedbacks();
 });
 
-// Computed property untuk mendapatkan 3 feedback terbaik
-// Asumsi 'rating' adalah properti untuk menentukan "terbaik" dan nilainya lebih tinggi lebih baik
-// Jika tidak ada rating, kamu bisa ambil 3 terbaru atau acak.
 const topThreeFeedbacks = computed(() => {
-  // Buat salinan array agar tidak mengubah state asli
   return [...allFeedbacks.value]
     .sort((a, b) => (b.rating || 0) - (a.rating || 0))
     .slice(0, 3);
@@ -67,7 +61,7 @@ const topThreeFeedbacks = computed(() => {
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <div
           v-for="(testimonial, index) in topThreeFeedbacks"
-          :key="index"
+          :key="testimonial.Id"
           class="bg-white p-6 rounded-lg shadow-md"
         >
           <div class="flex justify-between mb-4">
@@ -95,11 +89,11 @@ const topThreeFeedbacks = computed(() => {
               class="bg-[#DCFCE7] inset-shadow-sm inset-shadow-gray-300 w-10 h-10 rounded-full flex items-center justify-center mr-3"
             >
               <span class="text-tertiary font-bold">{{
-                testimonial.nama.charAt(0)
+                testimonial.userId.charAt(0)
               }}</span>
             </div>
             <div>
-              <h4 class="font-semibold">{{ testimonial.nama }}</h4>
+              <h4 class="font-semibold">{{ testimonial.userId }}</h4>
               <p class="text-sm text-gray-500">Orang tua</p>
             </div>
           </div>
