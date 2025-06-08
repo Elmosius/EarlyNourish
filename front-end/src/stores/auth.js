@@ -42,7 +42,7 @@ export const useAuthStore = defineStore("auth", {
         this.error = null;
       } catch (error) {
         this.error =
-          error.response?.data?.message ||
+          error.response?.data?.Message ||
           "An unexpected login error occurred.";
         this.user = null;
         this.accessToken = null;
@@ -72,7 +72,7 @@ export const useAuthStore = defineStore("auth", {
         this.error = null;
       } catch (error) {
         this.error =
-          error.response?.data?.message ||
+          error.response?.data?.Message ||
           "An unexpected registration error occurred.";
         this.user = null;
         this.accessToken = null;
