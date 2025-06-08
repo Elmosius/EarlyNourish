@@ -30,9 +30,9 @@ const registerUser = async ({ email, password, fullName }) => {
     throw new Error('Email sudah digunakan');
   }
 
-  const userRole = await Role.findOne({ nama: 'user' });
+  let userRole = await Role.findOne({ nama: 'user' });
   if (!userRole) {
-    throw new Error('Role user tidak ditemukan');
+    userRole = await new Role({ nama: 'user' }).save();
   }
 
   const passwordHash = await hashPassword(password);

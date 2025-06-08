@@ -11,98 +11,49 @@ const ClientError = require('../../exceptions/ClientError');
 const createPredictionHandlerImpl = async (request, h) => {
   PredictionsValidator.validatePostPredictionPayload(request.payload);
 
-  const {
-    provinsi,
-    jenisKelamin,
-    usiaBayiBulan,
-    bbLahir,
-    tbLahir,
-    asiEksklusifBulan,
-    lingkarKepala,
-    lahirPrematur,
-    usiaIbu,
-    tinggiIbu,
-    bmiIbu,
-    pendidikanIbu,
-    sanitasiLayak,
-    airMinumLayak,
-    statusImunisasi,
-  } = request.payload;
+  const { jk, bbLahir, tbLahir, umur, bb, tb } = request.payload;
+  const userId = request.auth.credentials.userId;
 
-  const userIdString = request.auth.credentials.userId;
-  const userDoc = await User.findById(userIdString);
-  if (!userDoc) {
-    throw new InvariantError('User tidak ditemukan');
-  }
+  const user = await User.findById(userId);
+  if (!user) throw new InvariantError('User tidak ditemukan');
 
   const mlApiUrl = process.env.ML_API_URL;
-  if (!mlApiUrl || mlApiUrl.trim() === '') {
-    throw new ClientError('Variabel ML_API_URL belum di‐set di .env', 400);
-  }
+  if (!mlApiUrl) throw new ClientError('ML_API_URL belum diatur di .env', 400);
 
-  const mlPayload = {
-    provinsi,
-    jenisKelamin,
-    usiaBayiBulan,
-    bbLahir,
-    tbLahir,
-    asiEksklusifBulan,
-    lingkarKepala,
-    lahirPrematur,
-    usiaIbu,
-    tinggiIbu,
-    bmiIbu,
-    pendidikanIbu,
-    sanitasiLayak,
-    airMinumLayak,
-    statusImunisasi,
-  };
+  const mlPayload = { jk, bbLahir, tbLahir, umur, bb, tb };
 
   let mlResult;
   try {
-    const mlResponse = await axios.post(
-      mlApiUrl,
-      mlPayload,
-      {
-        headers: { 'Content-Type': 'application/json' },
-        timeout: 10000, 
-      }
-    );
-    mlResult = mlResponse.data;
+    const response = await axios.post(mlApiUrl, mlPayload, {
+      headers: { 'Content-Type': 'application/json' },
+      timeout: 10000,
+    });
+
+    mlResult = response.data;
     if (
-      !mlResult ||
-      typeof mlResult.stuntingRisk !== 'string' ||
-      !Array.isArray(mlResult.rekomendasi) ||
+      typeof mlResult.risikoStunting !== 'string' ||
+      !Array.isArray(mlResult.tindakan) ||
       !Array.isArray(mlResult.nutrisi)
     ) {
-      throw new Error('ML API merespons format yang tidak sesuai');
+      throw new Error('Format response ML tidak sesuai');
     }
   } catch (err) {
-    console.error('Error saat memanggil ML API:', err.message || err);
-    throw new ClientError('Gagal memproses prediksi ke ML API', 400);
+    console.error('Error ML API:', err.message || err);
+    throw new ClientError('Gagal memproses prediksi dari ML API', 400);
   }
 
-  const newHistory = await new History({ userId: userDoc._id }).save();
+  const history = await new History({ userId }).save();
 
   const prediction = new Prediction({
-    historyId: newHistory._id,
-    provinsi,
-    jenisKelamin,
-    usiaBayiBulan,
+    historyId: history._id,
+    jenisKelamin: jk,
     bbLahir,
     tbLahir,
-    asiEksklusifBulan,
-    lingkarKepala,
-    lahirPrematur,
-    usiaIbu,
-    tinggiIbu,
-    bmiIbu,
-    pendidikanIbu,
-    sanitasiLayak,
-    airMinumLayak,
-    statusImunisasi,
-    stuntingRisk: mlResult.stuntingRisk,
-    rekomendasi: mlResult.rekomendasi,
+    usia: umur,
+    bb,
+    tb,
+    risikoStunting: mlResult.risikoStunting,
+    rekomendasi: mlResult.tindakan, // 🟢 mapping tindakan → rekomendasi
     nutrisi: mlResult.nutrisi,
   });
   await prediction.save();
@@ -111,7 +62,7 @@ const createPredictionHandlerImpl = async (request, h) => {
     Error: false,
     Message: 'success',
     Result: {
-      stuntingRisk: prediction.stuntingRisk,
+      risikoStunting: prediction.risikoStunting,
       rekomendasi: prediction.rekomendasi,
       nutrisi: prediction.nutrisi,
     },
@@ -141,39 +92,26 @@ const getPredictionByIdHandlerImpl = async (request, h) => {
 
   const history = await History.findOne({ _id: idPredict, userId: idUser });
   if (!history) {
-    return h.response({ Error: true, Message: 'Data prediksi tidak ditemukan' }).code(404);
+    return h.response({ Error: true, Message: 'Data tidak ditemukan' }).code(404);
   }
 
   const prediction = await Prediction.findOne({ historyId: idPredict });
   if (!prediction) {
-    return h.response({ Error: true, Message: 'Data prediksi tidak ditemukan' }).code(404);
+    return h.response({ Error: true, Message: 'Data tidak ditemukan' }).code(404);
   }
 
   return h.response({
     Error: false,
     Message: 'success',
     Result: {
-      Id: prediction._id,
-      provinsi: prediction.provinsi,
+      id: prediction._id,
       jenisKelamin: prediction.jenisKelamin,
-      usiaBayiBulan: prediction.usiaBayiBulan,
+      usia: prediction.usia,
       bbLahir: prediction.bbLahir,
       tbLahir: prediction.tbLahir,
-      asiEksklusifBulan: prediction.asiEksklusifBulan,
-      lingkarKepala: prediction.lingkarKepala,
-      lahirPrematur: prediction.lahirPrematur,
-      usiaIbu: prediction.usiaIbu,
-      tinggiIbu: prediction.tinggiIbu,
-      bmiIbu: prediction.bmiIbu,
-      pendidikanIbu: prediction.pendidikanIbu,
-      sanitasiLayak: prediction.sanitasiLayak,
-      airMinumLayak: prediction.airMinumLayak,
-      statusImunisasi: prediction.statusImunisasi,
-      stuntingRisk: prediction.stuntingRisk,
-      rekomendasi: prediction.rekomendasi,
-      nutrisi: prediction.nutrisi,
+      bb: prediction.bb,
+      tb: prediction.tb,
       createdAt: prediction.createdAt,
-      updatedAt: prediction.updatedAt,
     },
   }).code(200);
 };
