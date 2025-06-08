@@ -6,21 +6,17 @@ import FormError from "../ui/FormError.vue";
 
 const formData = ref({
   // Step 1 data
-  childName: "",
-  birthDate: "",
-  gender: "",
-  parentName: "",
+  namaLengkap: "",
   email: "",
+  namaAnak: "",
+  jenisKelamin: "",
+  tanggalLahir: "",
 
-  // Step 2 data - Medical Information
-  birthWeight: "",
-  birthHeight: "",
-  currentWeight: "",
-  currentHeight: "",
-  breastfeedingDuration: "",
-  motherAgeAtBirth: "",
-  fatherHeight: "",
-  motherHeight: "",
+  // Step 2 data
+  bbLahir: "",
+  tbLahir: "",
+  bb: "",
+  tb: "",
 });
 
 const currentStep = ref(2);
@@ -31,79 +27,77 @@ const progressPercentage = computed(() => {
   return (currentStep.value / totalSteps) * 100;
 });
 
+const umurInMonths = computed(() => {
+  if (!formData.value.tanggalLahir) return 0;
+
+  const birthDate = new Date(formData.value.tanggalLahir);
+  const currentDate = new Date();
+
+  let months = (currentDate.getFullYear() - birthDate.getFullYear()) * 12;
+  months += currentDate.getMonth() - birthDate.getMonth();
+
+  if (currentDate.getDate() < birthDate.getDate()) {
+    months--;
+  }
+
+  return Math.max(0, months);
+});
+
 const step1Rules = {
-  childName: {
-    label: "Nama Anak",
-    required: true,
-    minLength: 5,
-    maxLength: 50,
-  },
-  birthDate: { label: "Tanggal Lahir", required: true },
-  gender: { label: "Jenis Kelamin", required: true },
-  parentName: {
+  namaLengkap: {
     label: "Nama Orang Tua",
     required: true,
     minLength: 5,
     maxLength: 50,
   },
-  email: { label: "Email", type: "email", required: true },
+  email: {
+    label: "Email",
+    type: "email",
+    required: true,
+  },
+  namaAnak: {
+    label: "Nama Anak",
+    required: true,
+    minLength: 5,
+    maxLength: 50,
+  },
+  jenisKelamin: {
+    label: "Jenis Kelamin",
+    required: true,
+  },
+  tanggalLahir: {
+    label: "Tanggal Lahir",
+    required: true,
+  },
 };
 
 const step2Rules = {
-  birthWeight: {
+  bbLahir: {
     label: "Berat Badan Lahir",
     required: true,
     type: "number",
     min: 0.5,
     max: 10,
   },
-  birthHeight: {
+  tbLahir: {
     label: "Tinggi Badan Lahir",
     required: true,
     type: "number",
     min: 20,
     max: 70,
   },
-  currentWeight: {
+  bb: {
     label: "Berat Badan Saat Ini",
     required: true,
     type: "number",
     min: 1,
     max: 200,
   },
-  currentHeight: {
+  tb: {
     label: "Tinggi Badan Saat Ini",
     required: true,
     type: "number",
     min: 30,
-    max: 250,
-  },
-  breastfeedingDuration: {
-    label: "Pemberian ASI",
-    required: true,
-    type: "number",
-    min: 0,
-    max: 60,
-  },
-  motherAgeAtBirth: {
-    label: "Usia Ibu saat Melahirkan",
-    required: true,
-    type: "number",
-    min: 15,
-    max: 60,
-  },
-  fatherHeight: {
-    label: "Tinggi Badan Ayah",
-    required: true,
-    type: "number",
-    min: 120,
-    max: 250,
-  },
-  motherHeight: {
-    label: "Tinggi Badan Ibu",
-    required: true,
-    type: "number",
-    min: 120,
     max: 250,
   },
 };
@@ -120,13 +114,27 @@ const validateStep2 = () => {
   return validation.isValid;
 };
 
+// Fungsi untuk menyiapkan data prediksi
+const preparePredictionData = () => {
+  return {
+    jenisKelamin: formData.value.jenisKelamin,
+    bbLahir: parseFloat(formData.value.bbLahir),
+    tbLahir: parseFloat(formData.value.tbLahir),
+    umur: umurInMonths.value,
+    bb: parseFloat(formData.value.bb),
+    tb: parseFloat(formData.value.tb),
+  };
+};
+
 // Navigation handlers
 const handleNext = () => {
   if (currentStep.value === 1 && validateStep1()) {
     currentStep.value = 2;
   } else if (currentStep.value === 2 && validateStep2()) {
     // Submit form
-    console.log("Form submitted:", formData.value);
+    const predictionData = preparePredictionData();
+    console.log("Form data:", formData.value);
+    console.log("Prediction data:", predictionData);
     alert("Form berhasil dikirim!");
   }
 };
@@ -183,36 +191,61 @@ const clearError = (field) => {
         <form @submit.prevent="handleNext" class="p-6">
           <!-- Step 1 Form -->
           <div v-if="currentStep === 1" class="space-y-6 flex flex-col">
-            <div class="lg:flex gap-6">
-              <div class="w-full mb-2">
+            <div class="flex justify-betwee gap-6">
+              <div class="w-full">
                 <FormInput
-                  id="childName"
-                  label="Nama Anak"
-                  v-model="formData.childName"
-                  @input="clearError('childName')"
-                  placeholder="Masukkan nama anak"
-                  class="w-full"
+                  id="namaLengkap"
+                  label="Nama Orang Tua"
+                  v-model="formData.namaLengkap"
+                  @input="clearError('namaLengkap')"
+                  placeholder="Masukkan nama lengkap Anda"
                   required
                 />
                 <FormError
-                  :message="errors.childName"
-                  v-if="errors.childName"
+                  :message="errors.namaLengkap"
+                  v-if="errors.namaLengkap"
                 />
               </div>
 
               <div class="w-full">
                 <FormInput
-                  id="birthDate"
+                  id="email"
+                  label="Email"
+                  type="email"
+                  v-model="formData.email"
+                  @input="clearError('email')"
+                  placeholder="email@example.com"
+                  readonly
+                  required
+                />
+                <FormError :message="errors.email" v-if="errors.email" />
+              </div>
+            </div>
+
+            <div class="flex justify-between gap-6">
+              <div class="w-full">
+                <FormInput
+                  id="namaAnak"
+                  label="Nama Anak"
+                  v-model="formData.namaAnak"
+                  @input="clearError('namaAnak')"
+                  placeholder="Masukkan nama anak"
+                  required
+                />
+                <FormError :message="errors.namaAnak" v-if="errors.namaAnak" />
+              </div>
+              <div class="w-full">
+                <FormInput
+                  id="tanggalLahir"
                   label="Tanggal Lahir"
                   type="date"
-                  v-model="formData.birthDate"
-                  @input="clearError('birthDate')"
-                  placeholder="mm/dd/yyyy"
+                  v-model="formData.tanggalLahir"
+                  @input="clearError('tanggalLahir')"
                   required
                 />
                 <FormError
-                  :message="errors.birthDate"
-                  v-if="errors.birthDate"
+                  :message="errors.tanggalLahir"
+                  v-if="errors.tanggalLahir"
                 />
               </div>
             </div>
@@ -229,10 +262,10 @@ const clearError = (field) => {
                     <input
                       id="male"
                       type="radio"
-                      name="gender"
-                      value="male"
-                      v-model="formData.gender"
-                      @change="clearError('gender')"
+                      name="jenisKelamin"
+                      value="l"
+                      v-model="formData.jenisKelamin"
+                      @change="clearError('jenisKelamin')"
                       class="h-4 w-4 text-tertiary focus:ring-tertiary"
                     />
                     <span class="ml-2 text-gray-700 text-base">Laki-laki</span>
@@ -243,45 +276,20 @@ const clearError = (field) => {
                     <input
                       id="female"
                       type="radio"
-                      name="gender"
-                      value="female"
-                      v-model="formData.gender"
-                      @change="clearError('gender')"
+                      name="jenisKelamin"
+                      value="p"
+                      v-model="formData.jenisKelamin"
+                      @change="clearError('jenisKelamin')"
                       class="h-4 w-4 text-tertiary focus:ring-tertiary"
                     />
                     <span class="ml-2 text-gray-700 text-base">Perempuan</span>
                   </label>
                 </div>
               </div>
-              <FormError :message="errors.gender" v-if="errors.gender" />
-            </div>
-
-            <div>
-              <FormInput
-                id="parentName"
-                label="Nama Orang Tua"
-                v-model="formData.parentName"
-                @input="clearError('parentName')"
-                placeholder="Masukkan nama Anda"
-                required
-              />
               <FormError
-                :message="errors.parentName"
-                v-if="errors.parentName"
+                :message="errors.jenisKelamin"
+                v-if="errors.jenisKelamin"
               />
-            </div>
-
-            <div>
-              <FormInput
-                id="email"
-                label="Email"
-                type="email"
-                v-model="formData.email"
-                @input="clearError('email')"
-                placeholder="Masukkan Email Anda"
-                required
-              />
-              <FormError :message="errors.email" v-if="errors.email" />
             </div>
           </div>
 
@@ -294,35 +302,29 @@ const clearError = (field) => {
             <div class="lg:flex gap-6">
               <div class="w-full mb-2">
                 <FormInput
-                  id="birthWeight"
+                  id="bbLahir"
                   label="Berat Badan Lahir (kg)"
                   type="number"
                   step="0.1"
-                  v-model="formData.birthWeight"
-                  @input="clearError('birthWeight')"
+                  v-model="formData.bbLahir"
+                  @input="clearError('bbLahir')"
                   placeholder="Contoh: 3.2"
                   required
                 />
-                <FormError
-                  :message="errors.birthWeight"
-                  v-if="errors.birthWeight"
-                />
+                <FormError :message="errors.bbLahir" v-if="errors.bbLahir" />
               </div>
 
               <div class="w-full">
                 <FormInput
-                  id="birthHeight"
+                  id="tbLahir"
                   label="Tinggi Badan Lahir (cm)"
                   type="number"
-                  v-model="formData.birthHeight"
-                  @input="clearError('birthHeight')"
+                  v-model="formData.tbLahir"
+                  @input="clearError('tbLahir')"
                   placeholder="Contoh: 50"
                   required
                 />
-                <FormError
-                  :message="errors.birthHeight"
-                  v-if="errors.birthHeight"
-                />
+                <FormError :message="errors.tbLahir" v-if="errors.tbLahir" />
               </div>
             </div>
 
@@ -333,107 +335,29 @@ const clearError = (field) => {
             <div class="lg:flex gap-6">
               <div class="w-full mb-2">
                 <FormInput
-                  id="currentWeight"
+                  id="bb"
                   label="Berat Badan Saat Ini (kg)"
                   type="number"
                   step="0.1"
-                  v-model="formData.currentWeight"
-                  @input="clearError('currentWeight')"
+                  v-model="formData.bb"
+                  @input="clearError('bb')"
                   placeholder="Contoh: 15.5"
                   required
                 />
-                <FormError
-                  :message="errors.currentWeight"
-                  v-if="errors.currentWeight"
-                />
+                <FormError :message="errors.bb" v-if="errors.bb" />
               </div>
 
               <div class="w-full">
                 <FormInput
-                  id="currentHeight"
+                  id="tb"
                   label="Tinggi Badan Saat Ini (cm)"
                   type="number"
-                  v-model="formData.currentHeight"
-                  @input="clearError('currentHeight')"
+                  v-model="formData.tb"
+                  @input="clearError('tb')"
                   placeholder="Contoh: 95"
                   required
                 />
-                <FormError
-                  :message="errors.currentHeight"
-                  v-if="errors.currentHeight"
-                />
-              </div>
-            </div>
-
-            <div>
-              <FormInput
-                id="breastfeedingDuration"
-                label="Pemberian ASI (bulan)"
-                type="number"
-                v-model="formData.breastfeedingDuration"
-                @input="clearError('breastfeedingDuration')"
-                placeholder="Contoh: 24"
-                required
-              />
-              <FormError
-                :message="errors.breastfeedingDuration"
-                v-if="errors.breastfeedingDuration"
-              />
-            </div>
-
-            <!-- Data Orang Tua -->
-            <h3 class="text-base font-semibold text-gray-800 mb-4">
-              Data Orang Tua
-            </h3>
-            <div class="space-y-4">
-              <div>
-                <FormInput
-                  id="motherAgeAtBirth"
-                  label="Usia Ibu saat Melahirkan (tahun)"
-                  type="number"
-                  v-model="formData.motherAgeAtBirth"
-                  @input="clearError('motherAgeAtBirth')"
-                  placeholder="Contoh: 28"
-                  required
-                />
-                <FormError
-                  :message="errors.motherAgeAtBirth"
-                  v-if="errors.motherAgeAtBirth"
-                />
-              </div>
-
-              <div class="lg:flex gap-6">
-                <div class="w-full mb-2">
-                  <FormInput
-                    id="fatherHeight"
-                    label="Tinggi Badan Ayah (cm)"
-                    type="number"
-                    v-model="formData.fatherHeight"
-                    @input="clearError('fatherHeight')"
-                    placeholder="Contoh: 175"
-                    required
-                  />
-                  <FormError
-                    :message="errors.fatherHeight"
-                    v-if="errors.fatherHeight"
-                  />
-                </div>
-
-                <div class="w-full">
-                  <FormInput
-                    id="motherHeight"
-                    label="Tinggi Badan Ibu (cm)"
-                    type="number"
-                    v-model="formData.motherHeight"
-                    @input="clearError('motherHeight')"
-                    placeholder="Contoh: 160"
-                    required
-                  />
-                  <FormError
-                    :message="errors.motherHeight"
-                    v-if="errors.motherHeight"
-                  />
-                </div>
+                <FormError :message="errors.tb" v-if="errors.tb" />
               </div>
             </div>
           </div>

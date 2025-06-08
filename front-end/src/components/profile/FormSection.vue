@@ -37,6 +37,11 @@ const tanggalLahir = ref("");
 const bbLahir = ref("");
 const tbLahir = ref("");
 
+const options = [
+  { value: "l", label: "Laki-laki" },
+  { value: "p", label: "Perempuan" },
+];
+
 const errors = ref({});
 
 const handlePhotoUpload = (event) => {
@@ -249,7 +254,7 @@ const handleSubmit = async () => {
             <div>
               <FormSelect
                 id="jenisKelamin"
-                :options="['laki-laki', 'perempuan']"
+                :options="options"
                 label="Jenis Kelamin"
                 v-model="jenisKelamin"
               />
