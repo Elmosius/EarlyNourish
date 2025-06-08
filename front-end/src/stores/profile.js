@@ -18,7 +18,7 @@ export const useProfileStore = defineStore("profile", {
         this.error = null;
       } catch (error) {
         this.error =
-          error.response?.data?.message ||
+          error.response?.data?.Message ||
           "An unexpected error occurred while fetching profile.";
         this.profile = null;
       } finally {
@@ -40,7 +40,7 @@ export const useProfileStore = defineStore("profile", {
         return response.data.profile;
       } catch (error) {
         this.error =
-          error.response?.data?.message ||
+          error.response?.data?.Message ||
           "An unexpected error occurred while updating profile.";
         throw error;
       } finally {
