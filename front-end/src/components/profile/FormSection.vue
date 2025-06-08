@@ -28,7 +28,7 @@ const { user: authUser } = storeToRefs(authStore);
 const fotoProfil = ref(profile.value?.fotoProfil || null);
 const fotoProfilFile = ref(null);
 
-const fullName = ref("");
+const namaLengkap = ref("");
 const email = ref("");
 const alamat = ref("");
 const namaAnak = ref("");
@@ -49,7 +49,7 @@ const handlePhotoUpload = (event) => {
 
 const populateForm = (profileData) => {
   if (profileData) {
-    fullName.value = profileData.fullName || "";
+    namaLengkap.value = profileData.namaLengkap || "";
     email.value = profileData.email || "";
     alamat.value = profileData.alamat || "";
     namaAnak.value = profileData.namaAnak || "";
@@ -191,11 +191,10 @@ const handleSubmit = async () => {
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <FormInput
-                id="fullName"
+                id="namaLengkap"
                 label="Nama Lengkap"
-                v-model="fullName"
+                v-model="namaLengkap"
                 placeholder="Masukkan nama lengkap Anda"
-                :model-value="profile?.fullName"
                 autofocus
               />
               <FormError
@@ -211,7 +210,6 @@ const handleSubmit = async () => {
                 type="email"
                 v-model="email"
                 placeholder="Masukkan email Anda"
-                :model-value="profile?.email"
                 readonly
                 class="bg-gray-50 cursor-not-allowed"
               />
@@ -225,7 +223,6 @@ const handleSubmit = async () => {
                 placeholder="Masukkan alamat lengkap Anda"
                 :rows="3"
                 label="Alamat"
-                :model-value="profile?.alamat"
               />
               <FormError :message="errors.alamat" v-if="errors.alamat" />
             </div>
@@ -245,7 +242,6 @@ const handleSubmit = async () => {
                 label="Nama Anak"
                 v-model="namaAnak"
                 placeholder="Masukkan nama anak Anda"
-                :model-value="profile?.namaAnak"
               />
               <FormError :message="errors.namaAnak" v-if="errors.namaAnak" />
             </div>
@@ -256,7 +252,6 @@ const handleSubmit = async () => {
                 :options="['laki-laki', 'perempuan']"
                 label="Jenis Kelamin"
                 v-model="jenisKelamin"
-                :model-value="profile?.jenisKelamin"
               />
             </div>
 
@@ -266,7 +261,6 @@ const handleSubmit = async () => {
                 label="Tanggal Lahir"
                 type="date"
                 v-model="tanggalLahir"
-                :model-value="profile?.tanggalLahir"
               />
               <FormError
                 :message="errors.tanggalLahir"
@@ -282,7 +276,6 @@ const handleSubmit = async () => {
                 placeholder="Contoh: 3.2"
                 step="0.1"
                 label="Berat Lahir (kg)"
-                :model-value="profile?.bbLahir"
               />
               <FormError :message="errors.bbLahir" v-if="errors.bbLahir" />
             </div>
@@ -292,7 +285,6 @@ const handleSubmit = async () => {
                 id="tbLahir"
                 type="number"
                 v-model="tbLahir"
-                :model-value="profile?.tbLahir"
                 placeholder="Contoh: 50"
                 label="Tinggi Lahir (cm)"
               />
