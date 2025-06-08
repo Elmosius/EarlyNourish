@@ -2,7 +2,8 @@ const User = require('../models/user.model');
 const Role = require('../models/role.model');
 const bcrypt = require('bcrypt');
 const TokenManager = require('../token/TokenManager');
-const ClientError = require('../exceptions/ClientError');
+const InvariantError = require('../exceptions/InvariantError');
+const AuthenticationError = require('../exceptions/AuthenticationError');
 
 const SALT_ROUNDS = 10;
 
@@ -27,8 +28,10 @@ const generateTokenPair = (user) => {
 };
 
 const registerUser = async ({ email, password, namaLengkap }) => {
-  if (await User.findOne({ email })) {
-    throw new Error('Email sudah digunakan');
+  // Cek exact email (case-insensitive)
+  const existingUser = await User.findOne({ email: new RegExp(`^${email}$`, 'i') });
+  if (existingUser) {
+    throw new InvariantError('Email sudah digunakan');
   }
 
   let userRole = await Role.findOne({ nama: 'user' });
@@ -48,24 +51,20 @@ const registerUser = async ({ email, password, namaLengkap }) => {
   return newUser;
 };
 
-
 const loginUser = async ({ email, password }) => {
-  const user = await User.findOne({ email }).populate('roleId', 'nama');
-
+  const user = await User.findOne({ email: new RegExp(`^${email}$`, 'i') }).populate('roleId', 'nama');
   if (!user) {
-    await bcrypt.hash(password, SALT_ROUNDS);
-    throw new ClientError('Email atau password salah', 400); 
+    throw new AuthenticationError('Email atau password salah');
   }
 
   const valid = await verifyPassword(password, user.passwordHash);
   if (!valid) {
-    throw new ClientError('Email atau password salah', 400);
+    throw new AuthenticationError('Email atau password salah');
   }
 
   const { token, refreshToken } = generateTokenPair(user);
   return { user, token, refreshToken };
 };
-
 
 module.exports = {
   hashPassword,

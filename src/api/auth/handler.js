@@ -1,5 +1,6 @@
 const authService = require('../../services/auth.service');
 const AuthenticationsValidator = require('../../validator/auth');
+const InvariantError = require('../../exceptions/InvariantError');
 const AuthenticationError = require('../../exceptions/AuthenticationError');
 const ClientError = require('../../exceptions/ClientError');
 
