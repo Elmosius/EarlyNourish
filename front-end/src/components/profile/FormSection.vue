@@ -15,6 +15,7 @@ import ErrorMessage from "../ui/ErrorMessage.vue";
 import LoadingSpinner2 from "../ui/LoadingSpinner2.vue";
 import FormSelect from "../ui/FormSelect.vue";
 import SuccessMessage from "../ui/SuccessMessage.vue";
+import { formatDateForInput } from "../../utils/date.js";
 
 const profileStore = useProfileStore();
 const authStore = useAuthStore();
@@ -61,7 +62,7 @@ const populateForm = (profileData) => {
     alamat.value = profileData.alamat || "";
     namaAnak.value = profileData.namaAnak || "";
     jenisKelamin.value = profileData.jenisKelamin || "";
-    tanggalLahir.value = profileData.tanggalLahir || "";
+    tanggalLahir.value = formatDateForInput(profileData.tanggalLahir);
     bbLahir.value = profileData.bbLahir || "";
     tbLahir.value = profileData.tbLahir || "";
   }
@@ -101,7 +102,7 @@ const handleSubmit = async () => {
       maxLength: 100,
     },
     alamat: { label: "Alamat", minLength: 10 },
-    namaAnak: { label: "Nama Anak", minLength: 2 },
+    namaAnak: { label: "Nama Anak", minLength: 5 },
     jenisKelamin: { label: "Jenis Kelamin" },
     tanggalLahir: { label: "Tanggal Lahir" },
     bbLahir: {
@@ -140,8 +141,6 @@ const handleSubmit = async () => {
       filteredFormData[key] = value;
     }
   });
-
-  console.info(filteredFormData);
 
   const validation = validateForm(filteredFormData, rules);
 
@@ -206,8 +205,8 @@ const handleSubmit = async () => {
           />
 
           <p class="text-gray-600 text-base mt-3 text-center max-w-xs">
-            Kami sarankan Anda mengunggah foto dengan rasio 1:1. Pastikan ukuran
-            file kurang dari 1 MB.
+            *Maaf ftiru ini masih dalam tahap pengembangan untuk fitur mengubah
+            foto /update foto
           </p>
         </div>
 
