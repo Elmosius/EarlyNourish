@@ -28,7 +28,7 @@ const {
 } = storeToRefs(profileStore);
 const { user: authUser } = storeToRefs(authStore);
 
-const fotoProfil = ref(profile.value?.fotoProfil || null);
+const fotoProfil = ref(null);
 const fotoProfilFile = ref(null);
 
 const namaLengkap = ref("");
@@ -66,6 +66,9 @@ const populateForm = (profileData) => {
     bbLahir.value = profileData.bbLahir || "";
     tbLahir.value = profileData.tbLahir || "";
   }
+  if (profileData.fotoProfil) {
+    fotoProfil.value = `${import.meta.env.VITE_API_URL}/${profileData.fotoProfil}`;
+  }
 };
 
 onMounted(async () => {
@@ -101,7 +104,7 @@ const handleSubmit = async () => {
       minLength: 5,
       maxLength: 100,
     },
-    alamat: { label: "Alamat", minLength: 10 },
+    alamat: { label: "Alamat", minLength: 5 },
     namaAnak: { label: "Nama Anak", minLength: 5 },
     jenisKelamin: { label: "Jenis Kelamin" },
     tanggalLahir: { label: "Tanggal Lahir" },
@@ -120,7 +123,7 @@ const handleSubmit = async () => {
   };
 
   const formData = {
-    // fotoProfil: fotoProfilFile.value,
+    fotoProfil: fotoProfilFile.value,
     namaLengkap: namaLengkap.value,
     alamat: alamat.value,
     namaAnak: namaAnak.value,
@@ -169,7 +172,10 @@ const handleSubmit = async () => {
         Informasi Pribadi
       </h1>
 
-      <SuccessMessage :message="profileSuccess" v-if="profileSuccess" />
+      <SuccessMessage
+        :message="profileSuccess"
+        v-if="profileSuccess && !profileError"
+      />
       <ErrorMessage :message="profileError" v-if="profileError" />
       <div v-if="profileLoading">
         <LoadingSpinner />
@@ -205,8 +211,8 @@ const handleSubmit = async () => {
           />
 
           <p class="text-gray-600 text-base mt-3 text-center max-w-xs">
-            *Maaf fitur ini masih dalam tahap pengembangan untuk fitur mengubah
-            foto /update foto
+            Kami sarankan Anda mengunggah foto dengan rasio 1:1. Pastikan ukuran
+            file kurang dari 1 MB.
           </p>
         </div>
 

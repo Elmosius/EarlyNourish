@@ -11,7 +11,20 @@ export const getProfile = async (userId) => {
 
 export const updateProfile = async (userId, profileData) => {
   try {
-    const response = await axiosInstance.put(`/profile/${userId}`, profileData);
+    const formData = new FormData();
+
+    Object.keys(profileData).forEach((key) => {
+      const value = profileData[key];
+      if (value !== null && value !== undefined && value !== "") {
+        if (key === "fotoProfil" && value instanceof File) {
+          formData.append(key, value);
+        } else {
+          formData.append(key, value);
+        }
+      }
+    });
+
+    const response = await axiosInstance.put(`/profile/${userId}`, formData);
 
     return response.data;
   } catch (error) {
