@@ -11,6 +11,7 @@ const updateUserProfile = async (userId, profileData) => {
     userId,
     {
       ...(profileData.namaLengkap && { namaLengkap: profileData.namaLengkap }),
+      ...(profileData.fotoProfil && { fotoProfil: profileData.fotoProfil }),
       ...(profileData.namaAnak && { namaAnak: profileData.namaAnak }),
       ...(profileData.jenisKelamin && { jenisKelamin: profileData.jenisKelamin }),
       ...(profileData.namaOrangTua && { namaOrangTua: profileData.namaOrangTua }),

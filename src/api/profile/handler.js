@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const mongoose = require('mongoose');
 const profileService = require('../../services/profile.service');
 const ProfileValidator = require('../../validator/profile');
@@ -39,9 +41,21 @@ const updateProfileHandlerImpl = async (request, h) => {
     throw new InvariantError('User ID tidak valid');
   }
 
-  ProfileValidator.validatePutProfilePayload(request.payload);
+  const data = request.payload;
+  let photoPath = null;
+  
+  if (data.fotoProfil && typeof data.fotoProfil._data !== 'undefined') {
+    const filename = `${Date.now()}-${data.fotoProfil.hapi.filename}`;
+    const uploadPath = path.join(__dirname, '../../uploads', filename);
 
-  const updatePayload = { ...request.payload };
+    await fs.promises.writeFile(uploadPath, data.fotoProfil._data);
+    photoPath = `uploads/${filename}`;
+  }
+
+  const updatePayload = {
+    ...data,
+    ...(photoPath && { fotoProfil: photoPath }),
+  };
   delete updatePayload.email;
 
   const updatedUser = await profileService.updateUserProfile(userId, updatePayload);
