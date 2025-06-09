@@ -205,7 +205,7 @@ const handleSubmit = async () => {
           />
 
           <p class="text-gray-600 text-base mt-3 text-center max-w-xs">
-            *Maaf ftiru ini masih dalam tahap pengembangan untuk fitur mengubah
+            *Maaf fitur ini masih dalam tahap pengembangan untuk fitur mengubah
             foto /update foto
           </p>
         </div>
