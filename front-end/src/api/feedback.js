@@ -9,9 +9,21 @@ export const getFeedbacks = async () => {
   }
 };
 
-export const postFeedback = async (feedbackData) => {
+export const postFeedback = async (userId, feedbackData) => {
   try {
-    const response = await axiosInstance.post("/feedback", feedbackData);
+    const response = await axiosInstance.post(
+      `/feedback/${userId}`,
+      feedbackData,
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getUserFeedback = async (userId) => {
+  try {
+    const response = await axiosInstance.get(`/feedback/${userId}`);
     return response.data;
   } catch (error) {
     throw error;

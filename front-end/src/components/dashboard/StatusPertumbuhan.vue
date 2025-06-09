@@ -8,7 +8,6 @@ const props = defineProps({
       { name: "Tinggi Berdasarkan Umur", value: -1.5, color: "yellow" },
       { name: "Berat Berdasarkan Umur", value: 2.3, color: "red" },
       { name: "Berat Berdasarkan Tinggi", value: 0.5, color: "green" },
-      { name: "Lingkar Kepala", value: -2.5, color: "green" },
     ],
   },
 });
@@ -71,7 +70,6 @@ const getProgressBarClass = (color) => {
             :style="{ width: status.percentage + '%' }"
           ></div>
         </div>
-        <!-- keterangan kategori -->
         <p class="text-sm text-gray-600 mt-1">{{ status.category }}</p>
       </div>
     </div>

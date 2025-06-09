@@ -1,13 +1,28 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { storeToRefs } from "pinia";
+import { useRouter } from "vue-router";
+
+import { createPrediction } from "../../api/predict.js";
 import { validateForm } from "../../utils/validation.js";
-import FormInput from "../ui/FormInput.vue";
+import { calculateAgeInMonths, formatDateForInput } from "../../utils/date.js";
+
+import { useAuthStore, useProfileStore } from "../../stores/index.js";
+
 import FormError from "../ui/FormError.vue";
+import FormInput from "../ui/FormInput.vue";
+import LoadingSpinner2 from "../ui/LoadingSpinner2.vue";
+import ErrorMessage from "../ui/ErrorMessage.vue";
+
+const router = useRouter();
+const authStore = useAuthStore();
+const profileStore = useProfileStore();
+const { profile } = storeToRefs(profileStore);
+const { user: authUser } = storeToRefs(authStore);
 
 const formData = ref({
   // Step 1 data
   namaLengkap: "",
-  email: "",
   namaAnak: "",
   jenisKelamin: "",
   tanggalLahir: "",
@@ -19,29 +34,36 @@ const formData = ref({
   tb: "",
 });
 
-const currentStep = ref(2);
+const currentStep = ref(1);
 const errors = ref({});
 const totalSteps = 2;
+const isSubmitting = ref(false);
 
 const progressPercentage = computed(() => {
   return (currentStep.value / totalSteps) * 100;
 });
 
-const umurInMonths = computed(() => {
-  if (!formData.value.tanggalLahir) return 0;
-
-  const birthDate = new Date(formData.value.tanggalLahir);
-  const currentDate = new Date();
-
-  let months = (currentDate.getFullYear() - birthDate.getFullYear()) * 12;
-  months += currentDate.getMonth() - birthDate.getMonth();
-
-  if (currentDate.getDate() < birthDate.getDate()) {
-    months--;
+const autoFillFromProfile = () => {
+  if (profile.value) {
+    formData.value.namaLengkap = profile.value.namaLengkap;
+    formData.value.namaAnak = profile.value.namaAnak;
+    formData.value.jenisKelamin = profile.value.jenisKelamin;
+    formData.value.tanggalLahir = formatDateForInput(
+      profile.value.tanggalLahir,
+    );
+    formData.value.bbLahir = profile.value.bbLahir;
+    formData.value.tbLahir = profile.value.tbLahir;
   }
+};
 
-  return Math.max(0, months);
-});
+const hasProfileData = computed(() => ({
+  namaLengkap: profile.value?.namaLengkap,
+  namaAnak: profile.value?.namaAnak,
+  jenisKelamin: profile.value?.jenisKelamin,
+  tanggalLahir: profile.value?.tanggalLahir,
+  bbLahir: profile.value?.bbLahir,
+  tbLahir: profile.value?.tbLahir,
+}));
 
 const step1Rules = {
   namaLengkap: {
@@ -49,11 +71,6 @@ const step1Rules = {
     required: true,
     minLength: 5,
     maxLength: 50,
-  },
-  email: {
-    label: "Email",
-    type: "email",
-    required: true,
   },
   namaAnak: {
     label: "Nama Anak",
@@ -97,7 +114,7 @@ const step2Rules = {
     label: "Tinggi Badan Saat Ini",
     required: true,
     type: "number",
-    min: 30,
+    min: 20,
     max: 250,
   },
 };
@@ -114,28 +131,83 @@ const validateStep2 = () => {
   return validation.isValid;
 };
 
-// Fungsi untuk menyiapkan data prediksi
 const preparePredictionData = () => {
   return {
-    jenisKelamin: formData.value.jenisKelamin,
+    jenisKelamin: formData.value.jenisKelamin.toUpperCase(),
     bbLahir: parseFloat(formData.value.bbLahir),
     tbLahir: parseFloat(formData.value.tbLahir),
-    umur: umurInMonths.value,
+    umur: calculateAgeInMonths(formData.value.tanggalLahir),
     bb: parseFloat(formData.value.bb),
     tb: parseFloat(formData.value.tb),
   };
 };
 
-// Navigation handlers
+const handleSubmit = async () => {
+  try {
+    isSubmitting.value = true;
+
+    const profileUpdateData = {};
+
+    if (!hasProfileData.value.namaLengkap && formData.value.namaLengkap) {
+      profileUpdateData.namaLengkap = formData.value.namaLengkap;
+    }
+    if (!hasProfileData.value.namaAnak && formData.value.namaAnak) {
+      profileUpdateData.namaAnak = formData.value.namaAnak;
+    }
+    if (!hasProfileData.value.jenisKelamin && formData.value.jenisKelamin) {
+      profileUpdateData.jenisKelamin = formData.value.jenisKelamin;
+    }
+    if (!hasProfileData.value.tanggalLahir && formData.value.tanggalLahir) {
+      profileUpdateData.tanggalLahir = formatDateForInput(
+        formData.value.tanggalLahir,
+      );
+    }
+    if (!hasProfileData.value.bbLahir && formData.value.bbLahir) {
+      profileUpdateData.bbLahir = parseFloat(formData.value.bbLahir);
+    }
+    if (!hasProfileData.value.tbLahir && formData.value.tbLahir) {
+      profileUpdateData.tbLahir = parseFloat(formData.value.tbLahir);
+    }
+
+    if (Object.keys(profileUpdateData).length > 0) {
+      console.log("Updating profile with:", profileUpdateData);
+      await profileStore.updateUserProfile(
+        authUser.value.userId,
+        profileUpdateData,
+      );
+    }
+
+    const predictionData = preparePredictionData();
+    console.info("Prediction data:", predictionData);
+    const result = await createPrediction(predictionData);
+
+    console.log("Form data:", formData.value);
+    console.log("Prediction data:", predictionData);
+    console.log("Prediction result:", result);
+
+    if (result && result.id) {
+      await router.push(`/dashboard/${result.id}`);
+    } else {
+      errors.value = {
+        general: "Gagal membuat prediksi. Silakan coba lagi.",
+      };
+      await router.push("/assessment");
+    }
+
+    alert("Prediksi berhasil dibuat!");
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Terjadi kesalahan saat memproses data");
+  } finally {
+    isSubmitting.value = false;
+  }
+};
+
 const handleNext = () => {
   if (currentStep.value === 1 && validateStep1()) {
     currentStep.value = 2;
   } else if (currentStep.value === 2 && validateStep2()) {
-    // Submit form
-    const predictionData = preparePredictionData();
-    console.log("Form data:", formData.value);
-    console.log("Prediction data:", predictionData);
-    alert("Form berhasil dikirim!");
+    handleSubmit();
   }
 };
 
@@ -151,6 +223,13 @@ const clearError = (field) => {
     errors.value[field] = "";
   }
 };
+
+onMounted(async () => {
+  if (authUser.value && authUser.value.userId) {
+    await profileStore.fetchProfile(authUser.value.userId);
+    autoFillFromProfile();
+  }
+});
 </script>
 
 <template>
@@ -169,6 +248,8 @@ const clearError = (field) => {
           ></div>
         </div>
       </div>
+
+      <ErrorMessage message="{{ errors.general }}" v-if="errors.general" />
 
       <div
         class="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100"
@@ -191,62 +272,49 @@ const clearError = (field) => {
         <form @submit.prevent="handleNext" class="p-6">
           <!-- Step 1 Form -->
           <div v-if="currentStep === 1" class="space-y-6 flex flex-col">
-            <div class="flex justify-betwee gap-6">
-              <div class="w-full">
-                <FormInput
-                  id="namaLengkap"
-                  label="Nama Orang Tua"
-                  v-model="formData.namaLengkap"
-                  @input="clearError('namaLengkap')"
-                  placeholder="Masukkan nama lengkap Anda"
-                  required
-                />
-                <FormError
-                  :message="errors.namaLengkap"
-                  v-if="errors.namaLengkap"
-                />
-              </div>
+            <div class="grid gap-6">
+              <FormInput
+                id="namaLengkap"
+                label="Nama Orang Tua"
+                v-model="formData.namaLengkap"
+                @input="clearError('namaLengkap')"
+                placeholder="Masukkan nama lengkap Anda"
+                required
+              />
+              <FormError
+                :message="errors.namaLengkap"
+                v-if="errors.namaLengkap"
+              />
 
-              <div class="w-full">
-                <FormInput
-                  id="email"
-                  label="Email"
-                  type="email"
-                  v-model="formData.email"
-                  @input="clearError('email')"
-                  placeholder="email@example.com"
-                  readonly
-                  required
-                />
-                <FormError :message="errors.email" v-if="errors.email" />
-              </div>
-            </div>
-
-            <div class="flex justify-between gap-6">
-              <div class="w-full">
-                <FormInput
-                  id="namaAnak"
-                  label="Nama Anak"
-                  v-model="formData.namaAnak"
-                  @input="clearError('namaAnak')"
-                  placeholder="Masukkan nama anak"
-                  required
-                />
-                <FormError :message="errors.namaAnak" v-if="errors.namaAnak" />
-              </div>
-              <div class="w-full">
-                <FormInput
-                  id="tanggalLahir"
-                  label="Tanggal Lahir"
-                  type="date"
-                  v-model="formData.tanggalLahir"
-                  @input="clearError('tanggalLahir')"
-                  required
-                />
-                <FormError
-                  :message="errors.tanggalLahir"
-                  v-if="errors.tanggalLahir"
-                />
+              <div class="flex justify-between gap-6">
+                <div class="w-full">
+                  <FormInput
+                    id="namaAnak"
+                    label="Nama Anak"
+                    v-model="formData.namaAnak"
+                    @input="clearError('namaAnak')"
+                    placeholder="Masukkan nama anak"
+                    required
+                  />
+                  <FormError
+                    :message="errors.namaAnak"
+                    v-if="errors.namaAnak"
+                  />
+                </div>
+                <div class="w-full">
+                  <FormInput
+                    id="tanggalLahir"
+                    label="Tanggal Lahir Anak"
+                    type="date"
+                    v-model="formData.tanggalLahir"
+                    @input="clearError('tanggalLahir')"
+                    required
+                  />
+                  <FormError
+                    :message="errors.tanggalLahir"
+                    v-if="errors.tanggalLahir"
+                  />
+                </div>
               </div>
             </div>
 
@@ -378,7 +446,16 @@ const clearError = (field) => {
                 type="submit"
                 class="bg-linear-65 from-[#4ADE80] to-[#22C55E] shadow-xl inset-shadow-xs inset-shadow-gray-400 hover:opacity-85 text-white font-medium py-2 px-6 rounded-full transition duration-300 text-base"
               >
-                {{ currentStep === totalSteps ? "Kirim" : "Selanjutnya" }}
+                <span v-if="isSubmitting" class="flex items-center">
+                  <LoadingSpinner2 />
+                </span>
+                <span v-else>
+                  {{
+                    currentStep === totalSteps
+                      ? "Kirim Prediksi"
+                      : "Selanjutnya"
+                  }}
+                </span>
               </button>
             </div>
           </div>

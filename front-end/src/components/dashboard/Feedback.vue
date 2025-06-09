@@ -2,19 +2,21 @@
 import { ref, computed, watch, onMounted } from "vue";
 import { Star, CheckCircle } from "lucide-vue-next";
 
-import { postFeedback } from "../../api/feedback.js";
+import { getUserFeedback, postFeedback } from "../../api/feedback.js";
 import { useAuthStore } from "../../stores/auth.js";
 
 import FormTextArea from "../ui/FormTextArea.vue";
 import FormInput from "../ui/FormInput.vue";
 import ErrorMessage from "../ui/ErrorMessage.vue";
 import LoadingSpinner2 from "../ui/LoadingSpinner2.vue";
+import { storeToRefs } from "pinia";
 
 const emit = defineEmits(["feedback-submitted"]);
 const authStore = useAuthStore();
+const { user: authUser } = storeToRefs(authStore);
 
 const formData = ref({
-  fullName: "",
+  namaLengkap: "",
   rating: 0,
   testimonial: "",
 });
@@ -22,20 +24,42 @@ const formData = ref({
 const isSubmitting = ref(false);
 const feedbackSubmitted = ref(false);
 const errorMessage = ref("");
+const isLoading = ref(true);
 
-onMounted(() => {
-  if (authStore.user && authStore.user.fullName) {
-    formData.value.fullName = authStore.user.fullName;
+const checkExistingFeedback = async () => {
+  if (!authUser.value?.userId) {
+    isLoading.value = false;
+    return;
   }
-  //   buat dummy
-  else {
-    formData.value.fullName = "John Doe";
+
+  try {
+    await getUserFeedback(authUser.value.userId);
+    // Jika tidak error, berarti user sudah pernah submit feedback
+    feedbackSubmitted.value = true;
+  } catch (error) {
+    if (error.response?.status === 404) {
+      feedbackSubmitted.value = false;
+    } else {
+      console.error("Error checking existing feedback:", error);
+      feedbackSubmitted.value = false;
+    }
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+onMounted(async () => {
+  if (authUser.value && authUser.value.userId) {
+    formData.value.namaLengkap = authUser.value.name;
+    await checkExistingFeedback();
+  } else {
+    isLoading.value = false;
   }
 });
 
 const isFormValid = computed(() => {
   return (
-    formData.value.fullName.trim() !== "" &&
+    formData.value.namaLengkap.trim() !== "" &&
     formData.value.rating > 0 &&
     formData.value.testimonial.trim() !== "" &&
     formData.value.testimonial.length <= 500
@@ -70,28 +94,27 @@ const submitFeedback = async () => {
 
   try {
     const feedbackData = {
-      fullName: formData.value.fullName,
       rating: formData.value.rating,
-      comment: formData.value.testimonial,
+      description: formData.value.testimonial,
     };
 
-    const userId = authStore.user.id;
+    const userId = authUser.value.userId;
     const response = await postFeedback(userId, feedbackData);
 
-    console.log("Feedback berhasil dikirim:", response.data.newFeedback);
+    console.log("Feedback berhasil dikirim:", response);
 
     emit("feedback-submitted", {
       ...formData.value,
       userId: userId,
-      feedbackId: response.data.newFeedback.id,
+      feedbackId: response.data?.newFeedback?.id,
     });
 
     feedbackSubmitted.value = true;
   } catch (error) {
     console.error("Error submitting feedback:", error);
 
-    if (error.response?.data?.message) {
-      errorMessage.value = error.response.data.message;
+    if (error.response?.data?.Message) {
+      errorMessage.value = error.response.data.Message;
     } else {
       errorMessage.value =
         "Terjadi kesalahan saat mengirim feedback. Silakan coba lagi.";
@@ -107,7 +130,6 @@ const submitFeedback = async () => {
     <div
       class="container max-w-4xl mx-auto bg-[#EEF2FF] rounded-xl shadow-xl mb-4 p-6"
     >
-      <!-- Header tetap ditampilkan -->
       <h2 class="font-bold text-gray-800 mb-3">
         Bagikan Cerita Early Nourish Anda
       </h2>
@@ -116,14 +138,18 @@ const submitFeedback = async () => {
         perjalanan mereka memastikan nutrisi terbaik untuk anak-anak mereka.
       </p>
 
-      <div v-if="!feedbackSubmitted">
+      <div v-if="isLoading" class="text-center py-8">
+        <LoadingSpinner />
+      </div>
+
+      <div v-else-if="!feedbackSubmitted">
         <form @submit.prevent="submitFeedback" class="space-y-6">
           <FormInput
             label="Nama Lengkap"
             type="text"
-            id="fullName"
+            id="namaLengkap"
             placeholder="Masukkan nama Anda"
-            v-model="formData.fullName"
+            v-model="formData.namaLengkap"
             :autofocus="false"
             :readonly="true"
           />

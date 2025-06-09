@@ -1,7 +1,7 @@
 import { createPinia } from "pinia";
 
 export * from "./auth";
-export * from "./profile.js";
+export * from "./profile";
 
 const pinia = createPinia();
 

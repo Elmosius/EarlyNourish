@@ -288,7 +288,16 @@ const userProfilePhoto = computed(() => {
                 <div
                   class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center"
                 >
-                  <span class="text-sm font-medium">{{ userInitials }}</span>
+                  <img
+                    v-if="userProfilePhoto"
+                    :src="userProfilePhoto"
+                    alt="Profile Photo"
+                    class="w-full h-full object-cover rounded-full"
+                    @error="userProfilePhoto = null"
+                  />
+                  <span v-else class="text-sm font-medium">{{
+                    userInitials
+                  }}</span>
                 </div>
                 <div>
                   <p class="text-sm font-semibold text-gray-900">
