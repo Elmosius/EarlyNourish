@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from "vue";
 import { Star, CheckCircle } from "lucide-vue-next";
+import { storeToRefs } from "pinia";
 
 import { getUserFeedback, postFeedback } from "../../api/feedback.js";
 import { useAuthStore } from "../../stores/auth.js";
@@ -9,7 +10,6 @@ import FormTextArea from "../ui/FormTextArea.vue";
 import FormInput from "../ui/FormInput.vue";
 import ErrorMessage from "../ui/ErrorMessage.vue";
 import LoadingSpinner2 from "../ui/LoadingSpinner2.vue";
-import { storeToRefs } from "pinia";
 
 const emit = defineEmits(["feedback-submitted"]);
 const authStore = useAuthStore();
@@ -33,16 +33,12 @@ const checkExistingFeedback = async () => {
   }
 
   try {
-    await getUserFeedback(authUser.value.userId);
-    // Jika tidak error, berarti user sudah pernah submit feedback
-    feedbackSubmitted.value = true;
+    const response = await getUserFeedback(authUser.value.userId);
+    if (response !== null) feedbackSubmitted.value = true;
+    console.log("user belum mengisi feedback ini pada dashboard ini");
   } catch (error) {
-    if (error.response?.status === 404) {
-      feedbackSubmitted.value = false;
-    } else {
-      console.error("Error checking existing feedback:", error);
-      feedbackSubmitted.value = false;
-    }
+    console.error("Error checking existing feedback:", error);
+    feedbackSubmitted.value = false;
   } finally {
     isLoading.value = false;
   }

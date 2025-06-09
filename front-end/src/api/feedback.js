@@ -26,6 +26,9 @@ export const getUserFeedback = async (userId) => {
     const response = await axiosInstance.get(`/feedback/${userId}`);
     return response.data;
   } catch (error) {
+    if (error.response?.status === 404) {
+      return null;
+    }
     throw error;
   }
 };
