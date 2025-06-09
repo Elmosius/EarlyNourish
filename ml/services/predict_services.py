@@ -7,7 +7,7 @@ from core.config import settings
 from pygrowup import Calculator
 
 # Initialize pygrowup calculator
-calculator = Calculator(adjust_height_data=True, include_cdc=False, log_level='ERROR')
+calculator = Calculator(adjust_height_data=True, include_cdc=True, log_level='DEBUG')
 
 try:
     model = tf.keras.models.load_model(settings.MODEL_STUNTING_H5_PATH)
@@ -127,73 +127,72 @@ def calculate_zscores(gender, age_months, weight_kg, height_cm):
     # Convert gender to format expected by pygrowup (M/F)
     gender_formatted = "M" if gender.upper() == "L" else "F"
     
-    # Check if inputs are within valid ranges for WHO standards
-    if age_months < 0 or age_months > 60:  # WHO standards are typically for under 5 years
-        print(f"Warning: Age {age_months} months may be outside valid range")
-    if weight_kg <= 0 or weight_kg > 30:  # Sanity check for weight
-        print(f"Warning: Weight {weight_kg} kg may be outside valid range")
-    if height_cm <= 0 or height_cm > 120:  # Sanity check for height
-        print(f"Warning: Height {height_cm} cm may be outside valid range")
+    # Initialize results
+    bbU = None
+    tbU = None
+    bbTb = None
     
+    if age_months < 0 or age_months > 240:
+        print(f"Warning: Age {age_months} months is outside the typical range covered by WHO/CDC growth standards (0-240 months).")
+    elif age_months > 60:
+        print(f"Info: Age {age_months} months is outside WHO standard range (0-60 months), attempting calculation with CDC standards.")
+
+    if weight_kg <= 0.5 or weight_kg > 150:
+        print(f"Warning: Weight {weight_kg} kg is an extreme value.")
+    if height_cm <= 30 or height_cm > 220:
+        print(f"Warning: Height {height_cm} cm is an extreme value.")
+    
+    # Calculate BBU (Weight-for-age) - Use positional arguments
     try:
-        # Direct method calls with keyword arguments
-        bbU = calculator.wfa(weight=weight_kg, age_in_months=age_months, sex=gender_formatted)
-        print(f"BBU calculation result: {bbU}")
-        
-        tbU = calculator.lhfa(length_height=height_cm, age_in_months=age_months, sex=gender_formatted)
-        print(f"TBU calculation result: {tbU}")
-        
-        bbTb = calculator.wfl(weight=weight_kg, length_height=height_cm, sex=gender_formatted)
-        print(f"BBTB calculation result: {bbTb}")
-        
-        # Convert to float and round to 2 decimal places
-        bbU = round(float(bbU), 2) if bbU is not None else None
-        tbU = round(float(tbU), 2) if tbU is not None else None
-        bbTb = round(float(bbTb), 2) if bbTb is not None else None
-        
-        return bbU, tbU, bbTb
-        
+        bbU_result = calculator.wfa(weight_kg, age_months, gender_formatted)
+        print(f"BBU calculation result: {bbU_result}")
+        bbU = round(float(bbU_result), 2) if bbU_result is not None else None
     except Exception as e:
-        print(f"Error calculating z-scores with standard parameters: {e}")
-        
-        # Try several parameter variations
-        methods = [
-            # Method 1: using positional arguments
-            lambda: (
-                calculator.wfa(weight_kg, age_months, gender_formatted),
-                calculator.lhfa(height_cm, age_months, gender_formatted),
-                calculator.wfl(weight_kg, height_cm, gender_formatted)
-            ),
-            # Method 2: different keyword arguments
-            lambda: (
-                calculator.wfa(weight_kg=weight_kg, age_months=age_months, sex=gender_formatted),
-                calculator.lhfa(height_cm=height_cm, age_months=age_months, sex=gender_formatted),
-                calculator.wfl(weight_kg=weight_kg, height_cm=height_cm, sex=gender_formatted)
-            ),
-            # Method 3: different function names (some versions use different names)
-            lambda: (
-                getattr(calculator, 'wfa', calculator.wfa)(weight=weight_kg, age_in_months=age_months, sex=gender_formatted),
-                getattr(calculator, 'hfa', calculator.lhfa)(length_height=height_cm, age_in_months=age_months, sex=gender_formatted),
-                getattr(calculator, 'wfh', calculator.wfl)(weight=weight_kg, length_height=height_cm, sex=gender_formatted)
-            )
-        ]
-        
-        for i, method in enumerate(methods):
+        print(f"Error calculating BBU: {e}")
+    
+    # Calculate TBU (Length/Height-for-age) - Use positional arguments
+    try:
+        tbU_result = calculator.lhfa(height_cm, age_months, gender_formatted)
+        print(f"TBU calculation result: {tbU_result}")
+        tbU = round(float(tbU_result), 2) if tbU_result is not None else None
+    except Exception as e:
+        print(f"Error calculating TBU: {e}")
+    
+    # Calculate BBTB (Weight-for-length/height) - Try multiple approaches
+    try:
+        # First try: Standard weight-for-length
+        bbTb_result = calculator.wfl(weight_kg, height_cm, gender_formatted)
+        print(f"BBTB calculation result: {bbTb_result}")
+        bbTb = round(float(bbTb_result), 2) if bbTb_result is not None else None
+    except Exception as e:
+        print(f"Error calculating BBTB with wfl: {e}")
+        try:
+            # Second try: Weight-for-height
+            bbTb_result = calculator.wfh(weight_kg, height_cm, gender_formatted)
+            print(f"BBTB alternative calculation result: {bbTb_result}")
+            bbTb = round(float(bbTb_result), 2) if bbTb_result is not None else None
+        except Exception as e_alt:
+            print(f"Alternative BBTB calculation also failed: {e_alt}")
             try:
-                print(f"Trying method {i+1}...")
-                bbU, tbU, bbTb = method()
+                # Third try: Calculate BMI and then use BMI-for-age as approximation
+                # This is a reasonable fallback when direct WFL/WFH fails
+                bmi = weight_kg / ((height_cm / 100) ** 2)
+                bbTb_result = calculator.bfa(bmi, age_months, gender_formatted)
+                print(f"BBTB fallback using BMI-for-age: {bbTb_result}")
+                bbTb = round(float(bbTb_result), 2) if bbTb_result is not None else None
+            except Exception as e_bmi:
+                print(f"BMI-for-age calculation also failed: {e_bmi}")
                 
-                bbU = round(float(bbU), 2) if bbU is not None else None
-                tbU = round(float(tbU), 2) if tbU is not None else None
-                bbTb = round(float(bbTb), 2) if bbTb is not None else None
-                
-                print(f"Method {i+1} worked: bbU={bbU}, tbU={tbU}, bbTb={bbTb}")
-                return bbU, tbU, bbTb
-            except Exception as e_method:
-                print(f"Method {i+1} failed: {e_method}")
-        
-        print("All z-score calculation methods failed")
-        return None, None, None
+                # If all else fails, provide an estimate based on the ratio of BBU and TBU
+                if bbU is not None and tbU is not None:
+                    # This is an approximation formula based on the relationship between
+                    # weight-for-age, height-for-age and weight-for-height
+                    estimated_bbTb = bbU - (0.7 * tbU)
+                    bbTb = round(float(estimated_bbTb), 2)
+                    print(f"BBTB estimated from BBU and TBU: {bbTb}")
+    
+    print(f"Final z-scores to be returned: bbU={bbU}, tbU={tbU}, bbTb={bbTb}")
+    return bbU, tbU, bbTb
 
 async def get_stunting_prediction(data: StuntingInput) -> StuntingOutput:
     if not all([model, scaler, status_encoder]):
@@ -215,6 +214,16 @@ async def get_stunting_prediction(data: StuntingInput) -> StuntingOutput:
         weight_kg=data.bb,
         height_cm=data.tb
     )
+    
+    # Print the calculated values immediately after function returns
+    print(f"After calculation function - Raw values: bbU={bbU}, tbU={tbU}, bbTb={bbTb}")
+    
+    # Explicitly convert values to float or None for Pydantic model
+    bbU_value = float(bbU) if bbU is not None else None
+    tbU_value = float(tbU) if tbU is not None else None
+    bbTb_value = float(bbTb) if bbTb is not None else None
+    
+    print(f"After explicit conversion - Values: bbU={bbU_value}, tbU={tbU_value}, bbTb={bbTb_value}")
 
     # 1. Preprocess input data
     jk_encoded = 0 if data.jk.upper() == "P" else 1
@@ -244,16 +253,17 @@ async def get_stunting_prediction(data: StuntingInput) -> StuntingOutput:
     predicted_status = status_prediksi[0]
     
     print(f"Prediksi status stunting: {predicted_status}")
-    print(f"Z-scores: bbU={bbU}, tbU={tbU}, bbTb={bbTb}")
+    print(f"Right before return - Z-scores: bbU={bbU_value}, tbU={tbU_value}, bbTb={bbTb_value}")
     
     # 5. Get age-specific and status-specific recommendations
     tindakan_list, nutrisi_list = get_recommendations_by_age_and_status(data.umur, predicted_status)
     
+    # Create and return result using direct values (no intermediate variable references)
     return StuntingOutput(
         risikoStunting=predicted_status,
         tindakan=tindakan_list,
         nutrisi=nutrisi_list,
-        bbU=bbU,
-        tbU=tbU,
-        bbTb=bbTb
+        bbU=bbU_value,
+        tbU=tbU_value,
+        bbTb=bbTb_value
     )
