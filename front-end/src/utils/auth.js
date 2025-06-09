@@ -88,3 +88,24 @@ export const removeUserData = () => {
     console.warn("localStorage is not available. User data not removed.");
   }
 };
+
+export const storeCredentials = (email, password) => {
+  if (typeof localStorage !== "undefined") {
+    localStorage.setItem("rememberedEmail", email);
+  }
+};
+
+export const getRememberedCredentials = () => {
+  if (typeof localStorage !== "undefined") {
+    return {
+      email: localStorage.getItem("rememberedEmail"),
+    };
+  }
+  return { email: null };
+};
+
+export const removeRememberedCredentials = () => {
+  if (typeof localStorage !== "undefined") {
+    localStorage.removeItem("rememberedEmail");
+  }
+};

@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { validateForm } from "../../utils/validation.js";
 import { useRouter } from "vue-router";
 
@@ -9,10 +9,23 @@ import { useAuthStore } from "../../stores/index.js";
 import { storeToRefs } from "pinia";
 import LoadingSpinner2 from "../ui/LoadingSpinner2.vue";
 import ErrorMessage from "../ui/ErrorMessage.vue";
+import {
+  getRememberedCredentials,
+  removeRememberedCredentials,
+  storeCredentials,
+} from "../../utils/auth.js";
 
 const router = useRouter();
 const authStore = useAuthStore();
 const { loading, error: authError } = storeToRefs(authStore);
+
+onMounted(() => {
+  const credentials = getRememberedCredentials();
+  if (credentials.email) {
+    email.value = credentials.email;
+    rememberMe.value = true;
+  }
+});
 
 const email = ref("");
 const password = ref("");
@@ -43,6 +56,12 @@ const handleSubmit = async () => {
   const validation = validateForm(formData, rules);
 
   if (validation.isValid) {
+    if (rememberMe.value) {
+      storeCredentials(email.value);
+    } else {
+      removeRememberedCredentials();
+    }
+
     await authStore.login(formData);
 
     if (!authStore.error) {
