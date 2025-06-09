@@ -15,8 +15,9 @@ const updateUserProfile = async (userId, profileData) => {
       ...(profileData.jenisKelamin && { jenisKelamin: profileData.jenisKelamin }),
       ...(profileData.namaOrangTua && { namaOrangTua: profileData.namaOrangTua }),
       ...(profileData.tanggalLahir && { tanggalLahir: profileData.tanggalLahir }),
-      ...(profileData.beratBadan !== undefined && { beratBadan: profileData.beratBadan }),
-      ...(profileData.tinggiBadan !== undefined && { tinggiBadan: profileData.tinggiBadan }),
+      ...(profileData.alamat && { alamat: profileData.alamat }),
+      ...(profileData.bbLahir !== undefined && { bbLahir: profileData.bbLahir }),
+      ...(profileData.tbLahir !== undefined && { tbLahir: profileData.tbLahir }),
     },
     {
       new: true,

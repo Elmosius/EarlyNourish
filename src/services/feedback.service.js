@@ -12,6 +12,19 @@ const getAllFeedback = async () => {
   }));
 };
 
+const getFeedbackByUser = async (userId) => {
+  const feedback = await Feedback.findOne({ userId }).populate('userId', 'namaLengkap');
+  if (!feedback) return null;
+
+  return {
+    id: feedback._id,
+    namaLengkap: feedback.userId?.namaLengkap ?? null,
+    rating: feedback.rating,
+    description: feedback.description,
+    createdAt: feedback.createdAt,
+  };
+};
+
 const createFeedback = async (userId, payload) => {
   const user = await User.findById(userId);
   if (!user) return null;
@@ -23,5 +36,6 @@ const createFeedback = async (userId, payload) => {
 
 module.exports = {
   getAllFeedback,
+  getFeedbackByUser,
   createFeedback,
 };

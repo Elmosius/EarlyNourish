@@ -8,22 +8,23 @@ const ClientError = require('../../exceptions/ClientError');
 
 const getHistoryByUserHandlerImpl = async (request, h) => {
   const { idUser } = request.params;
-  if (!mongoose.Types.ObjectId.isValid(idUser)) {
-    throw new InvariantError('User ID tidak valid');
-  }
+  if (!mongoose.Types.ObjectId.isValid(idUser)) throw new InvariantError('User ID tidak valid');
 
   const histories = await History.find({ userId: idUser }).sort({ createdAt: -1 });
-
   const result = await Promise.all(histories.map(async (hist) => {
     const prediction = await Prediction.findOne({ historyId: hist._id });
     const recommendation = await Recommendation.findOne({ historyId: hist._id });
 
     return {
       historyId: hist._id,
-      jenisKelamin: prediction?.jenisKelamin ?? null,
-      usia: prediction?.usia ?? null,
+      predictionId: prediction?._id ?? null,
+      recommendationId: recommendation?._id ?? null,
+      jenisKelamin: prediction?.jk ?? null,
+      usia: prediction?.umur ?? null,
       bbLahir: prediction?.bbLahir ?? null,
-      rekomendasiId: recommendation?._id ?? null,
+      tbLahir: prediction?.tbLahir ?? null,
+      bb: prediction?.bb ?? null,
+      tb: prediction?.tb ?? null,
       nutrisi: recommendation?.nutrisi ?? [],
       tindakan: recommendation?.tindakan ?? [],
       createdAt: prediction?.createdAt ?? hist.createdAt,

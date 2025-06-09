@@ -1,11 +1,21 @@
-const { getAllFeedbackHandler, createFeedbackHandler } = require('./handler');
+const {
+  getAllFeedbackHandler,
+  getFeedbackByUserHandler,
+  createFeedbackHandler,
+} = require('./handler');
 
 module.exports = [
   {
     method: 'GET',
     path: '/feedback',
     handler: getAllFeedbackHandler,
-    options: { auth: false }, 
+    options: { auth: false },
+  },
+  {
+    method: 'GET',
+    path: '/feedback/{userId}',
+    handler: getFeedbackByUserHandler,
+    options: { auth: 'jwt' },
   },
   {
     method: 'POST',

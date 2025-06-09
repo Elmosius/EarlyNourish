@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const axios = require('axios');
 const History = require('../../models/history.model');
 const Prediction = require('../../models/prediction.model');
+const Recommendation = require('../../models/recommendation.model');
 const User = require('../../models/user.model');
 const PredictionsValidator = require('../../validator/predictions');
 const InvariantError = require('../../exceptions/InvariantError');
@@ -10,7 +11,6 @@ const ClientError = require('../../exceptions/ClientError');
 
 const createPredictionHandlerImpl = async (request, h) => {
   PredictionsValidator.validatePostPredictionPayload(request.payload);
-
   const { jk, bbLahir, tbLahir, umur, bb, tb } = request.payload;
   const userId = request.auth.credentials.userId;
 
@@ -21,20 +21,14 @@ const createPredictionHandlerImpl = async (request, h) => {
   if (!mlApiUrl) throw new ClientError('ML_API_URL belum diatur di .env', 400);
 
   const mlPayload = { jk, bbLahir, tbLahir, umur, bb, tb };
-
   let mlResult;
   try {
     const response = await axios.post(mlApiUrl, mlPayload, {
       headers: { 'Content-Type': 'application/json' },
       timeout: 10000,
     });
-
     mlResult = response.data;
-    if (
-      typeof mlResult.risikoStunting !== 'string' ||
-      !Array.isArray(mlResult.tindakan) ||
-      !Array.isArray(mlResult.nutrisi)
-    ) {
+    if (!mlResult?.risikoStunting || !Array.isArray(mlResult.tindakan) || !Array.isArray(mlResult.nutrisi)) {
       throw new Error('Format response ML tidak sesuai');
     }
   } catch (err) {
@@ -43,31 +37,35 @@ const createPredictionHandlerImpl = async (request, h) => {
   }
 
   const history = await new History({ userId }).save();
-
-  const prediction = new Prediction({
+  const prediction = await new Prediction({
     historyId: history._id,
-    jk: jk.toLowerCase(), 
+    jk: jk.toLowerCase(),
     bbLahir,
     tbLahir,
     umur,
     bb,
     tb,
     risikoStunting: mlResult.risikoStunting.toLowerCase(),
-  });
+  }).save();
 
-  await prediction.save();
+  await new Recommendation({
+    historyId: history._id,
+    nutrisi: mlResult.nutrisi,
+    tindakan: mlResult.tindakan,
+  }).save();
 
   return h.response({
     Error: false,
     Message: 'success',
     Result: {
+      predictionId: prediction._id,
+      historyId: history._id,
       risikoStunting: prediction.risikoStunting,
       rekomendasi: mlResult.tindakan,
       nutrisi: mlResult.nutrisi,
     },
   }).code(201);
 };
-
 
 const createPredictionHandler = async (request, h) => {
   try {
@@ -90,13 +88,13 @@ const getPredictionByIdHandlerImpl = async (request, h) => {
     throw new InvariantError('ID tidak valid');
   }
 
-  const history = await History.findOne({ _id: idPredict, userId: idUser });
-  if (!history) {
+  const prediction = await Prediction.findById(idPredict).lean();
+  if (!prediction) {
     return h.response({ Error: true, Message: 'Data tidak ditemukan' }).code(404);
   }
 
-  const prediction = await Prediction.findOne({ historyId: idPredict });
-  if (!prediction) {
+  const history = await History.findOne({ _id: prediction.historyId, userId: idUser });
+  if (!history) {
     return h.response({ Error: true, Message: 'Data tidak ditemukan' }).code(404);
   }
 
@@ -104,9 +102,10 @@ const getPredictionByIdHandlerImpl = async (request, h) => {
     Error: false,
     Message: 'success',
     Result: {
-      id: prediction._id,
-      jenisKelamin: prediction.jenisKelamin,
-      usia: prediction.usia,
+      predictionId: prediction._id,
+      historyId: prediction.historyId,
+      jenisKelamin: prediction.jk,
+      usia: prediction.umur,
       bbLahir: prediction.bbLahir,
       tbLahir: prediction.tbLahir,
       bb: prediction.bb,
