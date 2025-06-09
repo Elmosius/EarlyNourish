@@ -181,15 +181,13 @@ const handleSubmit = async () => {
     console.info("Prediction data:", predictionData);
     const result = await createPrediction(predictionData);
 
-    console.log("Form data:", formData.value);
-    console.log("Prediction data:", predictionData);
-    console.log("Prediction result:", result);
+    console.log("Prediction result:", result.Result);
 
-    if (result && result.id) {
-      await router.push(`/dashboard/${result.id}`);
+    if (result.Result && result.Result.predictionId) {
+      await router.push(`/dashboard/${result.Result.predictionId}`);
     } else {
       errors.value = {
-        general: "Gagal membuat prediksi. Silakan coba lagi.",
+        general: "Gagal untuk load hasil prediksi. Silakan check riwayat Anda",
       };
       await router.push("/assessment");
     }
@@ -249,7 +247,7 @@ onMounted(async () => {
         </div>
       </div>
 
-      <ErrorMessage message="{{ errors.general }}" v-if="errors.general" />
+      <ErrorMessage :message="errors.general" v-if="errors.general" />
 
       <div
         class="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100"
