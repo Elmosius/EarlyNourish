@@ -16,6 +16,108 @@ except Exception as e:
     scaler = None
     status_encoder = None
 
+def get_recommendations_by_age_and_status(age_months, status):
+    """Generate recommendations based on age group and stunting status"""
+    tindakan = []
+    nutrisi = []
+    
+    # 0-6 bulan
+    if 0 <= age_months <= 6:
+        if "Normal" in status:
+            tindakan = [
+                "ASI eksklusif 6 bulan",
+                "Pantau tumbuh kembang rutin"
+            ]
+            nutrisi = [
+                "ASI langsung dari ibu (8-12x sehari)"
+            ]
+        elif "Stunting" in status or "Severely Stunted" in status:
+            tindakan = [
+                "Evaluasi menyusui",
+                "Gizi ibu ditingkatkan",
+                "Rujukan bila perlu"
+            ]
+            nutrisi = [
+                "ASI eksklusif",
+                "Ibu konsumsi: telur, ikan, hati, kacang hijau, sayur hijau, susu ibu menyusui"
+            ]
+    
+    # 6-24 bulan
+    elif 6 < age_months <= 24:
+        if "Normal" in status:
+            tindakan = [
+                "MPASI dimulai usia 6 bulan",
+                "Edukasi tekstur dan variasi makanan"
+            ]
+            nutrisi = [
+                "Bubur nasi + telur + bayam halus",
+                "Puree kentang + ayam + wortel",
+                "Snack: pisang, pepaya, biskuit bayi"
+            ]
+        elif "Stunting" in status:
+            tindakan = [
+                "Tambah protein & lemak sehat",
+                "Konsultasi gizi"
+            ]
+            nutrisi = [
+                "Nasi tim hati + daun katuk",
+                "Daging cincang + labu",
+                "Snack: alpukat, susu full cream, ubi kukus"
+            ]
+        elif "Severely Stunted" in status:
+            tindakan = [
+                "PMT atau RUTF",
+                "Suplementasi Fe, zinc, vitamin A/D",
+                "Rujukan faskes"
+            ]
+            nutrisi = [
+                "Bubur kacang hijau + santan",
+                "Nasi tim daging + minyak",
+                "Susu fortifikasi, biskuit balita, roti isi telur"
+            ]
+    
+    # >2 tahun (>24 bulan)
+    else:
+        if "Normal" in status:
+            tindakan = [
+                "Variasi menu harian",
+                "Makan bersama keluarga",
+                "Stimulasi motorik makan"
+            ]
+            nutrisi = [
+                "Nasi + ikan + sayur asem",
+                "Sup ayam + kentang",
+                "Snack: smoothie pisang, roti isi telur"
+            ]
+        elif "Stunting" in status:
+            tindakan = [
+                "Frekuensi makan >5x/hari",
+                "Pemantauan tinggi badan bulanan"
+            ]
+            nutrisi = [
+                "Nasi + pepes ikan + buncis",
+                "Bubur ayam + telur",
+                "Snack: tahu goreng, puding susu, alpukat"
+            ]
+        elif "Severely Stunted" in status:
+            tindakan = [
+                "Intervensi komunitas (PMT/Posyandu)",
+                "Evaluasi sanitasi dan infeksi"
+            ]
+            nutrisi = [
+                "Nasi + rendang + bayam tumis",
+                "Bubur kacang merah + santan",
+                "Susu tinggi kalori, camilan berbasis kacang"
+            ]
+    
+    # Add general advice if recommendations are empty
+    if not tindakan:
+        tindakan = ["Konsultasikan dengan dokter anak atau ahli gizi untuk saran lebih lanjut."]
+    if not nutrisi:
+        nutrisi = ["Pastikan asupan gizi seimbang sesuai usia."]
+            
+    return tindakan, nutrisi
+
 async def get_stunting_prediction(data: StuntingInput) -> StuntingOutput:
     if not all([model, scaler, status_encoder]):
         return StuntingOutput(
@@ -31,14 +133,16 @@ async def get_stunting_prediction(data: StuntingInput) -> StuntingOutput:
 
     nama_kolom = ["JK", "BB_Lahir", "TB_Lahir", "Umur", "Berat", "Tinggi"]
     
-    fitur_input_df = pd.DataFrame([[
-        jk_encoded,
-        data.bbLahir,
-        data.tbLahir,
-        data.umur,  
-        data.bb,  
-        data.tb   
-    ]], columns=nama_kolom)
+    fitur_input_df = pd.DataFrame([
+        [
+            jk_encoded,
+            data.bbLahir,
+            data.tbLahir,
+            data.umur,  
+            data.bb,  
+            data.tb   
+        ]
+    ], columns=nama_kolom)
 
     # 2. Scale features
     fitur_scaled = scaler.transform(fitur_input_df)
@@ -49,36 +153,15 @@ async def get_stunting_prediction(data: StuntingInput) -> StuntingOutput:
 
     # 4. Decode prediction
     status_prediksi = status_encoder.inverse_transform(pred_label)
+    predicted_status = status_prediksi[0]
     
-    print(f"Prediksi status stunting: {status_prediksi[0]}")
-
-    tindakan_list = [
-        "Lanjutkan pemantauan tumbuh kembang anak secara rutin.",
-        "Pastikan asupan gizi seimbang dan adekuat sesuai usia.",
-        "Berikan stimulasi yang sesuai untuk perkembangan optimal."
-    ]
-    if "Stunting" in status_prediksi[0] or "Gizi Kurang" in status_prediksi[0]:
-         tindakan_list = [
-            "Segera konsultasikan dengan dokter anak atau ahli gizi.",
-            "Perlu evaluasi lebih lanjut mengenai status gizi dan tinggi badan.",
-            "Tingkatkan asupan protein hewani dan mikronutrien penting (zat besi, zinc, kalsium)."
-        ]
-
-    # Nutrition advice
-    nutrisi_list = [
-        "Pastikan asupan Energi (kalori) cukup sesuai kebutuhan usia anak.",
-        "Berikan Protein terutama sumber hewani (telur, ikan, daging, ayam, susu dan produk olahannya) setiap hari.",
-        "Lengkapi dengan sumber Lemak sehat (contoh: alpukat, ikan salmon/kembung).",
-        "Pastikan asupan Vitamin dan Mineral penting (Zat Besi, Kalsium, Vitamin A, Vitamin D, Zinc) dari beragam sayur, buah, dan sumber lainnya."
-    ]
-    if "Stunting" in status_prediksi[0] or "Gizi Kurang" in status_prediksi[0]:
-        nutrisi_list.extend([
-            "Konsultasikan lebih lanjut dengan dokter atau ahli gizi untuk kemungkinan adanya defisiensi mikronutrien spesifik dan kebutuhan suplementasi.",
-            "Fokus pada pemberian Makanan Pendamping ASI (MPASI) yang kaya gizi jika anak masih dalam periode MPASI, atau makanan keluarga yang padat gizi."
-        ])
+    print(f"Prediksi status stunting: {predicted_status}")
+    
+    # 5. Get age-specific and status-specific recommendations
+    tindakan_list, nutrisi_list = get_recommendations_by_age_and_status(data.umur, predicted_status)
     
     return StuntingOutput(
-        risikoStunting=status_prediksi[0],
+        risikoStunting=predicted_status,
         tindakan=tindakan_list,
         nutrisi=nutrisi_list
     )
