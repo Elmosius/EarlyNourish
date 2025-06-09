@@ -1,12 +1,16 @@
 import axios from "axios";
-import { getAccessToken, getRefreshToken, storeTokens } from "./auth.js";
+import {
+  getAccessToken,
+  getRefreshToken,
+  storeTokens,
+  removeTokens,
+} from "./auth.js";
 
 const api = import.meta.env.VITE_API_URL;
 
-// Buat axios instance
 const axiosInstance = axios.create({
   baseURL: api,
-  timeout: 10000, // 10 detik timeout
+  timeout: 10000,
 });
 
 let isRefreshing = false;
@@ -20,11 +24,10 @@ const processQueue = (error, token = null) => {
       prom.resolve(token);
     }
   });
-
   failedQueue = [];
 };
 
-// Request Interceptor - Auto attach token
+// Request Interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = getAccessToken();
@@ -33,23 +36,17 @@ axiosInstance.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  },
+  (error) => Promise.reject(error),
 );
 
-// Response Interceptor - Handle token refresh
+// Response Interceptor
 axiosInstance.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Kalau 401 dan belum coba refresh
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
-        // Kalau sedang refresh, tunggu di queue
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
@@ -57,9 +54,7 @@ axiosInstance.interceptors.response.use(
             originalRequest.headers.Authorization = `Bearer ${token}`;
             return axiosInstance(originalRequest);
           })
-          .catch((err) => {
-            return Promise.reject(err);
-          });
+          .catch((err) => Promise.reject(err));
       }
 
       originalRequest._retry = true;
@@ -68,51 +63,38 @@ axiosInstance.interceptors.response.use(
       const refreshToken = getRefreshToken();
 
       if (!refreshToken) {
-        // Tidak ada refresh token, logout
         processQueue(error, null);
         isRefreshing = false;
 
-        // Import dinamis untuk avoid circular dependency
-        const { useAuthStore } = await import("../stores/index.js");
-        const authStore = useAuthStore();
-        authStore.logout();
-
+        // Clear tokens dan redirect ke login
+        removeTokens();
+        window.location.href = "/login";
         return Promise.reject(error);
       }
 
       try {
-        // Coba refresh token
         const response = await axios.post(`${api}/refresh`, {
           refreshToken: refreshToken,
         });
 
-        const newAccessToken = response.data.accessToken;
-        const newRefreshToken = response.data.refreshToken;
+        const { accessToken, refreshToken: newRefreshToken } = response.data;
 
         // Simpan token baru
-        storeTokens(newAccessToken, newRefreshToken);
+        storeTokens(accessToken, newRefreshToken);
 
-        // Update store
-        const { useAuthStore } = await import("../stores/index.js");
-        const authStore = useAuthStore();
-        authStore.accessToken = newAccessToken;
-        if (newRefreshToken) {
-          authStore.refreshToken = newRefreshToken;
-        }
+        // Process queue
+        processQueue(null, accessToken);
 
-        // Process semua request yang di-queue
-        processQueue(null, newAccessToken);
-
-        // Retry original request dengan token baru
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        // Retry original request
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return axiosInstance(originalRequest);
       } catch (refreshError) {
-        // Refresh token juga expired, logout
+        console.error("Refresh token failed:", refreshError);
         processQueue(refreshError, null);
 
-        const { useAuthStore } = await import("../stores/index.js");
-        const authStore = useAuthStore();
-        authStore.logout();
+        // Clear semua token dan redirect
+        removeTokens();
+        window.location.href = "/login";
 
         return Promise.reject(refreshError);
       } finally {
