@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
   roleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Role', required: true },
   alamat: { type: String, default: null },
   namaAnak: { type: String, default: '' },
-  jenisKelamin: { type: String, enum: ['p', 'l'], default: null },
+  jenisKelamin: { type: String, default: null },
   tanggalLahir: { type: Date, default: null },
   bbLahir: { type: Number, default: null },
   tbLahir: { type: Number, default: null },
