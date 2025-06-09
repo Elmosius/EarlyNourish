@@ -4,6 +4,10 @@ import tensorflow as tf
 import joblib
 from schemas.predict_schemas import StuntingInput, StuntingOutput
 from core.config import settings
+from pygrowup import Calculator
+
+# Initialize pygrowup calculator
+calculator = Calculator(adjust_height_data=True, include_cdc=False, log_level='ERROR')
 
 try:
     model = tf.keras.models.load_model(settings.MODEL_STUNTING_H5_PATH)
@@ -118,15 +122,99 @@ def get_recommendations_by_age_and_status(age_months, status):
             
     return tindakan, nutrisi
 
+def calculate_zscores(gender, age_months, weight_kg, height_cm):
+    """Calculate z-scores using pygrowup library"""
+    # Convert gender to format expected by pygrowup (M/F)
+    gender_formatted = "M" if gender.upper() == "L" else "F"
+    
+    # Check if inputs are within valid ranges for WHO standards
+    if age_months < 0 or age_months > 60:  # WHO standards are typically for under 5 years
+        print(f"Warning: Age {age_months} months may be outside valid range")
+    if weight_kg <= 0 or weight_kg > 30:  # Sanity check for weight
+        print(f"Warning: Weight {weight_kg} kg may be outside valid range")
+    if height_cm <= 0 or height_cm > 120:  # Sanity check for height
+        print(f"Warning: Height {height_cm} cm may be outside valid range")
+    
+    try:
+        # Direct method calls with keyword arguments
+        bbU = calculator.wfa(weight=weight_kg, age_in_months=age_months, sex=gender_formatted)
+        print(f"BBU calculation result: {bbU}")
+        
+        tbU = calculator.lhfa(length_height=height_cm, age_in_months=age_months, sex=gender_formatted)
+        print(f"TBU calculation result: {tbU}")
+        
+        bbTb = calculator.wfl(weight=weight_kg, length_height=height_cm, sex=gender_formatted)
+        print(f"BBTB calculation result: {bbTb}")
+        
+        # Convert to float and round to 2 decimal places
+        bbU = round(float(bbU), 2) if bbU is not None else None
+        tbU = round(float(tbU), 2) if tbU is not None else None
+        bbTb = round(float(bbTb), 2) if bbTb is not None else None
+        
+        return bbU, tbU, bbTb
+        
+    except Exception as e:
+        print(f"Error calculating z-scores with standard parameters: {e}")
+        
+        # Try several parameter variations
+        methods = [
+            # Method 1: using positional arguments
+            lambda: (
+                calculator.wfa(weight_kg, age_months, gender_formatted),
+                calculator.lhfa(height_cm, age_months, gender_formatted),
+                calculator.wfl(weight_kg, height_cm, gender_formatted)
+            ),
+            # Method 2: different keyword arguments
+            lambda: (
+                calculator.wfa(weight_kg=weight_kg, age_months=age_months, sex=gender_formatted),
+                calculator.lhfa(height_cm=height_cm, age_months=age_months, sex=gender_formatted),
+                calculator.wfl(weight_kg=weight_kg, height_cm=height_cm, sex=gender_formatted)
+            ),
+            # Method 3: different function names (some versions use different names)
+            lambda: (
+                getattr(calculator, 'wfa', calculator.wfa)(weight=weight_kg, age_in_months=age_months, sex=gender_formatted),
+                getattr(calculator, 'hfa', calculator.lhfa)(length_height=height_cm, age_in_months=age_months, sex=gender_formatted),
+                getattr(calculator, 'wfh', calculator.wfl)(weight=weight_kg, length_height=height_cm, sex=gender_formatted)
+            )
+        ]
+        
+        for i, method in enumerate(methods):
+            try:
+                print(f"Trying method {i+1}...")
+                bbU, tbU, bbTb = method()
+                
+                bbU = round(float(bbU), 2) if bbU is not None else None
+                tbU = round(float(tbU), 2) if tbU is not None else None
+                bbTb = round(float(bbTb), 2) if bbTb is not None else None
+                
+                print(f"Method {i+1} worked: bbU={bbU}, tbU={tbU}, bbTb={bbTb}")
+                return bbU, tbU, bbTb
+            except Exception as e_method:
+                print(f"Method {i+1} failed: {e_method}")
+        
+        print("All z-score calculation methods failed")
+        return None, None, None
+
 async def get_stunting_prediction(data: StuntingInput) -> StuntingOutput:
     if not all([model, scaler, status_encoder]):
         return StuntingOutput(
             risikoStunting="Error: Model tidak dimuat", 
             tindakan=["Silakan periksa log server untuk masalah pemuatan model."],
-            nutrisi=["Tidak ada saran nutrisi karena model tidak dapat diakses."]
+            nutrisi=["Tidak ada saran nutrisi karena model tidak dapat diakses."],
+            bbU=None,
+            tbU=None,
+            bbTb=None
         )
 
     print(f"Menerima data untuk prediksi: {data.model_dump()}")
+
+    # Calculate z-scores using pygrowup
+    bbU, tbU, bbTb = calculate_zscores(
+        gender=data.jk,
+        age_months=data.umur,
+        weight_kg=data.bb,
+        height_cm=data.tb
+    )
 
     # 1. Preprocess input data
     jk_encoded = 0 if data.jk.upper() == "P" else 1
@@ -156,6 +244,7 @@ async def get_stunting_prediction(data: StuntingInput) -> StuntingOutput:
     predicted_status = status_prediksi[0]
     
     print(f"Prediksi status stunting: {predicted_status}")
+    print(f"Z-scores: bbU={bbU}, tbU={tbU}, bbTb={bbTb}")
     
     # 5. Get age-specific and status-specific recommendations
     tindakan_list, nutrisi_list = get_recommendations_by_age_and_status(data.umur, predicted_status)
@@ -163,5 +252,8 @@ async def get_stunting_prediction(data: StuntingInput) -> StuntingOutput:
     return StuntingOutput(
         risikoStunting=predicted_status,
         tindakan=tindakan_list,
-        nutrisi=nutrisi_list
+        nutrisi=nutrisi_list,
+        bbU=bbU,
+        tbU=tbU,
+        bbTb=bbTb
     )
