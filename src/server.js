@@ -64,7 +64,7 @@ const init = async () => {
         options: { auth: false },
         handler: {
         directory: {
-            path: Path.join(__dirname, '..', 'uploads'),
+            path: Path.join(__dirname, 'uploads'),
             index: false,
             listing: false,
         },
