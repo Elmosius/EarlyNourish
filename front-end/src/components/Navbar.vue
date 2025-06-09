@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from "vue";
+import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import {
   MenuIcon,
   XIcon,
@@ -9,11 +9,14 @@ import {
   ChevronDownIcon,
   LogInIcon,
 } from "lucide-vue-next";
-import { useAuthStore } from "../stores/index.js";
+import { useAuthStore, useProfileStore } from "../stores/index.js";
 import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 
 const authStore = useAuthStore();
+const profileStore = useProfileStore();
+
+const { profile } = storeToRefs(profileStore);
 const { isAuthenticated, user } = storeToRefs(authStore);
 const router = useRouter();
 
@@ -45,6 +48,16 @@ const handleClickOutside = (event) => {
 onMounted(() => {
   window.addEventListener("scroll", handleScroll);
   document.addEventListener("click", handleClickOutside);
+
+  if (user.value && user.value.userId) {
+    profileStore.fetchProfile(user.value.userId);
+  }
+});
+
+watch(user, (newUser) => {
+  if (newUser && newUser.userId) {
+    profileStore.fetchProfile(newUser.userId);
+  }
 });
 
 onUnmounted(() => {
@@ -91,6 +104,13 @@ const userInitials = computed(() => {
 
 const userDisplayName = computed(() => {
   return user.value?.name || "Guest User";
+});
+
+const userProfilePhoto = computed(() => {
+  if (profile.value && profile.value.fotoProfil) {
+    return `${import.meta.env.VITE_API_URL}/${profile.value.fotoProfil}`;
+  }
+  return null;
 });
 </script>
 
@@ -158,7 +178,14 @@ const userDisplayName = computed(() => {
               <div
                 class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center"
               >
-                <span class="text-sm">{{ userInitials }}</span>
+                <img
+                  v-if="userProfilePhoto"
+                  :src="userProfilePhoto"
+                  alt="Profile Photo"
+                  class="w-full h-full object-cover rounded-full"
+                  @error="userProfilePhoto = null"
+                />
+                <span v-else class="text-sm">{{ userInitials }}</span>
               </div>
 
               <span>{{ userDisplayName }}</span>
