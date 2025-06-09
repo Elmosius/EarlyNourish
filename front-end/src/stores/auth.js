@@ -57,17 +57,6 @@ export const useAuthStore = defineStore("auth", {
       this.error = null;
       try {
         const response = await apiRegister(userInfo);
-        const loginResult = response.loginResult;
-
-        this.user = {
-          userId: loginResult.userId,
-          name: loginResult.name,
-        };
-        this.token = loginResult.token;
-        this.refreshToken = loginResult.refreshToken;
-
-        storeTokens(this.token, this.refreshToken);
-        storeUserData(this.user);
 
         this.error = null;
       } catch (error) {
