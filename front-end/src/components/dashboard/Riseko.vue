@@ -1,45 +1,83 @@
 <script setup>
 import { computed } from "vue";
 import { CircleAlert } from "lucide-vue-next";
+import { processGrowthStatuses } from "../../utils/status.js";
 
 const props = defineProps({
-  riskPercentage: {
-    type: Number,
-    default: 50,
-  },
-  riskFactors: {
-    type: Array,
-    default: () => [
-      "Tinggi Berdasarkan Umur Dibawah -2 SD",
-      "Asupan Protein Tidak Mencukupi",
-      "Kekurangan Vitamin A Reguler",
-    ],
+  predictionData: {
+    type: Object,
+    default: null,
   },
 });
 
+const growthStatuses = computed(() => {
+  return processGrowthStatuses(props.predictionData);
+});
+
+const riskPercentage = computed(() => {
+  if (!growthStatuses.value.length) return 50;
+
+  const worstZScore = Math.max(
+    ...growthStatuses.value.map((status) => Math.abs(status.value)),
+  );
+  if (worstZScore >= 4) return 95;
+  if (worstZScore >= 3) return 85;
+  if (worstZScore >= 2) return 65;
+  if (worstZScore >= 1) return 40;
+  if (worstZScore >= 0.5) return 20;
+  return 5;
+});
+
+const riskFactors = computed(() => {
+  if (!growthStatuses.value.length) {
+    return ["Data pertumbuhan tidak tersedia"];
+  }
+
+  const factors = [];
+
+  growthStatuses.value.forEach((status) => {
+    if (status.value < -2) {
+      factors.push(`${status.name} Dibawah -2 SD (${status.value})`);
+    } else if (status.value > 2) {
+      factors.push(`${status.name} Diatas +2 SD (${status.value})`);
+    }
+  });
+
+  if (factors.length === 0) {
+    if (riskPercentage.value >= 40) {
+      factors.push("Faktor risiko lingkungan atau sosial ekonomi");
+      factors.push("Monitoring rutin diperlukan");
+    } else {
+      factors.push("Tidak ada faktor risiko signifikan terdeteksi");
+    }
+  }
+
+  return factors;
+});
+
 const riskCircleClass = computed(() => {
-  if (props.riskPercentage >= 70) return "border-red-400 bg-red-50";
-  if (props.riskPercentage >= 40) return "border-yellow-400 bg-yellow-50";
+  if (riskPercentage.value >= 70) return "border-red-400 bg-red-50";
+  if (riskPercentage.value >= 40) return "border-yellow-400 bg-yellow-50";
   return "border-secondary bg-quaternary";
 });
 
 const riskTextColorClass = computed(() => {
-  if (props.riskPercentage >= 70) return "text-red-600";
-  if (props.riskPercentage >= 40) return "text-yellow-600";
+  if (riskPercentage.value >= 70) return "text-red-600";
+  if (riskPercentage.value >= 40) return "text-yellow-600";
   return "text-tertiary";
 });
 
 const riskStatusClass = computed(() => {
-  if (props.riskPercentage >= 70)
+  if (riskPercentage.value >= 70)
     return "bg-red-100 text-red-800 hover:bg-red-200";
-  if (props.riskPercentage >= 40)
+  if (riskPercentage.value >= 40)
     return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200";
   return "bg-quaternary text-tertiary hover:bg-green-200";
 });
 
 const riskStatusText = computed(() => {
-  if (props.riskPercentage >= 70) return "Risiko Stunting Tinggi";
-  if (props.riskPercentage >= 40) return "Risiko Stunting Sedang";
+  if (riskPercentage.value >= 70) return "Risiko Stunting Tinggi";
+  if (riskPercentage.value >= 40) return "Risiko Stunting Sedang";
   return "Risiko Stunting Rendah";
 });
 </script>

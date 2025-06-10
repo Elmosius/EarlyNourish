@@ -20,8 +20,6 @@ const { predictionData, profile } = defineProps({
   },
 });
 
-console.info("Prediction Data:", predictionData);
-
 const statusStunting = computed(() => {
   if (predictionData.risikoStunting === "stunted") {
     return "Stunting Ringan";

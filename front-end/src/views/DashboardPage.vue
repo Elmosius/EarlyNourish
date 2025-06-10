@@ -66,7 +66,7 @@ onMounted(() => {
       <InfoSection :predictionData="predictionData" :profile="profile" />
       <StatusPertumbuhan :predictionData="predictionData" />
       <Trajektori :predictionData="predictionData" />
-      <Riseko />
+      <Riseko :predictionData="predictionData" />
       <Rekomendasi />
       <RencanaLanjutan />
       <LangkahSelanjutnya />

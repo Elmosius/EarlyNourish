@@ -49,10 +49,6 @@ export const mapPredictionData = (predictionData) => {
 export const processGrowthStatuses = (predictionData) => {
   const zScoreMapping = mapPredictionData(predictionData);
 
-  if (!zScoreMapping) {
-    return getFallbackGrowthData();
-  }
-
   const results = [];
   const indicatorOrder = ["tb-u", "bb-u", "bb-tb"];
 
@@ -81,37 +77,7 @@ export const processGrowthStatuses = (predictionData) => {
     }
   });
 
-  return results.length > 0 ? results : getFallbackGrowthData();
-};
-
-// Fallback data untuk testing/development
-export const getFallbackGrowthData = () => {
-  return [
-    {
-      name: "Tinggi Berdasarkan Umur",
-      value: -1.5,
-      status: "Stunting Ringan",
-      color: "yellow",
-      percentage: whoCalculator.getWHOZoneProgress(-1.5),
-      healthStatus: whoCalculator.getHealthStatus(1.5),
-    },
-    {
-      name: "Berat Berdasarkan Umur",
-      value: 2.3,
-      status: "Risiko Gizi Lebih",
-      color: "red",
-      percentage: whoCalculator.getWHOZoneProgress(2.3),
-      healthStatus: whoCalculator.getHealthStatus(2.3),
-    },
-    {
-      name: "Berat Berdasarkan Tinggi",
-      value: 0.5,
-      status: "Normal",
-      color: "green",
-      percentage: whoCalculator.getWHOZoneProgress(0.5),
-      healthStatus: whoCalculator.getHealthStatus(0.5),
-    },
-  ];
+  return results;
 };
 
 // Progress bar color utilities
