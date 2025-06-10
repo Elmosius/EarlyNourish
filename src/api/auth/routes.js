@@ -1,4 +1,4 @@
-const { loginHandler, registerHandler } = require('./handler');
+const { loginHandler, registerHandler, refreshTokenHandler } = require('./handler');
 
 module.exports = [
   {
@@ -11,6 +11,12 @@ module.exports = [
     method: 'POST',
     path: '/register',
     handler: registerHandler,
+    options: { auth: false },
+  },
+  {
+    method: 'POST',
+    path: '/refresh',
+    handler: refreshTokenHandler,
     options: { auth: false },
   },
 ];

@@ -61,8 +61,6 @@ const createPredictionHandlerImpl = async (request, h) => {
       predictionId: prediction._id,
       historyId: history._id,
       risikoStunting: prediction.risikoStunting,
-      rekomendasi: mlResult.tindakan,
-      nutrisi: mlResult.nutrisi,
     },
   }).code(201);
 };
@@ -98,18 +96,26 @@ const getPredictionByIdHandlerImpl = async (request, h) => {
     return h.response({ Error: true, Message: 'Data tidak ditemukan' }).code(404);
   }
 
+  const recommendation = await Recommendation.findOne({ historyId: history._id });
+
   return h.response({
     Error: false,
     Message: 'success',
     Result: {
-      predictionId: prediction._id,
       historyId: prediction.historyId,
+      predictionId: prediction._id,
       jenisKelamin: prediction.jk,
       usia: prediction.umur,
       bbLahir: prediction.bbLahir,
       tbLahir: prediction.tbLahir,
       bb: prediction.bb,
       tb: prediction.tb,
+      bbU: prediction.bbU ?? null,
+      bbTb: prediction.bbTb ?? null,
+      tbU: prediction.tbU ?? null,
+      risikoStunting: prediction.risikoStunting,
+      rekomendasi: recommendation?.tindakan ?? [],
+      nutrisi: recommendation?.nutrisi ?? [],
       createdAt: prediction.createdAt,
     },
   }).code(200);

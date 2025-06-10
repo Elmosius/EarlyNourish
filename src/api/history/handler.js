@@ -16,7 +16,7 @@ const getHistoryByUserHandlerImpl = async (request, h) => {
     const recommendation = await Recommendation.findOne({ historyId: hist._id });
 
     return {
-      historyId: hist._id,
+      id: hist._id,
       predictionId: prediction?._id ?? null,
       recommendationId: recommendation?._id ?? null,
       jenisKelamin: prediction?.jk ?? null,
@@ -25,6 +25,10 @@ const getHistoryByUserHandlerImpl = async (request, h) => {
       tbLahir: prediction?.tbLahir ?? null,
       bb: prediction?.bb ?? null,
       tb: prediction?.tb ?? null,
+      bbU: prediction?.bbU ?? null,
+      bbTb: prediction?.bbTb ?? null,
+      tbU: prediction?.tbU ?? null,
+      risikoStunting: prediction?.risikoStunting ?? null,
       nutrisi: recommendation?.nutrisi ?? [],
       tindakan: recommendation?.tindakan ?? [],
       createdAt: prediction?.createdAt ?? hist.createdAt,

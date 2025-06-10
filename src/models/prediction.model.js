@@ -9,6 +9,9 @@ const predictionSchema = new mongoose.Schema({
   bb: { type: Number, required: true },
   tb: { type: Number, required: true },
   risikoStunting: { type: String, required: true },
+  bbU: { type: Number, default: null },
+  bbTb: { type: Number, default: null },
+  tbU: { type: Number, default: null },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Prediction', predictionSchema);

@@ -28,7 +28,6 @@ const generateTokenPair = (user) => {
 };
 
 const registerUser = async ({ email, password, namaLengkap }) => {
-  // Cek exact email (case-insensitive)
   const existingUser = await User.findOne({ email: new RegExp(`^${email}$`, 'i') });
   if (existingUser) {
     throw new InvariantError('Email sudah digunakan');
@@ -66,9 +65,20 @@ const loginUser = async ({ email, password }) => {
   return { user, token, refreshToken };
 };
 
+const refreshAccessToken = async (refreshToken) => {
+  try {
+    const { userId } = TokenManager.verifyRefreshToken(refreshToken);
+    const accessPayload = { userId };
+    return TokenManager.generateAccessToken(accessPayload);
+  } catch (err) {
+    throw new InvariantError('Refresh token tidak valid');
+  }
+};
+
 module.exports = {
   hashPassword,
   verifyPassword,
   registerUser,
   loginUser,
+  refreshAccessToken,
 };

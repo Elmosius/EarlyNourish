@@ -55,7 +55,34 @@ const registerHandler = async (request, h) => {
   }
 };
 
+const refreshTokenHandlerImpl = async (request, h) => {
+  const { refreshToken } = request.payload;
+  if (!refreshToken) {
+    throw new ClientError('refreshToken wajib diisi', 400);
+  }
+
+  const newAccessToken = await authService.refreshAccessToken(refreshToken);
+  return h.response({
+    Error: false,
+    Message: 'Success refresh access token',
+    accessToken: newAccessToken,
+  }).code(200);
+};
+
+const refreshTokenHandler = async (request, h) => {
+  try {
+    return await refreshTokenHandlerImpl(request, h);
+  } catch (err) {
+    if (err instanceof ClientError) {
+      return h.response({ Error: true, Message: err.message }).code(err.statusCode);
+    }
+    console.error(err);
+    return h.response({ Error: true, Message: 'Internal Server Error' }).code(500);
+  }
+};
+
 module.exports = {
   loginHandler,
   registerHandler,
+  refreshTokenHandler,
 };

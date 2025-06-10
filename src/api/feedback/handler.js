@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 const getAllFeedbackHandler = async (request, h) => {
   try {
     const result = await feedbackService.getAllFeedback();
-    return h.response({ Error: false, Message: 'success', feedback: result }).code(200);
+    return h.response({ Error: false, Message: 'success', feedbacks: result }).code(200);
   } catch (err) {
     return h.response({ Error: true, Message: 'Gagal mengambil feedback' }).code(500);
   }
