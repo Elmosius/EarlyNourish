@@ -80,7 +80,7 @@ axiosInstance.interceptors.response.use(
         const { accessToken } = response.data;
 
         // Simpan token baru
-        storeTokens(accessToken);
+        storeTokens(accessToken, refreshToken);
 
         // Process queue
         processQueue(null, accessToken);
