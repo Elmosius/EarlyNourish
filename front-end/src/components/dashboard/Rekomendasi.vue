@@ -1,163 +1,42 @@
 <script setup>
-import { Heart, Sun, Shield, Egg, Carrot, Milk, Leaf } from "lucide-vue-next";
+import { computed } from "vue";
+import { Utensils } from "lucide-vue-next";
+import {
+  getRecommendedFoods,
+  getNutritionRecommendations,
+  getMealPlan,
+  getColorClasses,
+  getMealTypeLabel,
+} from "../../utils/nutrisi.js";
 
 const props = defineProps({
-  recommendations: {
-    type: Array,
-    default: () => [
-      {
-        title: "Asupan Protein",
-        description:
-          "Perbanyak makan makanan kaya protein seperti telur, susu, kacang-kacangan, dan daging tanpa lemak.",
-        color: "green",
-        icon: Heart,
-      },
-      {
-        title: "Makanan Kaya Vitamin A",
-        description:
-          "Makan buah dan sayuran berwarna orange dan kuning seperti wortel, ubi jalar, dan mangga.",
-        color: "purple",
-        icon: Sun,
-      },
-      {
-        title: "Makanan Kaya Zat Besi",
-        description:
-          "Seperti sereal yang diperkaya zat besi, sayur hijau gelap, dan kacang-kacangan untuk mencegah anemia.",
-        color: "yellow",
-        icon: Shield,
-      },
-    ],
-  },
-  recommendedFoods: {
-    type: Array,
-    default: () => [
-      {
-        name: "Telur",
-        benefit: "Tinggi Protein",
-        icon: Egg,
-        bgColor: "bg-yellow-50",
-        iconBgColor: "bg-yellow-100",
-        iconColor: "text-yellow-600",
-      },
-      {
-        name: "Ubi Jalar",
-        benefit: "Kaya Vitamin A",
-        icon: Carrot,
-        bgColor: "bg-orange-50",
-        iconBgColor: "bg-orange-100",
-        iconColor: "text-orange-600",
-      },
-      {
-        name: "Yogurt",
-        benefit: "Kalsium & Protein",
-        icon: Milk,
-        bgColor: "bg-blue-50",
-        iconBgColor: "bg-blue-100",
-        iconColor: "text-blue-600",
-      },
-      {
-        name: "Bayam",
-        benefit: "Zat Besi & Folat",
-        icon: Leaf,
-        bgColor: "bg-green-50",
-        iconBgColor: "bg-green-100",
-        iconColor: "text-green-600",
-      },
-    ],
-  },
-  mealPlan: {
+  predictionData: {
     type: Object,
-    default: () => ({
-      breakfast: [
-        "Telur Dadar dan Bayam",
-        "Roti Gandum",
-        "Irisan Pisang",
-        "Susu (120ml)",
-      ],
-      lunch: ["Ubi Jalar", "Potongan Ayam", "Wortel Kukus", "Yogurt (60g)"],
-      dinnerSnacks: [
-        "Sup Kacang & Sayuran",
-        "Nasi Merah",
-        "Siang: Potongan Mangga",
-        "Sore: Potongan Keju",
-      ],
-    }),
+    required: true,
   },
 });
 
-const getRecommendationClass = (color) => {
-  switch (color) {
-    case "green":
-      return "bg-quaternary";
-    case "purple":
-      return "bg-purple-100";
-    case "yellow":
-      return "bg-yellow-100";
-    default:
-      return "bg-gray-100";
-  }
-};
+const nutritionRecommendations = computed(() => {
+  if (!props.predictionData?.nutrisi) return [];
+  return getNutritionRecommendations(props.predictionData.nutrisi);
+});
 
-const getIconBgClass = (color) => {
-  switch (color) {
-    case "green":
-      return "bg-green-200";
-    case "purple":
-      return "bg-purple-200";
-    case "yellow":
-      return "bg-yellow-200";
-    default:
-      return "bg-gray-200";
-  }
-};
+const recommendedFoods = computed(() => {
+  if (!props.predictionData?.nutrisi) return [];
+  return getRecommendedFoods(props.predictionData.nutrisi);
+});
 
-const getIconColorClass = (color) => {
-  switch (color) {
-    case "green":
-      return "text-tertiary";
-    case "purple":
-      return "text-purple-600";
-    case "yellow":
-      return "text-yellow-600";
-    default:
-      return "text-gray-600";
-  }
-};
+const mealPlan = computed(() => {
+  if (!props.predictionData?.nutrisi)
+    return { breakfast: [], lunch: [], dinnerSnacks: [] };
+  return getMealPlan(props.predictionData.nutrisi);
+});
 
-const getTitleClass = (color) => {
-  switch (color) {
-    case "green":
-      return "text-green-800";
-    case "purple":
-      return "text-purple-800";
-    case "yellow":
-      return "text-yellow-800";
-    default:
-      return "text-gray-800";
-  }
-};
-
-const getDescriptionClass = (color) => {
-  switch (color) {
-    case "green":
-      return "text-green-700";
-    case "purple":
-      return "text-purple-700";
-    case "yellow":
-      return "text-yellow-700";
-    default:
-      return "text-gray-700";
-  }
-};
-
-const getMealTypeLabel = (mealType) => {
-  const labels = {
-    breakfast: "Sarapan",
-    lunch: "Makan Siang",
-    dinnerSnacks: "Makan Malam & Cemilan",
-  };
-  return labels[mealType] || mealType;
-};
+const getRecommendationClass = (color) => getColorClasses(color).recommendation;
+const getIconBgClass = (color) => getColorClasses(color).iconBg;
+const getIconColorClass = (color) => getColorClasses(color).iconColor;
+const getTitleClass = (color) => getColorClasses(color).title;
+const getDescriptionClass = (color) => getColorClasses(color).description;
 </script>
 
 <template>
@@ -169,10 +48,9 @@ const getMealTypeLabel = (mealType) => {
         Rekomendasi Nutrisi yang Dipersonalisasi
       </h2>
 
-      <!-- Nutrition Recommendations -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         <div
-          v-for="recommendation in recommendations"
+          v-for="recommendation in nutritionRecommendations"
           :key="recommendation.title"
           :class="getRecommendationClass(recommendation.color)"
           class="rounded-xl p-4 md:p-6"
@@ -206,7 +84,6 @@ const getMealTypeLabel = (mealType) => {
         </div>
       </div>
 
-      <!-- Recommended Foods -->
       <h3 class="font-bold text-gray-800 mb-4">Makanan yang Disarankan</h3>
       <div
         class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6"
@@ -228,6 +105,41 @@ const getMealTypeLabel = (mealType) => {
             {{ food.name }}
           </h4>
           <p class="text-xs md:text-sm text-gray-600">{{ food.benefit }}</p>
+        </div>
+      </div>
+
+      <div
+        v-if="
+          mealPlan.breakfast.length ||
+          mealPlan.lunch.length ||
+          mealPlan.dinnerSnacks.length
+        "
+      >
+        <h3 class="font-bold text-gray-800 mb-4">Contoh Menu Harian</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div
+            v-for="(meals, mealType) in mealPlan"
+            :key="mealType"
+            class="bg-gray-50 rounded-xl p-5"
+          >
+            <h4 class="font-bold text-gray-800 mb-3 flex items-center">
+              <Utensils class="w-4 h-4 mr-2 text-gray-600" />
+              {{ getMealTypeLabel(mealType) }}
+            </h4>
+            <ul v-if="meals.length" class="space-y-2">
+              <li
+                v-for="(meal, index) in meals"
+                :key="index"
+                class="text-sm text-gray-700 flex"
+              >
+                <span class="mr-2">•</span>
+                <span>{{ meal }}</span>
+              </li>
+            </ul>
+            <p v-else class="text-sm text-gray-500 italic">
+              Tidak ada rekomendasi spesifik
+            </p>
+          </div>
         </div>
       </div>
     </div>
