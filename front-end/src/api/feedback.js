@@ -27,7 +27,7 @@ export const getUserFeedback = async (userId) => {
     return response.data;
   } catch (error) {
     if (error.response?.status === 404) {
-      return null;
+      return 0;
     }
     throw error;
   }

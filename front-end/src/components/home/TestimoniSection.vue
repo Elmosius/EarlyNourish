@@ -13,7 +13,7 @@ const fetchAllFeedbacks = async () => {
   error.value = null;
   try {
     const response = await getFeedbacks();
-    allFeedbacks.value = response.feedback || [];
+    allFeedbacks.value = response.feedbacks || [];
   } catch (err) {
     console.error("Gagal mengambil testimoni:", err);
     error.value =

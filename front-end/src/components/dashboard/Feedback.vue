@@ -34,8 +34,7 @@ const checkExistingFeedback = async () => {
 
   try {
     const response = await getUserFeedback(authUser.value.userId);
-    if (response !== null) feedbackSubmitted.value = true;
-    console.log("user belum mengisi feedback ini pada dashboard ini");
+    if (response.Message === "success") feedbackSubmitted.value = true;
   } catch (error) {
     console.error("Error checking existing feedback:", error);
     feedbackSubmitted.value = false;
