@@ -1,5 +1,4 @@
 class WHOCalculator {
-  // Fungsi utama untuk interpretasi Z-score dari API
   interpretZScoreFromAPI(zScoreData) {
     const results = {};
 
