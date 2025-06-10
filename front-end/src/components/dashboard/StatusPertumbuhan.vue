@@ -115,15 +115,7 @@ const getProgressColorByPercentage = (percentage) => {
             :class="getProgressColorByPercentage(status.percentage)"
             class="h-3 rounded-full transition-all duration-300 relative"
             :style="{ width: status.percentage + '%' }"
-          >
-            <!-- Target indicator (50% mark for normal zone) -->
-          </div>
-          <!-- Zona markers -->
-          <div class="absolute inset-0 flex">
-            <div class="w-1/4 border-r border-white opacity-50"></div>
-            <div class="w-1/4 border-r border-white opacity-50"></div>
-            <div class="w-1/4 border-r border-white opacity-50"></div>
-          </div>
+          ></div>
         </div>
 
         <!-- Status Info -->
