@@ -64,7 +64,7 @@ onMounted(() => {
     <div v-else>
       <ProfileSection :predictionData="predictionData" />
       <InfoSection :predictionData="predictionData" :profile="profile" />
-      <StatusPertumbuhan />
+      <StatusPertumbuhan :predictionData="predictionData" />
       <Trajektori />
       <Riseko />
       <Rekomendasi />

@@ -13,6 +13,7 @@
     "apexcharts": "^4.7.0",
     "axios": "^1.9.0",
     "lucide-vue-next": "^0.510.0",
+    "papaparse": "^5.5.3",
     "pinia": "^3.0.2",
     "tailwindcss": "^4.1.6",
     "vite-plugin-pwa": "^1.0.0",
