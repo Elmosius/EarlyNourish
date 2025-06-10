@@ -1,63 +1,38 @@
 <script setup>
 import { Check } from "lucide-vue-next";
+import { computed } from "vue";
+import {
+  transformRecommendations,
+  calculateMilestones,
+} from "../../utils/rekomendasi.js";
 
 const props = defineProps({
+  predictionData: {
+    type: Object,
+    default: null,
+  },
   recommendedActions: {
     type: Array,
-    default: () => [
-      {
-        title: "Jadwalkan Asesmen Lanjutan dalam 1 Bulan",
-        description: "Untuk memantau kemajuan pertumbuhan anak",
-      },
-      {
-        title: "Menerapkan Rencana Makanan Harian",
-        description: "Fokus ke protein dan makanan kaya vitamin A",
-      },
-      {
-        title: "Cek Asupan Makanan Harian di Website",
-        description: "Ini membantu kami menyesuaikan rekomendasi",
-      },
-      {
-        title: "Konsultasikan ke Dokter",
-        description: "Berikan hasil ini ketika mengunjungi dokter",
-      },
-    ],
+    default: () => [],
   },
   milestones: {
     type: Object,
-    default: () => ({
-      period: {
-        label: "Target 3 Bulan ke Depan",
-        value: "Jun - Aug 2025",
-      },
-      targets: [
-        {
-          label: "Target Tinggi Badan",
-          targetValue: "80.5 cm",
-          currentValue: "76.5 cm",
-          targetChange: "+4 cm",
-          targetColor: "text-tertiary",
-          progressPercentage: 30,
-        },
-        {
-          label: "Target Berat Badan",
-          targetValue: "10.5 kg",
-          currentValue: "9.2 kg",
-          targetChange: "+1.3 kg",
-          targetColor: "text-tertiary",
-          progressPercentage: 20,
-        },
-        {
-          label: "Target Tinggi Berdasarkan Umur",
-          targetValue: "-1.5 SD",
-          currentValue: "-2.1 SD",
-          targetChange: "+0.6 SD",
-          targetColor: "text-tertiary",
-          progressPercentage: 65,
-        },
-      ],
-    }),
+    default: () => ({}),
   },
+});
+
+// Transform API data into recommended actions
+const transformedActions = computed(() => {
+  if (!props.predictionData) return props.recommendedActions;
+  return transformRecommendations(
+    props.predictionData.rekomendasi,
+    props.recommendedActions,
+  );
+});
+
+// Calculate milestone targets based on current measurements
+const calculatedMilestones = computed(() => {
+  return calculateMilestones(props.predictionData, props.milestones);
 });
 </script>
 
@@ -76,7 +51,7 @@ const props = defineProps({
 
           <div class="space-y-4">
             <div
-              v-for="action in recommendedActions"
+              v-for="action in transformedActions"
               :key="action.title"
               class="flex items-start gap-3"
             >
@@ -106,16 +81,16 @@ const props = defineProps({
           <div class="bg-gray-50 rounded-lg p-4">
             <div class="flex justify-between items-center mb-6">
               <span class="font-medium text-gray-700 text-base md:text-sm">{{
-                milestones.period.label
+                calculatedMilestones.period.label
               }}</span>
               <span class="text-tertiary font-medium text-base md:text-sm">{{
-                milestones.period.value
+                calculatedMilestones.period.value
               }}</span>
             </div>
 
             <div class="space-y-6">
               <div
-                v-for="milestone in milestones.targets"
+                v-for="milestone in calculatedMilestones.targets"
                 :key="milestone.label"
                 class="space-y-2"
               >
@@ -155,9 +130,3 @@ const props = defineProps({
     </div>
   </section>
 </template>
-
-<style scoped>
-.transition-all {
-  transition: all 0.3s ease-in-out;
-}
-</style>

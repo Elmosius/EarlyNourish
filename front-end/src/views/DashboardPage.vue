@@ -68,7 +68,7 @@ onMounted(() => {
       <Trajektori :predictionData="predictionData" />
       <Riseko :predictionData="predictionData" />
       <Rekomendasi :predictionData="predictionData" />
-      <RencanaLanjutan />
+      <RencanaLanjutan :predictionData="predictionData" />
       <LangkahSelanjutnya />
       <Feedback />
     </div>
