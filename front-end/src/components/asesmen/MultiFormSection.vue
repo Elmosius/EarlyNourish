@@ -178,10 +178,7 @@ const handleSubmit = async () => {
     }
 
     const predictionData = preparePredictionData();
-    console.info("Prediction data:", predictionData);
     const result = await createPrediction(predictionData);
-
-    console.log("Prediction result:", result.Result);
 
     if (result.Result && result.Result.predictionId) {
       await router.push(`/dashboard/${result.Result.predictionId}`);
