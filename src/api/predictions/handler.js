@@ -46,6 +46,9 @@ const createPredictionHandlerImpl = async (request, h) => {
     bb,
     tb,
     risikoStunting: mlResult.risikoStunting.toLowerCase(),
+    bbU: mlResult.bbU ?? null,
+    tbU: mlResult.tbU ?? null,
+    bbTb: mlResult.bbTb ?? null,
   }).save();
 
   await new Recommendation({
