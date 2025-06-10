@@ -1,69 +1,52 @@
 <script setup>
 import { computed } from "vue";
 import { UserIcon } from "lucide-vue-next";
+import {
+  getStatusBadgeClass,
+  getStatusCircleClass,
+} from "../../utils/status.js";
+import { calculateAgeInMonths } from "../../utils/date.js";
 
-const props = defineProps({
-  childName: {
-    type: String,
-    default: "Amelia Zahra",
+const { predictionData, profile } = defineProps({
+  predictionData: {
+    type: Object,
+    required: true,
+    default: () => ({}),
   },
-  gender: {
-    type: String,
-    default: "Perempuan",
-  },
-  childAge: {
-    type: String,
-    default: "12 bulan",
-  },
-  riskStatus: {
-    type: String,
-    default: "Berisiko Stunting",
-  },
-  weight: {
-    type: Number,
-    default: 9.2,
-  },
-  height: {
-    type: Number,
-    default: 76.5,
-  },
-  weightSD: {
-    type: String,
-    default: "x",
-  },
-  heightSD: {
-    type: String,
-    default: "x",
+  profile: {
+    type: Object,
+    required: true,
+    default: () => ({}),
   },
 });
 
-const statusCirle = computed(() => {
-  const baseClass = "inline-block w-3 h-3 mr-1 rounded-full";
-  switch (props.riskStatus) {
-    case "Berisiko Stunting":
-      return `${baseClass} bg-yellow-500`;
-    case "Normal":
-      return `${baseClass} bg-tertiary`;
-    case "Stunting":
-      return `${baseClass} bg-red-500 `;
-    default:
-      return `${baseClass} bg-gray-500`;
+console.info("Prediction Data:", predictionData);
+
+const risikoStunting = computed(() => {
+  if (predictionData.risikoStunting === "stunted") {
+    return "Stunting Ringan";
+  } else if (predictionData.risikoStunting === "severely stunting") {
+    return "Stunting Berat";
+  } else {
+    return "Normal";
   }
 });
 
-const statusClass = computed(() => {
-  const baseClass =
-    "text-xs md:text-sm px-4 py-1.5 rounded-full shadow-xl font-medium ";
-  switch (props.riskStatus) {
-    case "Berisiko Stunting":
-      return `${baseClass} bg-yellow-100 text-yellow-800`;
-    case "Normal":
-      return `${baseClass} bg-quaternary text-tertiary`;
-    case "Stunting":
-      return `${baseClass} bg-red-100 text-red-800`;
-    default:
-      return `${baseClass} bg-gray-100 text-gray-800`;
+const jenisKelamin = computed(() => {
+  return profile.jenisKelamin === "L" ? "Laki-laki" : "Perempuan";
+});
+
+const umur = computed(() => calculateAgeInMonths(predictionData.tangalLahir));
+
+const statusCirle = computed(() => getStatusCircleClass(risikoStunting));
+
+const statusClass = computed(() => getStatusBadgeClass(risikoStunting));
+
+const userProfilePhoto = computed(() => {
+  if (profile && profile.fotoProfil) {
+    return `${import.meta.env.VITE_API_URL}/${profile.fotoProfil}`;
   }
+  return null;
 });
 </script>
 
@@ -76,13 +59,20 @@ const statusClass = computed(() => {
       <div class="block md:hidden">
         <div class="flex flex-col items-center text-center gap-4 mb-4">
           <div
-            class="bg-quaternary rounded-full p-3 shadow-lg border-white border-2"
+            class="bg-quaternary rounded-full shadow-lg w-24 h-24 border-white border-2 overflow-hidden"
+            :class="{ 'p-3': !profile.fotoProfil }"
           >
-            <UserIcon class="text-tertiary h-8 w-8" />
+            <img
+              v-if="profile.fotoProfil"
+              :src="userProfilePhoto"
+              alt="Profile Photo"
+              class="w-full h-full object-cover"
+            />
+            <UserIcon v-else class="text-tertiary h-8 w-8" />
           </div>
           <div>
-            <h2 class="font-bold">{{ childName }}</h2>
-            <p class="text-base my-2">{{ gender }}, {{ childAge }}</p>
+            <h2 class="font-bold">{{ profile.namaAnak }}</h2>
+            <p class="text-base my-2">{{ jenisKelamin }}, {{ umur }} bulan</p>
 
             <div :class="statusClass">
               <span :class="statusCirle"></span>
@@ -93,19 +83,19 @@ const statusClass = computed(() => {
         <div class="grid grid-cols-2 gap-4 wrap-break-word">
           <div class="bg-gray-50 rounded-lg p-3">
             <p class="text-base text-gray-500 mb-1">Berat</p>
-            <p class="font-semibold text-sm">{{ weight }} kg</p>
+            <p class="font-semibold text-sm">{{ predictionData.bb }} kg</p>
           </div>
           <div class="bg-gray-50 rounded-lg p-3">
             <p class="text-base text-gray-500 mb-1">Tinggi</p>
-            <p class="font-semibold text-sm">{{ height }} cm</p>
+            <p class="font-semibold text-sm">{{ predictionData.tb }} cm</p>
           </div>
           <div class="bg-gray-50 rounded-lg p-3">
             <p class="text-base text-gray-500 mb-1">Berat Berdasarkan Usia</p>
-            <p class="font-semibold text-sm">{{ weightSD }} SD</p>
+            <p class="font-semibold text-sm">{{ predictionData.bbU }} SD</p>
           </div>
           <div class="bg-gray-50 rounded-lg p-3">
             <p class="text-base text-gray-500 mb-1">Tinggi Berdasarkan Usia</p>
-            <p class="font-semibold text-sm">{{ heightSD }} SD</p>
+            <p class="font-semibold text-sm">{{ predictionData.tbU }} SD</p>
           </div>
         </div>
       </div>
@@ -114,17 +104,26 @@ const statusClass = computed(() => {
       <div class="hidden md:flex items-center gap-8">
         <div class="flex-shrink-0">
           <div
-            class="bg-quaternary rounded-full p-8 shadow-lg border-white border-4 w-24 h-24 flex items-center justify-center"
+            class="bg-quaternary rounded-full shadow-lg border-white border-4 w-24 h-24 flex items-center justify-center overflow-hidden"
+            :class="{ 'p-8': !profile.fotoProfil }"
           >
-            <UserIcon class="text-tertiary h-8 w-8" />
+            <img
+              v-if="profile.fotoProfil"
+              :src="userProfilePhoto"
+              alt="Profile Photo"
+              class="w-full h-full object-cover"
+            />
+            <UserIcon v-else class="text-tertiary h-8 w-8" />
           </div>
         </div>
 
         <div class="flex-1">
           <div class="flex justify-between items-start mb-6">
             <div class="flex-1">
-              <h2 class="font-bold">{{ childName }}</h2>
-              <p class="text-gray-600 text-sm">{{ gender }}, {{ childAge }}</p>
+              <h2 class="font-bold">{{ profile.namaAnak }}</h2>
+              <p class="text-gray-600 text-sm">
+                {{ jenisKelamin }}, {{ umur }} bulan
+              </p>
             </div>
             <div class="flex-shrink-0 my-auto p-3">
               <div :class="statusClass">
@@ -137,22 +136,22 @@ const statusClass = computed(() => {
           <div class="grid grid-cols-2 gap-6">
             <div class="bg-gray-50 rounded-lg p-3">
               <p class="text-gray-600 text-sm mb-1">Berat</p>
-              <p class="font-semibold mb-3">{{ weight }} kg</p>
+              <p class="font-semibold mb-3">{{ predictionData.bb }} kg</p>
             </div>
 
             <div class="bg-gray-50 rounded-lg p-3">
               <p class="text-gray-600 text-sm mb-1">Berat Berdasarkan Usia</p>
-              <p class="font-semibold">{{ weightSD }}</p>
+              <p class="font-semibold">{{ predictionData.bbU }}</p>
             </div>
 
             <div class="bg-gray-50 rounded-lg p-3">
               <p class="text-gray-600 text-sm mb-1">Tinggi</p>
-              <p class="font-semibold mb-3">{{ height }} cm</p>
+              <p class="font-semibold mb-3">{{ predictionData.tb }} cm</p>
             </div>
 
             <div class="bg-gray-50 rounded-lg p-3">
               <p class="text-gray-600 text-sm mb-1">Tinggi Berdasarkan Usia</p>
-              <p class="font-semibold">{{ heightSD }}</p>
+              <p class="font-semibold">{{ predictionData.tbU }}</p>
             </div>
           </div>
         </div>

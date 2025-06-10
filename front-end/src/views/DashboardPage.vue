@@ -15,12 +15,14 @@ import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
 import { storeToRefs } from "pinia";
-import { useAuthStore } from "../stores/index.js";
+import { useAuthStore, useProfileStore } from "../stores/index.js";
 import { getPrediction } from "../api/predict.js";
 import ErrorMessage from "../components/ui/ErrorMessage.vue";
 
 const route = useRoute();
+const profileStore = useProfileStore();
 const authStore = useAuthStore();
+const { profile } = storeToRefs(profileStore);
 const { user: authUser } = storeToRefs(authStore);
 
 const predictionData = ref(null);
@@ -61,7 +63,7 @@ onMounted(() => {
 
     <div v-else>
       <ProfileSection :predictionData="predictionData" />
-      <InfoSection />
+      <InfoSection :predictionData="predictionData" :profile="profile" />
       <StatusPertumbuhan />
       <Trajektori />
       <Riseko />

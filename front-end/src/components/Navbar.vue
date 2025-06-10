@@ -176,7 +176,7 @@ const userProfilePhoto = computed(() => {
               class="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-full font-medium transition-colors"
             >
               <div
-                class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center"
+                class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden"
               >
                 <img
                   v-if="userProfilePhoto"
@@ -286,7 +286,7 @@ const userProfilePhoto = computed(() => {
             >
               <div class="flex items-center space-x-3 px-2 py-3">
                 <div
-                  class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center"
+                  class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden"
                 >
                   <img
                     v-if="userProfilePhoto"

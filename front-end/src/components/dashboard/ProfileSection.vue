@@ -3,7 +3,7 @@ import { Clipboard } from "lucide-vue-next";
 import { formatDateDisplay } from "../../utils/date.js";
 import { computed } from "vue";
 
-const data = defineProps({
+const { predictionData } = defineProps({
   predictionData: {
     type: Object,
     required: true,
@@ -11,8 +11,8 @@ const data = defineProps({
 });
 
 const checkDate = computed(() => {
-  return data.predictionData?.createdAt
-    ? formatDateDisplay(data.predictionData.createdAt)
+  return predictionData?.createdAt
+    ? formatDateDisplay(predictionData.createdAt)
     : "Tanggal tidak tersedia";
 });
 </script>
