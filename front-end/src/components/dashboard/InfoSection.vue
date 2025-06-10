@@ -22,7 +22,7 @@ const { predictionData, profile } = defineProps({
 
 console.info("Prediction Data:", predictionData);
 
-const risikoStunting = computed(() => {
+const statusStunting = computed(() => {
   if (predictionData.risikoStunting === "stunted") {
     return "Stunting Ringan";
   } else if (predictionData.risikoStunting === "severely stunting") {
@@ -38,9 +38,9 @@ const jenisKelamin = computed(() => {
 
 const umur = computed(() => calculateAgeInMonths(predictionData.tangalLahir));
 
-const statusCirle = computed(() => getStatusCircleClass(risikoStunting));
+const statusCirle = computed(() => getStatusCircleClass(statusStunting.value));
 
-const statusClass = computed(() => getStatusBadgeClass(risikoStunting));
+const statusClass = computed(() => getStatusBadgeClass(statusStunting.value));
 
 const userProfilePhoto = computed(() => {
   if (profile && profile.fotoProfil) {
@@ -76,7 +76,7 @@ const userProfilePhoto = computed(() => {
 
             <div :class="statusClass">
               <span :class="statusCirle"></span>
-              {{ riskStatus }}
+              {{ statusStunting }}
             </div>
           </div>
         </div>
@@ -128,7 +128,7 @@ const userProfilePhoto = computed(() => {
             <div class="flex-shrink-0 my-auto p-3">
               <div :class="statusClass">
                 <span :class="statusCirle"></span>
-                {{ riskStatus }}
+                {{ statusStunting }}
               </div>
             </div>
           </div>
@@ -141,7 +141,7 @@ const userProfilePhoto = computed(() => {
 
             <div class="bg-gray-50 rounded-lg p-3">
               <p class="text-gray-600 text-sm mb-1">Berat Berdasarkan Usia</p>
-              <p class="font-semibold">{{ predictionData.bbU }}</p>
+              <p class="font-semibold">{{ predictionData.bbU }} SD</p>
             </div>
 
             <div class="bg-gray-50 rounded-lg p-3">
@@ -151,7 +151,7 @@ const userProfilePhoto = computed(() => {
 
             <div class="bg-gray-50 rounded-lg p-3">
               <p class="text-gray-600 text-sm mb-1">Tinggi Berdasarkan Usia</p>
-              <p class="font-semibold">{{ predictionData.tbU }}</p>
+              <p class="font-semibold">{{ predictionData.tbU }} SD</p>
             </div>
           </div>
         </div>
