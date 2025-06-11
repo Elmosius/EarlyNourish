@@ -1,0 +1,45 @@
+{
+  "name": "earlynourish",
+  "version": "1.0.0",
+  "description": "Early Nourish Project (Capstone Project Coding Camp 2025)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Elmosius/EarlyNourish.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Elmosius/EarlyNourish/issues"
+  },
+  "homepage": "https://github.com/Elmosius/EarlyNourish#readme",
+  "dependencies": {
+    "@hapi/hapi": "^21.4.0",
+    "@hapi/inert": "^7.1.0",
+    "@hapi/jwt": "^3.2.0",
+    "@tensorflow/tfjs": "^4.22.0",
+    "amqplib": "^0.10.8",
+    "auto-bind": "^5.0.1",
+    "axios": "^1.9.0",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.5.0",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.14.1",
+    "nanoid": "^5.1.5",
+    "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "eslint": "^9.26.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.10",
+    "prettier": "^3.5.3"
+  }
+}
