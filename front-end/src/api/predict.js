@@ -46,15 +46,3 @@ export async function getUserHistory(idUser) {
     );
   }
 }
-
-export async function getUserPredictions(idUser) {
-  console.warn(
-    "getUserPredictions() is deprecated, use getUserHistory() instead",
-  );
-  return getUserHistory(idUser);
-}
-
-export async function predict(data) {
-  console.warn("predict() is deprecated, use createPrediction() instead");
-  return createPrediction(data);
-}
