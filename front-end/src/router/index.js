@@ -52,12 +52,12 @@ const routes = [
   {
     path: "/history",
     component: HistoryPage,
-    meta: { layout: "MainLayout", requiresAuth: false },
+    meta: { layout: "MainLayout", requiresAuth: true },
   },
   {
     path: "/dashboard/:id",
     component: DashboardPage,
-    meta: { layout: "MainLayout", requiresAuth: false },
+    meta: { layout: "MainLayout", requiresAuth: true },
   },
   {
     path: "/contact-support",

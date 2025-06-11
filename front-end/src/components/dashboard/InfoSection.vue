@@ -34,8 +34,6 @@ const jenisKelamin = computed(() => {
   return profile.jenisKelamin === "L" ? "Laki-laki" : "Perempuan";
 });
 
-const umur = computed(() => calculateAgeInMonths(predictionData.tangalLahir));
-
 const statusCirle = computed(() => getStatusCircleClass(statusStunting.value));
 
 const statusClass = computed(() => getStatusBadgeClass(statusStunting.value));
@@ -57,7 +55,7 @@ const userProfilePhoto = computed(() => {
       <div class="block md:hidden">
         <div class="flex flex-col items-center text-center gap-4 mb-4">
           <div
-            class="bg-quaternary rounded-full shadow-lg w-24 h-24 border-white border-2 overflow-hidden"
+            class="bg-quaternary rounded-full shadow-lg w-24 h-24 border-white border-2 overflow-hidden flex items-center justify-center"
             :class="{ 'p-3': !profile.fotoProfil }"
           >
             <img
@@ -70,7 +68,9 @@ const userProfilePhoto = computed(() => {
           </div>
           <div>
             <h2 class="font-bold">{{ profile.namaAnak }}</h2>
-            <p class="text-base my-2">{{ jenisKelamin }}, {{ umur }} bulan</p>
+            <p class="text-base my-2">
+              {{ jenisKelamin }}, {{ predictionData.usia }} bulan
+            </p>
 
             <div :class="statusClass">
               <span :class="statusCirle"></span>
@@ -120,7 +120,7 @@ const userProfilePhoto = computed(() => {
             <div class="flex-1">
               <h2 class="font-bold">{{ profile.namaAnak }}</h2>
               <p class="text-gray-600 text-sm">
-                {{ jenisKelamin }}, {{ umur }} bulan
+                {{ jenisKelamin }}, {{ predictionData.usia }} bulan
               </p>
             </div>
             <div class="flex-shrink-0 my-auto p-3">

@@ -10,8 +10,9 @@ import { useRoute } from "vue-router";
 
 import { storeToRefs } from "pinia";
 import { useAuthStore, useProfileStore } from "../stores/index.js";
-import { getPrediction, getUserHistory } from "../api/predict.js";
+import { getUserHistory } from "../api/predict.js";
 import ErrorMessage from "../components/ui/ErrorMessage.vue";
+import BelumPrediksi from "../components/riwayat/BelumPrediksi.vue";
 
 const route = useRoute();
 const profileStore = useProfileStore();
@@ -59,6 +60,11 @@ const latestPrediction = computed(() => {
 
   return validEntries[0];
 });
+
+const hasValidPrediction = computed(() => {
+  if (!historyData.value || historyData.value.length === 0) return false;
+  return historyData.value.some((entry) => entry.predictionId !== null);
+});
 </script>
 
 <template>
@@ -69,9 +75,14 @@ const latestPrediction = computed(() => {
 
     <div v-else>
       <ProfileSection />
-      <InfoSection :prediction-data="latestPrediction" :profile="profile" />
-      <ChartSection />
-      <AssessmentHistorySection />
+
+      <BelumPrediksi v-if="!hasValidPrediction" />
+
+      <div v-else>
+        <InfoSection :predictionData="latestPrediction" :profile="profile" />
+        <ChartSection :historyData="historyData" />
+        <AssessmentHistorySection />
+      </div>
     </div>
   </div>
 </template>

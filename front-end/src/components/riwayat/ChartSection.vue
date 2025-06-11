@@ -1,115 +1,48 @@
 <script setup>
-import { ref, computed } from "vue";
-import {
-  TrendingUp,
-  Weight,
-  Ruler,
-  Download,
-  FileText,
-  Share2,
-} from "lucide-vue-next";
+import { ref, computed, watch } from "vue";
 import ChartTemplate from "../template/ChartTemplate.vue";
 
-const selectedChart = ref("stunting-risk");
+import { processHistoryData, getChartConfigurations } from "../../utils/chart";
+import { CHART_TYPES, DEFAULT_CHART } from "../../utils/chart-config";
 
-const chartTypes = [
-  {
-    id: "stunting-risk",
-    title: "Riwayat Risiko Stunting",
-    description: "Persentase risiko stunting",
-    icon: TrendingUp,
+const props = defineProps({
+  historyData: {
+    type: Array,
+    default: () => [],
   },
-  {
-    id: "weight-progress",
-    title: "Progres Berat Badan",
-    description: "Perkembangan berat badan",
-    icon: Weight,
-  },
-  {
-    id: "height-progress",
-    title: "Progres Tinggi Badan",
-    description: "Perkembangan tinggi badan",
-    icon: Ruler,
-  },
-];
+});
 
-const chartData = {
-  "stunting-risk": {
-    title: "Riwayat Risiko Stunting",
-    info: "Grafik ini menunjukkan persentase risiko stunting anak Anda dari waktu ke waktu. Warna hijau menunjukkan risiko rendah (0-30%), kuning untuk risiko sedang (30-70%), dan merah untuk risiko tinggi (70-100%).",
-    data: {
-      riskData: [
-        { x: "3 mo", y: 15 },
-        { x: "6 mo", y: 25 },
-        { x: "9 mo", y: 35 },
-        { x: "12 mo", y: 45 },
-        { x: "15 mo", y: 55 },
-        { x: "18 mo", y: 60 },
-      ],
-    },
-  },
-  "weight-progress": {
-    title: "Progres Berat Badan",
-    info: "Grafik ini membandingkan berat badan anak Anda (garis ungu) dengan standar rata-rata WHO (garis abu-abu putus-putus). Pantau apakah pertumbuhan anak mengikuti kurva yang sehat.",
-    data: {
-      actualData: [
-        { x: "3 mo", y: 5.8 },
-        { x: "6 mo", y: 7.2 },
-        { x: "9 mo", y: 8.1 },
-        { x: "12 mo", y: 8.7 },
-        { x: "15 mo", y: 9.0 },
-        { x: "18 mo", y: 9.2 },
-      ],
-      standardData: [
-        { x: "3 mo", y: 6.2 },
-        { x: "6 mo", y: 7.8 },
-        { x: "9 mo", y: 8.9 },
-        { x: "12 mo", y: 9.6 },
-        { x: "15 mo", y: 10.1 },
-        { x: "18 mo", y: 10.4 },
-      ],
-    },
-  },
-  "height-progress": {
-    title: "Progres Tinggi Badan",
-    info: "Grafik ini membandingkan tinggi badan anak Anda (garis biru) dengan standar rata-rata WHO (garis abu-abu putus-putus). Tinggi badan yang konsisten mengikuti kurva pertumbuhan menunjukkan perkembangan yang sehat.",
-    data: {
-      actualData: [
-        { x: "3 mo", y: 61.0 },
-        { x: "6 mo", y: 66.5 },
-        { x: "9 mo", y: 70.2 },
-        { x: "12 mo", y: 73.1 },
-        { x: "15 mo", y: 75.0 },
-        { x: "18 mo", y: 76.5 },
-      ],
-      standardData: [
-        { x: "3 mo", y: 62.5 },
-        { x: "6 mo", y: 68.0 },
-        { x: "9 mo", y: 72.5 },
-        { x: "12 mo", y: 76.0 },
-        { x: "15 mo", y: 78.5 },
-        { x: "18 mo", y: 80.0 },
-      ],
-    },
-  },
-};
+const selectedChart = ref(DEFAULT_CHART);
 
-const currentChartConfig = computed(() => chartData[selectedChart.value]);
+const processedHistoryData = computed(() => {
+  return processHistoryData(props.historyData);
+});
 
-const exportChart = (format) => {
-  console.log(`Exporting chart as ${format}`);
-};
+const chartConfigurations = computed(() => {
+  return getChartConfigurations(processedHistoryData.value);
+});
 
-const shareChart = () => {
-  console.log("Sharing chart");
-  if (navigator.share) {
-    navigator.share({
-      title: currentChartConfig.value.title,
-      text: "Lihat perkembangan pertumbuhan anak saya di Early Nourish",
-      url: window.location.href,
-    });
-  }
-};
+const currentChartConfig = computed(() => {
+  const config = chartConfigurations.value[selectedChart.value];
+  console.log("Current chart config:", config);
+  return config;
+});
+
+const hasValidData = computed(() => {
+  return processedHistoryData.value.riskData.length > 0;
+});
+
+watch(
+  () => props.historyData,
+  (newData) => {
+    console.log("History data changed:", newData);
+  },
+  { deep: true },
+);
+
+watch(selectedChart, (newChart) => {
+  console.log("Selected chart changed:", newChart);
+});
 </script>
 
 <template>
@@ -119,32 +52,62 @@ const shareChart = () => {
         <h2 class="font-bold text-gray-800 mb-3">Pilih Jenis Grafik</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
           <button
-            v-for="chartType in chartTypes"
+            v-for="chartType in CHART_TYPES"
             :key="chartType.id"
             @click="selectedChart = chartType.id"
-            :class="
+            :class="[
+              'flex items-center gap-3 p-3 border-2 rounded-lg transition-colors',
               selectedChart === chartType.id
                 ? 'bg-secondary text-white border-secondary'
-                : 'bg-white text-gray-700 border-gray-300 hover:border-quaternary'
-            "
-            class="flex items-center gap-3 p-3 border-2 rounded-lg transition-colors"
+                : 'bg-white text-gray-700 border-gray-300 hover:border-quaternary',
+            ]"
           >
             <component :is="chartType.icon" class="h-5 w-5" />
             <div class="text-left">
               <div class="font-medium text-base md:text-sm">
                 {{ chartType.title }}
               </div>
-              <div class="text-xs opacity-75">{{ chartType.description }}</div>
+              <div class="text-xs opacity-75">
+                {{ chartType.description }}
+              </div>
             </div>
           </button>
         </div>
       </div>
 
+      <!-- Chart Display -->
       <ChartTemplate
+        v-if="hasValidData && currentChartConfig?.data"
         :title="currentChartConfig.title"
         :template="selectedChart"
         :data="currentChartConfig.data"
       />
+
+      <!-- No Data Message -->
+      <div v-else class="bg-white rounded-xl shadow-xl p-6 text-center">
+        <div class="text-gray-400 mb-4">
+          <svg
+            class="w-16 h-16 mx-auto"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            />
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-600 mb-2">Tidak Ada Data</h3>
+        <p class="text-gray-500">
+          Belum ada riwayat pemeriksaan untuk ditampilkan dalam grafik.
+        </p>
+        <p class="text-sm text-gray-400 mt-2">
+          Lakukan pemeriksaan pertama untuk melihat grafik perkembangan anak.
+        </p>
+      </div>
     </div>
   </section>
 </template>
