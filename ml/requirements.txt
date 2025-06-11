@@ -7,4 +7,3 @@ joblib
 numpy
 pandas
 scikit-learn
-pygrowup
