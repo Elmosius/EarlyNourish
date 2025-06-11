@@ -1,8 +1,29 @@
 {
-  "rewrites": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/assets/(.*)",
+      "headers": { "cache-control": "s-maxage=31536000,immutable" },
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/img/(.*)",
+      "headers": { "cache-control": "s-maxage=31536000,immutable" },
+      "dest": "/img/$1"
+    },
+    {
+      "src": "/favicon.ico",
+      "headers": { "cache-control": "s-maxage=31536000,immutable" },
+      "dest": "/favicon.ico"
+    },
+    {
+      "src": "/manifest.json",
+      "headers": { "cache-control": "s-maxage=86400" },
+      "dest": "/manifest.json"
+    },
+    { "handle": "filesystem" },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
