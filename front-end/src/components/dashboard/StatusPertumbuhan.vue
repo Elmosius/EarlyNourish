@@ -14,7 +14,6 @@ const { predictionData } = defineProps({
 });
 
 const processedStatuses = computed(() => {
-  console.log("predictionData:", predictionData);
   return processGrowthStatuses(predictionData);
 });
 </script>
