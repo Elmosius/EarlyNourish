@@ -25,7 +25,6 @@ class StuntingOutput(BaseModel):
     risikoStunting: str = Field(..., example="Normal", description="Prediksi risiko stunting anak")
     tindakan: List[str] = Field(..., example=["Lanjutkan pemantauan tumbuh kembang.", "Pastikan asupan gizi seimbang."], description="Saran tindakan yang direkomendasikan")
     nutrisi: List[str] = Field(..., example=["Pastikan asupan kalori cukup.", "Perbanyak sumber protein hewani dan nabati."], description="Saran nutrisi spesifik")
-    # Make z-score fields properly optional
     bbU: Optional[float] = Field(default=None, example=-1.2, description="Z-score berat badan menurut umur")
     tbU: Optional[float] = Field(default=None, example=-2.1, description="Z-score tinggi badan menurut umur")
     bbTb: Optional[float] = Field(default=None, example=-0.5, description="Z-score berat badan menurut tinggi badan")

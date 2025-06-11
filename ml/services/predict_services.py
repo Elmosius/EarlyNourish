@@ -4,21 +4,274 @@ import tensorflow as tf
 import joblib
 from schemas.predict_schemas import StuntingInput, StuntingOutput
 from core.config import settings
-from pygrowup import Calculator
+from pathlib import Path
+from typing import Optional, Dict, Any
 
-# Initialize pygrowup calculator
-calculator = Calculator(adjust_height_data=True, include_cdc=True, log_level='DEBUG')
+class WHOZScoreCalculator:
+    """
+    Calculator untuk menghitung z-score berdasarkan data WHO secara langsung
+    menggunakan metode LMS (Lambda-Mu-Sigma)
+    """
+    
+    def __init__(self, data_folder_path: str = None):
+        if data_folder_path is None:
+            current_file_dir = Path(__file__).parent.absolute()
+            self.data_folder = current_file_dir.parent / "data_who"
+        else:
+            self.data_folder = Path(data_folder_path)
+        
+        self.tables = {}
+        self._load_who_tables()
+    
+    def _load_who_tables(self):
+        """Load semua tabel WHO yang diperlukan"""
+        try:
+            # Mapping file names
+            file_mappings = {
+                'wfa_boys': 'data-who-berat-lk.csv',     
+                'wfa_girls': 'data-who-berat-pr.csv',       
+                'hfa_boys': 'data-who-tinggi-lk.csv',    
+                'hfa_girls': 'data-who-tinggi-pr.csv',   
+                'wfh_boys': 'data-who-berat-tinggi-lk.csv',
+                'wfh_girls': 'data-who-berat-tinggi-pr.csv' 
+            }
+            
+            for table_name, filename in file_mappings.items():
+                file_path = self.data_folder / filename
+                
+                if file_path.exists():
+                    df = pd.read_csv(file_path)
+                    df.columns = df.columns.str.strip()
+                    
+                    # Standardize column names
+                    if 'Month' in df.columns:
+                        df = df.rename(columns={'Month': 'age_key'})
+                    elif 'Length' in df.columns:
+                        df = df.rename(columns={'Length': 'age_key'})
+                    
+                    self.tables[table_name] = df.set_index('age_key')
+                    
+        except Exception as e:
+            self.tables = {}
+    
+    def _interpolate_lms(self, df: pd.DataFrame, key_value: float) -> Optional[Dict[str, float]]:
+        """
+        Interpolasi nilai L, M, S dari tabel WHO untuk key_value tertentu
+        """
+        if df is None or df.empty:
+            return None
+            
+        try:
+            # Exact match
+            if key_value in df.index:
+                row = df.loc[key_value]
+                return {
+                    'L': float(row['L']),
+                    'M': float(row['M']), 
+                    'S': float(row['S'])
+                }
+            
+            # Interpolation
+            available_keys = df.index.values
+            lower_keys = available_keys[available_keys <= key_value]
+            upper_keys = available_keys[available_keys >= key_value]
+            
+            if len(lower_keys) == 0:
+                min_key = available_keys.min()
+                row = df.loc[min_key]
+                return {
+                    'L': float(row['L']),
+                    'M': float(row['M']),
+                    'S': float(row['S'])
+                }
+            
+            if len(upper_keys) == 0:
+                max_key = available_keys.max()
+                row = df.loc[max_key]
+                return {
+                    'L': float(row['L']),
+                    'M': float(row['M']),
+                    'S': float(row['S'])
+                }
+            
+            # Linear interpolation
+            x0 = lower_keys.max()
+            x1 = upper_keys.min()
+            
+            if x0 == x1:
+                row = df.loc[x0]
+                return {
+                    'L': float(row['L']),
+                    'M': float(row['M']),
+                    'S': float(row['S'])
+                }
+            
+            row0 = df.loc[x0]
+            row1 = df.loc[x1]
+            
+            factor = (key_value - x0) / (x1 - x0)
+            
+            return {
+                'L': float(row0['L'] + factor * (row1['L'] - row0['L'])),
+                'M': float(row0['M'] + factor * (row1['M'] - row0['M'])),
+                'S': float(row0['S'] + factor * (row1['S'] - row0['S']))
+            }
+            
+        except Exception:
+            return None
+    
+    def _calculate_zscore_lms(self, measurement: float, L: float, M: float, S: float) -> Optional[float]:
+        """
+        Hitung z-score menggunakan metode LMS
+        Formula: Z = ((measurement/M)^L - 1) / (L * S)
+        Jika L = 0, gunakan: Z = ln(measurement/M) / S
+        """
+        try:
+            if L == 0:
+                z_score = np.log(measurement / M) / S
+            else:
+                z_score = (((measurement / M) ** L) - 1) / (L * S)
+            
+            if np.isnan(z_score) or np.isinf(z_score):
+                return None
+                
+            return round(float(z_score), 2)
+            
+        except Exception:
+            return None
+    
+    def get_weight_for_age_zscore(self, weight_kg: float, age_months: int, gender: str) -> Optional[float]:
+        """Hitung Weight-for-Age z-score (BBU)"""
+        try:
+            table_key = 'wfa_boys' if gender.upper() in ['L', 'LAKI', 'M', 'MALE'] else 'wfa_girls'
+            
+            if table_key not in self.tables:
+                return None
+            
+            lms = self._interpolate_lms(self.tables[table_key], age_months)
+            if not lms:
+                return None
+            
+            return self._calculate_zscore_lms(weight_kg, lms['L'], lms['M'], lms['S'])
+            
+        except Exception:
+            return None
+    
+    def get_height_for_age_zscore(self, height_cm: float, age_months: int, gender: str) -> Optional[float]:
+        """Hitung Height-for-Age z-score (TBU)"""
+        try:
+            table_key = 'hfa_boys' if gender.upper() in ['L', 'LAKI', 'M', 'MALE'] else 'hfa_girls'
+            
+            if table_key not in self.tables:
+                return None
+            
+            lms = self._interpolate_lms(self.tables[table_key], age_months)
+            if not lms:
+                return None
+            
+            return self._calculate_zscore_lms(height_cm, lms['L'], lms['M'], lms['S'])
+            
+        except Exception:
+            return None
+    
+    def get_weight_for_height_zscore(self, weight_kg: float, height_cm: float, gender: str) -> Optional[float]:
+        """Hitung Weight-for-Height z-score (BBTB)"""
+        try:
+            table_key = 'wfh_boys' if gender.upper() in ['L', 'LAKI', 'M', 'MALE'] else 'wfh_girls'
+            
+            if table_key not in self.tables:
+                return None
+            
+            lms = self._interpolate_lms(self.tables[table_key], height_cm)
+            if not lms:
+                return None
+            
+            return self._calculate_zscore_lms(weight_kg, lms['L'], lms['M'], lms['S'])
+            
+        except Exception:
+            return None
+    
+    def calculate_all_zscores(self, gender: str, age_months: int, weight_kg: float, height_cm: float) -> Dict[str, Optional[float]]:
+        """Hitung semua z-scores sekaligus"""
+        results = {}
+        
+        # Weight-for-Age (BBU)
+        results['bbU'] = self.get_weight_for_age_zscore(weight_kg, age_months, gender)
+        
+        # Height-for-Age (TBU)  
+        results['tbU'] = self.get_height_for_age_zscore(height_cm, age_months, gender)
+        
+        # Weight-for-Height (BBTB)
+        results['bbTb'] = self.get_weight_for_height_zscore(weight_kg, height_cm, gender)
+        
+        return results
 
+# Load models and encoders
 try:
     model = tf.keras.models.load_model(settings.MODEL_STUNTING_H5_PATH)
     scaler = joblib.load(settings.SCALER_STUNTING_PKL_PATH)
     status_encoder = joblib.load(settings.STATUS_ENCODER_PKL_PATH)
-    print("Models and encoders loaded successfully!")
 except Exception as e:
-    print(f"Error loading models/encoders: {e}")
     model = None
     scaler = None
     status_encoder = None
+
+# Initialize WHO Calculator
+try:
+    who_calculator = WHOZScoreCalculator()
+except Exception as e:
+    who_calculator = None
+
+def validate_input_data(gender, age_months, weight_kg, height_cm):
+    """Validasi input data sebelum kalkulasi z-score"""
+    errors = []
+    
+    # Validasi gender
+    if gender.upper() not in ['L', 'P']:
+        errors.append(f"Gender tidak valid: {gender}. Hanya 'L' (Laki-laki) atau 'P' (Perempuan) yang diterima.")
+    
+    # Validasi umur (0-240 bulan = 0-20 tahun)
+    if age_months < 0 or age_months > 240:
+        errors.append(f"Umur di luar rentang normal: {age_months} bulan")
+    
+    # Validasi berat badan berdasarkan umur
+    if age_months <= 60:  # 0-5 tahun
+        if weight_kg < 1.5 or weight_kg > 50:
+            errors.append(f"Berat badan tidak wajar untuk usia {age_months} bulan: {weight_kg} kg")
+    else:  # 5-20 tahun
+        if weight_kg < 5 or weight_kg > 150:
+            errors.append(f"Berat badan tidak wajar untuk usia {age_months} bulan: {weight_kg} kg")
+    
+    # Validasi tinggi badan berdasarkan umur
+    if age_months <= 24:  # 0-2 tahun (panjang badan)
+        if height_cm < 40 or height_cm > 110:
+            errors.append(f"Panjang badan tidak wajar untuk usia {age_months} bulan: {height_cm} cm")
+    elif age_months <= 60:  # 2-5 tahun
+        if height_cm < 70 or height_cm > 130:
+            errors.append(f"Tinggi badan tidak wajar untuk usia {age_months} bulan: {height_cm} cm")
+    else:  # 5-20 tahun
+        if height_cm < 90 or height_cm > 220:
+            errors.append(f"Tinggi badan tidak wajar untuk usia {age_months} bulan: {height_cm} cm")
+    
+    return errors
+
+def calculate_zscores(gender: str, age_months: int, weight_kg: float, height_cm: float):
+    """Fungsi utama untuk menghitung z-score menggunakan WHO calculator"""
+    
+    # Validasi input
+    validation_errors = validate_input_data(gender, age_months, weight_kg, height_cm)
+    if validation_errors:
+        return None, None, None
+    
+    # Gunakan WHO calculator
+    if who_calculator and who_calculator.tables:
+        try:
+            results = who_calculator.calculate_all_zscores(gender, age_months, weight_kg, height_cm)
+            return results.get('bbU'), results.get('tbU'), results.get('bbTb')
+        except Exception:
+            return None, None, None
+    
+    return None, None, None
 
 def get_recommendations_by_age_and_status(age_months, status):
     """Generate recommendations based on age group and stunting status"""
@@ -122,78 +375,6 @@ def get_recommendations_by_age_and_status(age_months, status):
             
     return tindakan, nutrisi
 
-def calculate_zscores(gender, age_months, weight_kg, height_cm):
-    """Calculate z-scores using pygrowup library"""
-    # Convert gender to format expected by pygrowup (M/F)
-    gender_formatted = "M" if gender.upper() == "L" else "F"
-    
-    # Initialize results
-    bbU = None
-    tbU = None
-    bbTb = None
-    
-    if age_months < 0 or age_months > 240:
-        print(f"Warning: Age {age_months} months is outside the typical range covered by WHO/CDC growth standards (0-240 months).")
-    elif age_months > 60:
-        print(f"Info: Age {age_months} months is outside WHO standard range (0-60 months), attempting calculation with CDC standards.")
-
-    if weight_kg <= 0.5 or weight_kg > 150:
-        print(f"Warning: Weight {weight_kg} kg is an extreme value.")
-    if height_cm <= 30 or height_cm > 220:
-        print(f"Warning: Height {height_cm} cm is an extreme value.")
-    
-    # Calculate BBU (Weight-for-age) - Use positional arguments
-    try:
-        bbU_result = calculator.wfa(weight_kg, age_months, gender_formatted)
-        print(f"BBU calculation result: {bbU_result}")
-        bbU = round(float(bbU_result), 2) if bbU_result is not None else None
-    except Exception as e:
-        print(f"Error calculating BBU: {e}")
-    
-    # Calculate TBU (Length/Height-for-age) - Use positional arguments
-    try:
-        tbU_result = calculator.lhfa(height_cm, age_months, gender_formatted)
-        print(f"TBU calculation result: {tbU_result}")
-        tbU = round(float(tbU_result), 2) if tbU_result is not None else None
-    except Exception as e:
-        print(f"Error calculating TBU: {e}")
-    
-    # Calculate BBTB (Weight-for-length/height) - Try multiple approaches
-    try:
-        # First try: Standard weight-for-length
-        bbTb_result = calculator.wfl(weight_kg, height_cm, gender_formatted)
-        print(f"BBTB calculation result: {bbTb_result}")
-        bbTb = round(float(bbTb_result), 2) if bbTb_result is not None else None
-    except Exception as e:
-        print(f"Error calculating BBTB with wfl: {e}")
-        try:
-            # Second try: Weight-for-height
-            bbTb_result = calculator.wfh(weight_kg, height_cm, gender_formatted)
-            print(f"BBTB alternative calculation result: {bbTb_result}")
-            bbTb = round(float(bbTb_result), 2) if bbTb_result is not None else None
-        except Exception as e_alt:
-            print(f"Alternative BBTB calculation also failed: {e_alt}")
-            try:
-                # Third try: Calculate BMI and then use BMI-for-age as approximation
-                # This is a reasonable fallback when direct WFL/WFH fails
-                bmi = weight_kg / ((height_cm / 100) ** 2)
-                bbTb_result = calculator.bfa(bmi, age_months, gender_formatted)
-                print(f"BBTB fallback using BMI-for-age: {bbTb_result}")
-                bbTb = round(float(bbTb_result), 2) if bbTb_result is not None else None
-            except Exception as e_bmi:
-                print(f"BMI-for-age calculation also failed: {e_bmi}")
-                
-                # If all else fails, provide an estimate based on the ratio of BBU and TBU
-                if bbU is not None and tbU is not None:
-                    # This is an approximation formula based on the relationship between
-                    # weight-for-age, height-for-age and weight-for-height
-                    estimated_bbTb = bbU - (0.7 * tbU)
-                    bbTb = round(float(estimated_bbTb), 2)
-                    print(f"BBTB estimated from BBU and TBU: {bbTb}")
-    
-    print(f"Final z-scores to be returned: bbU={bbU}, tbU={tbU}, bbTb={bbTb}")
-    return bbU, tbU, bbTb
-
 async def get_stunting_prediction(data: StuntingInput) -> StuntingOutput:
     if not all([model, scaler, status_encoder]):
         return StuntingOutput(
@@ -205,27 +386,15 @@ async def get_stunting_prediction(data: StuntingInput) -> StuntingOutput:
             bbTb=None
         )
 
-    print(f"Menerima data untuk prediksi: {data.model_dump()}")
-
-    # Calculate z-scores using pygrowup
+    # Kalkulasi z-score dengan WHO calculator
     bbU, tbU, bbTb = calculate_zscores(
         gender=data.jk,
         age_months=data.umur,
         weight_kg=data.bb,
         height_cm=data.tb
     )
-    
-    # Print the calculated values immediately after function returns
-    print(f"After calculation function - Raw values: bbU={bbU}, tbU={tbU}, bbTb={bbTb}")
-    
-    # Explicitly convert values to float or None for Pydantic model
-    bbU_value = float(bbU) if bbU is not None else None
-    tbU_value = float(tbU) if tbU is not None else None
-    bbTb_value = float(bbTb) if bbTb is not None else None
-    
-    print(f"After explicit conversion - Values: bbU={bbU_value}, tbU={tbU_value}, bbTb={bbTb_value}")
 
-    # 1. Preprocess input data
+    # Preprocess input data untuk model ML
     jk_encoded = 0 if data.jk.upper() == "P" else 1
 
     nama_kolom = ["JK", "BB_Lahir", "TB_Lahir", "Umur", "Berat", "Tinggi"]
@@ -241,29 +410,28 @@ async def get_stunting_prediction(data: StuntingInput) -> StuntingOutput:
         ]
     ], columns=nama_kolom)
 
-    # 2. Scale features
+    # Scale features
     fitur_scaled = scaler.transform(fitur_input_df)
 
-    # 3. Make prediction
+    # Make prediction
     pred = model.predict(fitur_scaled)
     pred_label = np.argmax(pred, axis=1)
 
-    # 4. Decode prediction
+    # Decode prediction
     status_prediksi = status_encoder.inverse_transform(pred_label)
     predicted_status = status_prediksi[0]
     
-    print(f"Prediksi status stunting: {predicted_status}")
-    print(f"Right before return - Z-scores: bbU={bbU_value}, tbU={tbU_value}, bbTb={bbTb_value}")
+    # Get age-specific and status-specific recommendations
+    tindakan_list, nutrisi_list = get_recommendations_by_age_and_status(
+        data.umur, predicted_status
+    )
     
-    # 5. Get age-specific and status-specific recommendations
-    tindakan_list, nutrisi_list = get_recommendations_by_age_and_status(data.umur, predicted_status)
-    
-    # Create and return result using direct values (no intermediate variable references)
+    # Return final result
     return StuntingOutput(
         risikoStunting=predicted_status,
         tindakan=tindakan_list,
         nutrisi=nutrisi_list,
-        bbU=bbU_value,
-        tbU=tbU_value,
-        bbTb=bbTb_value
+        bbU=bbU,
+        tbU=tbU,
+        bbTb=bbTb
     )
