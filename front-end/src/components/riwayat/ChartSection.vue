@@ -24,7 +24,6 @@ const chartConfigurations = computed(() => {
 
 const currentChartConfig = computed(() => {
   const config = chartConfigurations.value[selectedChart.value];
-  console.log("Current chart config:", config);
   return config;
 });
 

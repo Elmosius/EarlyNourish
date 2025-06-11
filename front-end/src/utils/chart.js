@@ -92,8 +92,6 @@ export const transformToChartData = (entries, dataType) => {
 };
 
 export const processHistoryData = (historyData) => {
-  console.log("Processing history data:", historyData);
-
   // Get valid entries
   const validEntries = getValidHistoryEntries(historyData);
 
@@ -131,16 +129,6 @@ export const processHistoryData = (historyData) => {
   const riskData = transformToChartData(validEntries, "risk");
   const weightData = transformToChartData(validEntries, "weight");
   const heightData = transformToChartData(validEntries, "height");
-
-  console.log("Processed data:", {
-    riskDataCount: riskData.length,
-    weightDataCount: weightData.length,
-    heightDataCount: heightData.length,
-    whoWeightDataCount: whoWeightData.length,
-    whoHeightDataCount: whoHeightData.length,
-    gender: gender,
-    ageRange: ageRange,
-  });
 
   return {
     riskData,

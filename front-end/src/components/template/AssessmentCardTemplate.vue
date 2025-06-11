@@ -1,4 +1,6 @@
 <script setup>
+import { useRouter } from 'vue-router'
+
 const props = defineProps({
   assessment: {
     type: Object,
@@ -7,6 +9,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["view-details", "show-menu"]);
+const router = useRouter();
 
 const getRiskBadgeClass = (riskLevel) => {
   const baseClass = "inline-block ";
@@ -28,6 +31,14 @@ const formatDate = (dateString) => {
     month: "short",
     day: "numeric",
   });
+};
+
+const handleViewDetails = () => {
+  // Navigasi ke halaman dashboard detail dengan predictionId
+  router.push(`/dashboard/${props.assessment.predictionId}`);
+
+  // Emit untuk parent component jika masih diperlukan
+  emit('view-details', props.assessment);
 };
 </script>
 
@@ -58,7 +69,7 @@ const formatDate = (dateString) => {
           </p>
 
           <button
-            @click="$emit('view-details', assessment)"
+            @click="handleViewDetails"
             class="md:hidden text-blue-600 hover:text-blue-700 text-base font-medium transition-colors"
           >
             Lihat Rincian
@@ -66,13 +77,12 @@ const formatDate = (dateString) => {
         </div>
 
         <div class="hidden md:block my-1 mx-2">
-          <a
-            href=""
-            @click="$emit('view-details', assessment)"
-            class="text-blue-600 hover:text-blue-700 text-base font-medium transition-colors"
+          <button
+            @click="handleViewDetails"
+            class="text-blue-600 hover:text-blue-700 text-base font-medium transition-colors hover:underline cursor-pointer"
           >
             Lihat Rincian
-          </a>
+          </button>
         </div>
       </div>
 

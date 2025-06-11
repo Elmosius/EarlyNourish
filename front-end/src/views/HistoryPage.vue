@@ -81,7 +81,7 @@ const hasValidPrediction = computed(() => {
       <div v-else>
         <InfoSection :predictionData="latestPrediction" :profile="profile" />
         <ChartSection :historyData="historyData" />
-        <AssessmentHistorySection />
+        <AssessmentHistorySection :historyData="historyData" />
       </div>
     </div>
   </div>

@@ -71,8 +71,6 @@ const getRiskColor = (value) => {
 };
 
 const chartSeries = computed(() => {
-  console.log("Chart series data:", props.data);
-
   if (props.template === "stunting-risk") {
     return [
       {

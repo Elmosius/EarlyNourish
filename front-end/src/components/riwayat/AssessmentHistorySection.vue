@@ -3,6 +3,20 @@ import { ref, computed, onMounted } from "vue";
 import { FileText } from "lucide-vue-next";
 import AssessmentTimelineCard from "../template/AssessmentCardTemplate.vue";
 
+import {
+  getFilteredAssessments,
+  FILTER_OPTIONS,
+  SORT_OPTIONS,
+} from "../../utils/assessment";
+import LoadingSpinner2 from "../ui/LoadingSpinner2.vue";
+
+const props = defineProps({
+  historyData: {
+    type: Array,
+    default: () => [],
+  },
+});
+
 const emit = defineEmits(["view-details", "show-menu", "load-more"]);
 
 const selectedFilter = ref("all");
@@ -10,127 +24,28 @@ const sortOrder = ref("newest");
 const isLoading = ref(false);
 const hasMoreData = ref(true);
 
-const sampleAssessments = ref([
-  {
-    id: 1,
-    ageLabel: "Usia 18 Bulan",
-    date: "2025-05-05",
-    height: 76.5,
-    weight: 9.2,
-    heightByAge: -2.1,
-    weightByAge: -1.8,
-    riskPercentage: 60,
-    riskLevel: 60,
-    bmi: 15.7,
-  },
-  {
-    id: 2,
-    ageLabel: "Usia 15 Bulan",
-    date: "2025-02-15",
-    height: 74.8,
-    weight: 8.8,
-    heightByAge: -2.0,
-    weightByAge: -1.5,
-    riskPercentage: 58,
-    riskLevel: 58,
-    bmi: 15.3,
-  },
-  {
-    id: 3,
-    ageLabel: "Usia 12 Bulan",
-    date: "2024-11-12",
-    height: 72.5,
-    weight: 9.4,
-    heightByAge: -1.8,
-    weightByAge: -1.2,
-    riskPercentage: 52,
-    riskLevel: 52,
-    bmi: 17.9,
-  },
-  {
-    id: 4,
-    ageLabel: "Usia 9 Bulan",
-    date: "2024-08-17",
-    height: 69.8,
-    weight: 7.9,
-    heightByAge: -1.6,
-    weightByAge: -1.0,
-    riskPercentage: 45,
-    riskLevel: 45,
-    bmi: 16.2,
-  },
-  {
-    id: 5,
-    ageLabel: "Usia 6 Bulan",
-    date: "2024-05-13",
-    height: 65.7,
-    weight: 7.1,
-    heightByAge: -1.2,
-    weightByAge: -0.8,
-    riskPercentage: 28,
-    riskLevel: 28,
-    bmi: 16.4,
-  },
-  {
-    id: 6,
-    ageLabel: "Usia 3 Bulan",
-    date: "2024-02-15",
-    height: 60.1,
-    weight: 5.8,
-    heightByAge: -0.8,
-    weightByAge: -0.5,
-    riskPercentage: 15,
-    riskLevel: 15,
-    bmi: 16.1,
-  },
-]);
+const processedAssessments = computed(() => {
+  return getFilteredAssessments(
+    props.historyData,
+    selectedFilter.value,
+    sortOrder.value,
+  );
+});
 
-const filteredAssessments = computed(() => {
-  let filtered = [...sampleAssessments.value];
+const hasAssessments = computed(() => {
+  return props.historyData && props.historyData.length > 0;
+});
 
-  // Apply filter
-  switch (selectedFilter.value) {
-    case "high-risk":
-      filtered = filtered.filter((a) => a.riskLevel >= 70);
-      break;
-    case "medium-risk":
-      filtered = filtered.filter((a) => a.riskLevel >= 30 && a.riskLevel < 70);
-      break;
-    case "low-risk":
-      filtered = filtered.filter((a) => a.riskLevel < 30);
-      break;
-    case "recent":
-      const threeMonthsAgo = new Date();
-      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-      filtered = filtered.filter((a) => new Date(a.date) >= threeMonthsAgo);
-      break;
-  }
-
-  // Apply sorting
-  switch (sortOrder.value) {
-    case "newest":
-      filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-      break;
-    case "oldest":
-      filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
-      break;
-    case "risk-high":
-      filtered.sort((a, b) => b.riskLevel - a.riskLevel);
-      break;
-    case "risk-low":
-      filtered.sort((a, b) => a.riskLevel - b.riskLevel);
-      break;
-  }
-
-  return filtered;
+const hasValidAssessments = computed(() => {
+  return processedAssessments.value.length > 0;
 });
 
 const applyFilter = () => {
-  console.log("Filter applied:", selectedFilter.value);
+  // Computed will automatically recalculate
 };
 
 const applySorting = () => {
-  console.log("Sorting applied:", sortOrder.value);
+  // Computed will automatically recalculate
 };
 
 const handleViewDetails = (assessment) => {
@@ -143,16 +58,23 @@ const handleShowMenu = (assessment) => {
 
 const loadMore = () => {
   isLoading.value = true;
-  // Simulate API call
+
   setTimeout(() => {
     isLoading.value = false;
-    hasMoreData.value = false; // For demo purposes
+    hasMoreData.value = false;
     emit("load-more");
   }, 1000);
 };
 
+const debugData = () => {
+  if (props.historyData && props.historyData.length > 0) {
+    console.log("Sample data structure:", props.historyData[0]);
+    console.log("Available fields:", Object.keys(props.historyData[0]));
+  }
+};
+
 onMounted(() => {
-  console.log("Assessment History Section mounted");
+  // debugData();
 });
 </script>
 
@@ -162,59 +84,105 @@ onMounted(() => {
       <div class="flex justify-between items-center mb-8">
         <h2 class="font-bold text-gray-800">Riwayat Asesmen</h2>
 
-        <div class="items-center gap-3">
+        <div class="items-center gap-3" v-if="hasAssessments">
           <select
             v-model="selectedFilter"
             @change="applyFilter"
             class="text-base md:text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-tertiary bg-white my-2 mx-2"
           >
-            <option value="all">Semua</option>
-            <option value="high-risk">Risiko Tinggi</option>
-            <option value="medium-risk">Risiko Sedang</option>
-            <option value="low-risk">Risiko Rendah</option>
-            <option value="recent">3 Bulan Terakhir</option>
+            <option
+              v-for="option in FILTER_OPTIONS"
+              :key="option.value"
+              :value="option.value"
+            >
+              {{ option.label }}
+            </option>
           </select>
+
           <select
             v-model="sortOrder"
             @change="applySorting"
             class="text-base md:text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-tertiary bg-white mx-2"
           >
-            <option value="newest">Terbaru</option>
-            <option value="oldest">Terlama</option>
-            <option value="risk-high">Risiko Tertinggi</option>
-            <option value="risk-low">Risiko Terendah</option>
+            <option
+              v-for="option in SORT_OPTIONS"
+              :key="option.value"
+              :value="option.value"
+            >
+              {{ option.label }}
+            </option>
           </select>
         </div>
       </div>
 
-      <div class="relative">
-        <div
-          v-if="filteredAssessments.length > 0"
-          class="absolute left-2 top-0 bottom-0 w-0.5 bg-gray-200 z-0"
-        ></div>
+      <div class="relative" v-if="hasValidAssessments">
+        <div class="absolute left-2 top-0 bottom-0 w-0.5 bg-gray-200 z-0"></div>
 
         <div class="space-y-6">
           <AssessmentTimelineCard
-            v-for="assessment in filteredAssessments"
+            v-for="assessment in processedAssessments"
             :key="assessment.id"
             :assessment="assessment"
             @view-details="handleViewDetails"
             @show-menu="handleShowMenu"
           />
         </div>
+
+        <div
+          v-if="hasMoreData && processedAssessments.length >= 10"
+          class="text-center mt-8"
+        >
+          <button
+            @click="loadMore"
+            :disabled="isLoading"
+            class="bg-secondary text-white px-6 py-2 rounded-lg hover:bg-secondary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <LoadingSpinner2 v-if="isLoading" />
+            <span class="text-base">Memuat lebih banyak</span>
+          </button>
+        </div>
       </div>
 
-      <div v-if="filteredAssessments.length === 0" class="text-center py-16">
+      <div v-else class="text-center py-16">
         <div class="text-gray-400 mb-4">
           <FileText class="h-20 w-20 mx-auto" />
         </div>
-        <h3 class="font-medium text-gray-600 mb-2 text-lg">
-          Tidak ada data asesmen
-        </h3>
-        <p class="text-gray-500">
-          Belum ada riwayat asesmen yang tersedia untuk filter yang dipilih.
-        </p>
+
+        <div v-if="!hasAssessments">
+          <h3 class="font-medium text-gray-600 mb-2 text-lg">
+            Belum Ada Riwayat Asesmen
+          </h3>
+          <p class="text-gray-500">
+            Lakukan asesmen pertama untuk melihat riwayat perkembangan anak
+            Anda.
+          </p>
+        </div>
+
+        <div v-else>
+          <h3 class="font-medium text-gray-800 mb-2">Tidak Ada Data Asesmen</h3>
+          <p class="text-gray-500 text-base">
+            Belum ada riwayat asesmen yang tersedia untuk filter yang dipilih.
+          </p>
+          <button
+            @click="
+              selectedFilter = 'all';
+              sortOrder = 'newest';
+            "
+            class="mt-4 text-secondary hover:text-secondary/80 underline text-sm"
+          >
+            Reset Filter
+          </button>
+        </div>
       </div>
     </div>
   </section>
 </template>
+
+<style scoped>
+.transition-colors {
+  transition:
+    background-color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out,
+    color 0.2s ease-in-out;
+}
+</style>
