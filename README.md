@@ -2,6 +2,32 @@
 
 Ini adalah aplikasi frontend untuk proyek Early Nourish, menyediakan antarmuka pengguna untuk berinteraksi dengan layanan Early Nourish.
 
+## Teknologi yang Digunakan
+
+Berikut adalah beberapa teknologi utama dan pustaka (library) yang digunakan dalam pengembangan aplikasi frontend ini:
+
+- **Framework Utama:**
+  - [Vue.js](https://vuejs.org/): Framework JavaScript progresif untuk membangun antarmuka pengguna.
+- **Build Tool & Development Server:**
+  - [Vite](https://vitejs.dev/): Alat build frontend generasi berikutnya yang sangat cepat.
+- **Routing:**
+  - [Vue Router](https://router.vuejs.org/): Library routing resmi untuk Vue.js.
+- **State Management:**
+  - [Pinia](https://pinia.vuejs.org/): Library state management yang intuitif untuk Vue.js.
+- **Styling:**
+  - [Tailwind CSS](https://tailwindcss.com/): Framework CSS utility-first untuk desain kustom yang cepat.
+- **HTTP Client:**
+  - [Axios](https://axios-http.com/): Klien HTTP berbasis Promise untuk browser dan Node.js.
+- **Charting/Grafik:**
+  - [ApexCharts](https://apexcharts.com/): Library grafik interaktif modern.
+  - [Vue3-ApexCharts](https://github.com/apexcharts/vue3-apexcharts): Komponen Vue.js untuk ApexCharts.
+- **Icons:**
+  - [Lucide Vue Next](https://lucide.dev/guide/packages/lucide-vue-next): Paket ikon SVG yang indah dan konsisten.
+- **CSV Parsing:**
+  - [Papaparse](https://www.papaparse.com/): Parser CSV in-browser yang cepat dan powerful.
+- **Alat Pengembangan (Development Tools):**
+  - [Prettier](https://prettier.io/): Formatter kode.
+
 ## Akses Publik Aplikasi Frontend
 Aplikasi frontend dapat diakses secara publik melalui URL berikut:
 [https://early-nourish.vercel.app](https://early-nourish.vercel.app)
