@@ -2,6 +2,37 @@
 
 Ini adalah layanan backend untuk proyek Early Nourish, menyediakan API untuk autentikasi pengguna, manajemen data, dan komunikasi dengan layanan ML.
 
+## Teknologi yang Digunakan
+
+Berikut adalah beberapa teknologi utama dan pustaka (library) yang digunakan dalam pengembangan layanan backend ini:
+
+- **Framework Utama:**
+  - [@hapi/hapi](https://hapi.dev/): Framework untuk membangun aplikasi dan layanan web.
+- **Database:**
+  - [Mongoose](https://mongoosejs.com/): ODM (Object Data Modeling) library untuk MongoDB.
+- **Autentikasi & Keamanan:**
+  - [@hapi/jwt](https://hapi.dev/module/jwt/): Plugin Hapi untuk otentikasi JWT.
+  - [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken): Implementasi JSON Web Tokens.
+  - [bcrypt](https://github.com/kelektiv/node.bcrypt.js): Library untuk hashing password.
+- **Messaging Queue:**
+  - [amqplib](https://github.com/squaremo/amqp.node): Klien AMQP untuk RabbitMQ.
+- **HTTP Client:**
+  - [axios](https://axios-http.com/): Klien HTTP berbasis Promise untuk browser dan Node.js.
+- **Manajemen Environment:**
+  - [dotenv](https://github.com/motdotla/dotenv): Memuat variabel environment dari file `.env`.
+- **Validasi Data:**
+  - [joi](https://joi.dev/): Skema deskripsi dan validator data yang powerful.
+- **Notifikasi Push:**
+  - [web-push](https://github.com/web-push-libs/web-push): Library untuk mengirim notifikasi push.
+- **Utilitas Lainnya:**
+  - [nanoid](https://github.com/ai/nanoid): Generator ID unik yang kecil dan aman.
+  - [auto-bind](https://github.com/sindresorhus/auto-bind): Mengikat metode secara otomatis ke instance.
+- **Alat Pengembangan (Development Tools):**
+  - [Nodemon](https://nodemon.io/): Memantau perubahan file dan me-restart server secara otomatis.
+  - [ESLint](https://eslint.org/): Alat linting untuk JavaScript.
+  - [Prettier](https://prettier.io/): Formatter kode.
+  - [Jest](https://jestjs.io/): Framework testing JavaScript.
+
 ## Akses Publik Layanan Backend
 Layanan backend dapat diakses secara publik melalui URL berikut:
 [http://3.0.101.147](http://3.0.101.147)
