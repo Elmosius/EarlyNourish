@@ -73,5 +73,3 @@ Anda dapat menggunakan URL ini untuk melihat endpoint yang tersedia dan berinter
 Setelah layanan berjalan, dokumentasi API (disediakan oleh Swagger UI FastAPI) dapat diakses di:
 [http://localhost:8000/docs](http://localhost:8000/docs)
 
-Skema OpenAPI tersedia di:
-[http://localhost:8000/openapi.json](http://localhost:8000/openapi.json)
