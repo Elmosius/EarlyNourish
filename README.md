@@ -75,11 +75,11 @@ Berikut adalah URL untuk mengakses berbagai komponen aplikasi Early Nourish yang
   - *Catatan: Backend API masih menggunakan HTTP. Jika ada masalah tampilan/fungsionalitas, nonaktifkan sementara fitur 'secure browser' yang memblokir konten campuran.*
 
 - **Layanan Backend (API):**
-  - URL: [http://3.0.101.147](http://3.0.101.147)
+  - URL: [api-be-earlynourish.accesscam.org](https://api-be-earlynourish.accesscam.org/)
   - Spesifikasi API Lengkap: [Lihat Dokumen Google Docs](https://docs.google.com/document/d/e/2PACX-1vT-Xnj15juPZrIf6XIM5KhnbTWI0JfqC1B8D7FWT38mNl9kzC6qESgTvN0AHyp_m7HQJlsJaLMJoK-J/pub)
 
 - **Layanan Machine Learning (Dokumentasi API):**
-  - URL: [http://13.250.122.70/docs](http://13.250.122.70/docs)
+  - URL: [api-ml-earlynourish.ddnsgeek.com/docs](https://api-ml-earlynourish.ddnsgeek.com/)
 
 <br>
 
