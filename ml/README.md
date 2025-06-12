@@ -65,11 +65,11 @@ Layanan ini menggunakan Uvicorn untuk menjalankan aplikasi FastAPI.
 
 ## Akses Publik Layanan ML
 Dokumentasi API untuk layanan ML dapat diakses secara publik melalui URL berikut:
-[https://api-ml-earlynourish.ddnsgeek.com](https://api-ml-earlynourish.ddnsgeek.com/)
+[https://api-ml-earlynourish.my.id](https://api-ml-earlynourish.my.id/)
 
 Anda dapat menggunakan URL ini untuk melihat endpoint yang tersedia dan berinteraksi dengan API layanan ML.
 
 ## Dokumentasi API
 Setelah layanan berjalan, dokumentasi API (disediakan oleh Swagger UI FastAPI) dapat diakses di:
-[https://api-ml-earlynourish.ddnsgeek.com/docs](https://api-ml-earlynourish.ddnsgeek.com/docs)
+[https://api-ml-earlynourish.my.id/docs](https://api-ml-earlynourish.my.id/docs)
 
