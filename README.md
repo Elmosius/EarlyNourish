@@ -42,6 +42,30 @@ Berikut adalah fitur-fitur utama yang tersedia di aplikasi Early Nourish:
 
 <br>
 
+## Teknologi Utama yang Digunakan
+
+Proyek Early Nourish dibangun menggunakan berbagai teknologi modern untuk setiap komponennya:
+
+- **Layanan Backend:**
+  - **Framework:** HapiJS (@hapi/hapi)
+  - **Database:** MongoDB (dengan Mongoose ODM)
+  - **Bahasa Pemrograman:** JavaScript (Node.js)
+  - **Fitur Lain:** JWT, RabbitMQ
+
+- **Aplikasi Frontend:**
+  - **Framework:** Vue.js (versi 3)
+  - **Build Tool:** Vite
+  - **State Management:** Pinia
+  - **Styling:** Tailwind CSS
+  - **Bahasa Pemrograman:** JavaScript
+
+- **Layanan Machine Learning (ML):**
+  - **Framework API:** FastAPI
+  - **Bahasa Pemrograman:** Python
+  - **ML Libraries:** TensorFlow, Scikit-learn, Pandas, NumPy ,dll
+
+<br>
+
 ## URL Akses Publik
 
 Berikut adalah URL untuk mengakses berbagai komponen aplikasi Early Nourish yang telah di-deploy secara publik:
