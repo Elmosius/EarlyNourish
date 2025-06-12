@@ -35,7 +35,7 @@ Berikut adalah beberapa teknologi utama dan pustaka (library) yang digunakan dal
 
 ## Akses Publik Layanan Backend
 Layanan backend dapat diakses secara publik melalui URL berikut:
-[http://3.0.101.147](http://3.0.101.147)
+[https://api-be-earlynourish.accesscam.org](https://api-be-earlynourish.accesscam.org/)
 
 Untuk detail lengkap mengenai endpoint API, struktur request dan response, serta informasi lainnya, silakan merujuk ke dokumen spesifikasi API kami:
 [Spesifikasi API Detail (Google Docs)](https://docs.google.com/document/d/1stmp3PBsQIGKKsLM0CH3UeTV3bW7SsOwRVBQLXcyO0Y/edit?tab=t.0)
