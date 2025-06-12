@@ -32,14 +32,6 @@ Berikut adalah beberapa teknologi utama dan pustaka (library) yang digunakan dal
 Aplikasi frontend dapat diakses secara publik melalui URL berikut:
 [https://early-nourish.vercel.app](https://early-nourish.vercel.app)
 
-**Catatan Penting:**
-Saat ini, layanan backend yang digunakan oleh aplikasi ini masih berjalan menggunakan protokol HTTP. Beberapa browser modern memiliki fitur keamanan (seperti mode HTTPS-Only atau pemblokiran konten campuran) yang dapat mencegah frontend memuat data dari backend HTTP jika frontend diakses melalui HTTPS (seperti pada `vercel.app`).
-
-Jika Anda mengalami masalah dalam memuat data atau fungsionalitas tertentu tidak berjalan semestinya (misalnya, gambar tidak muncul):
-1. Pastikan tidak ada error terkait _mixed content_ di konsol browser Anda.
-2. Anda mungkin perlu menonaktifkan sementara fitur keamanan browser yang memblokir konten campuran atau mengizinkan situs ini secara spesifik. Pengaturan ini berbeda-beda tergantung browser yang Anda gunakan.
-3. Beberapa fitur, seperti pemuatan gambar yang di-host di backend, mungkin tidak akan berfungsi dengan benar hingga backend juga menggunakan HTTPS.
-
 ## Prasyarat
 - Node.js (versi X.X.X atau lebih tinggi direkomendasikan)
 - npm (versi X.X.X atau lebih tinggi direkomendasikan)
