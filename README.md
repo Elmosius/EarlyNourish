@@ -4,6 +4,20 @@ Early Nourish adalah aplikasi yang dirancang untuk membantu orang tua, khususnya
 
 <br>
 
+## Tim Pengembang
+
+### Tim Machine Learning (ML)
+- Irma Dwiyanti ([@IrmaDwiyanti](https://github.com/IrmaDwiyanti)) - ML Developer
+- Irma Rohmatillah ([@irma3111111](https://github.com/irma3111111)) - ML Developer
+- Yandiyan ([@spicynoon](https://github.com/spicynoon)) - ML Developer
+
+### Tim Web (Frontend, Backend, UI/UX)
+- Elmosius Suli ([@elmosius](https://github.com/elmosius)) - Full-stack Developer
+- Joshua Subianto ([@JGkwen](https://github.com/JGkwen)) - Backend Developer
+- Nadhila Azzahra ([@nadhilazz](https://github.com/nadhilazz)) - UI/UX Designer
+
+<br>
+
 ## Fitur Utama
 
 Berikut adalah fitur-fitur utama yang tersedia di aplikasi Early Nourish:
@@ -13,6 +27,18 @@ Berikut adalah fitur-fitur utama yang tersedia di aplikasi Early Nourish:
 - **Dashboard Hasil Prediksi:** Menampilkan hasil prediksi secara informatif dan mudah dipahami.
 - **Riwayat Pertumbuhan:** Menyimpan dan menampilkan riwayat asesmen serta kesimpulan pertumbuhan anak dari waktu ke waktu.
 - **Autentikasi:** Sistem login dan register yang aman untuk pengguna.
+
+<br>
+
+> **⚠️ Status Aplikasi: Versi Beta (alias belum sepenuhnya berfungsi hehe)**
+>
+> Harap diperhatikan bahwa aplikasi Early Nourish saat ini masih dalam tahap **Beta**. Ini berarti beberapa fitur mungkin belum berfungsi sepenuhnya atau belum diimplementasikan, seperti:
+> - Fitur Kontak/Dukungan (Contact).
+> - Fitur Unduh PDF untuk hasil asesmen.
+> - Dan beberapa fungsionalitas lainnya mungkin masih dalam pengembangan.
+>
+> Selain itu, ada kemungkinan Anda masih akan menemukan beberapa bug atau kesalahan yang tidak terduga selama penggunaan. Kami sangat menghargai kesabaran dan masukan Anda untuk membantu kami meningkatkan aplikasi ini.
+> 
 
 <br>
 
@@ -26,7 +52,7 @@ Berikut adalah URL untuk mengakses berbagai komponen aplikasi Early Nourish yang
 
 - **Layanan Backend (API):**
   - URL: [http://3.0.101.147](http://3.0.101.147)
-  - Spesifikasi API Lengkap: [Lihat Dokumen Google Docs](https://docs.google.com/document/d/1stmp3PBsQIGKKsLM0CH3UeTV3bW7SsOwRVBQLXcyO0Y/edit?tab=t.0)
+  - Spesifikasi API Lengkap: [Lihat Dokumen Google Docs](https://docs.google.com/document/d/e/2PACX-1vT-Xnj15juPZrIf6XIM5KhnbTWI0JfqC1B8D7FWT38mNl9kzC6qESgTvN0AHyp_m7HQJlsJaLMJoK-J/pub)
 
 - **Layanan Machine Learning (Dokumentasi API):**
   - URL: [http://13.250.122.70/docs](http://13.250.122.70/docs)
@@ -51,6 +77,7 @@ Untuk detail teknis, prasyarat, dan petunjuk instalasi masing-masing komponen, s
 - [**Frontend (`front-end/`)**](./front-end/README.md) atau bisa melihat [branch front-end](https://github.com/Elmosius/EarlyNourish/tree/front-end)
 - [**Machine Learning (`ml/`)**](./ml/README.md) atau bisa melihat branch [ml](https://github.com/Elmosius/EarlyNourish/tree/ml)
 
----
+<br>
 
+---
 *Proyek ini merupakan bagian dari Capstone Project Coding Camp 2025.*
