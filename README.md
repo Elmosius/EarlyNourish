@@ -47,9 +47,9 @@ Proyek ini terdiri dari beberapa komponen utama:
 
 Untuk detail teknis, prasyarat, dan petunjuk instalasi masing-masing komponen, silakan merujuk ke README di sub-direktori berikut:
 
-- [**Backend (`back-end/`)**](./back-end/README.md)
-- [**Frontend (`front-end/`)**](./front-end/README.md)
-- [**Machine Learning (`ml/`)**](./ml/README.md)
+- [**Backend (`back-end/`)**](./back-end/README.md) atau bisa melihat [branch back-end](https://github.com/Elmosius/EarlyNourish/tree/back-end)
+- [**Frontend (`front-end/`)**](./front-end/README.md) atau bisa melihat [branch front-end](https://github.com/Elmosius/EarlyNourish/tree/front-end)
+- [**Machine Learning (`ml/`)**](./ml/README.md) atau bisa melihat branch [ml](https://github.com/Elmosius/EarlyNourish/tree/ml)
 
 ---
 
