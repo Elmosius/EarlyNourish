@@ -2,6 +2,24 @@
 
 Ini adalah layanan Machine Learning untuk proyek Early Nourish. Layanan ini menyediakan prediksi terkait gizi anak dan stunting berdasarkan data masukan. API dibangun menggunakan FastAPI.
 
+# Teknologi yang Digunakan
+
+Berikut adalah beberapa teknologi utama dan pustaka (library) yang digunakan dalam pengembangan layanan Machine Learning ini:
+
+- **Web Framework:**
+  - [FastAPI](https://fastapi.tiangolo.com/): Framework web modern dan cepat untuk membangun API dengan Python 3.7+.
+- **ASGI Server:**
+  - [Uvicorn](https://www.uvicorn.org/): Server ASGI secepat kilat, digunakan untuk menjalankan aplikasi FastAPI.
+- **Validasi Data & Pengaturan:**
+  - [Pydantic](https://docs.pydantic.dev/): Validasi data dan manajemen pengaturan menggunakan type hints Python.
+- **Machine Learning & Komputasi Numerik:**
+  - [TensorFlow](https://www.tensorflow.org/): Platform end-to-end open-source untuk machine learning.
+  - [Scikit-learn](https://scikit-learn.org/): Library machine learning yang simpel dan efisien untuk analisis data prediktif.
+  - [Pandas](https://pandas.pydata.org/): Library untuk analisis dan manipulasi data berperforma tinggi dan mudah digunakan.
+  - [NumPy](https://numpy.org/): Paket fundamental untuk komputasi saintifik dengan Python.
+- **Model Persistence/Serialization:**
+  - [Joblib](https://joblib.readthedocs.io/): Library untuk menjalankan fungsi Python sebagai pekerjaan paralel, dan juga untuk persistensi objek Python (misalnya model).
+
 ## Prasyarat
 - Python (versi 3.x direkomendasikan, periksa `requirements.txt` untuk kompatibilitas pustaka tertentu)
 - pip (pemasang paket Python)
