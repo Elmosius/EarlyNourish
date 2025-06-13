@@ -31,7 +31,7 @@ const statusStunting = computed(() => {
 });
 
 const jenisKelamin = computed(() => {
-  return profile.jenisKelamin === "L" ? "Laki-laki" : "Perempuan";
+  return profile.jenisKelamin === "l" ? "Laki-laki" : "Perempuan";
 });
 
 const statusCirle = computed(() => getStatusCircleClass(statusStunting.value));

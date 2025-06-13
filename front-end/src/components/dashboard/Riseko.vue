@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import { CircleAlert } from "lucide-vue-next";
 import { processGrowthStatuses } from "../../utils/status.js";
+import { calculateStuntingRisk } from "../../utils/unified-risk.js";
 
 const props = defineProps({
   predictionData: {
@@ -14,18 +15,13 @@ const growthStatuses = computed(() => {
   return processGrowthStatuses(props.predictionData);
 });
 
-const riskPercentage = computed(() => {
-  if (!growthStatuses.value.length) return 50;
+// Gunakan fungsi terpusat untuk konsistensi
+const riskCalculation = computed(() => {
+  return calculateStuntingRisk(props.predictionData);
+});
 
-  const worstZScore = Math.max(
-    ...growthStatuses.value.map((status) => Math.abs(status.value)),
-  );
-  if (worstZScore >= 4) return 95;
-  if (worstZScore >= 3) return 85;
-  if (worstZScore >= 2) return 65;
-  if (worstZScore >= 1) return 40;
-  if (worstZScore >= 0.5) return 20;
-  return 5;
+const riskPercentage = computed(() => {
+  return riskCalculation.value.percentage;
 });
 
 const riskFactors = computed(() => {
@@ -37,9 +33,9 @@ const riskFactors = computed(() => {
 
   growthStatuses.value.forEach((status) => {
     if (status.value < -2) {
-      factors.push(`${status.name} Dibawah -2 SD (${status.value})`);
+      factors.push(`${status.name} Dibawah -2 SD (${status.value.toFixed(2)})`);
     } else if (status.value > 2) {
-      factors.push(`${status.name} Diatas +2 SD (${status.value})`);
+      factors.push(`${status.name} Diatas +2 SD (${status.value.toFixed(2)})`);
     }
   });
 

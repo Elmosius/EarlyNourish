@@ -1,20 +1,11 @@
 import { getWHOStandard } from "./data-who";
-
-export const RISK_MAPPING = {
-  "severely stunting": 85,
-  stunting: 65,
-  normal: 20,
-  default: 0,
-};
+import {
+  calculateStuntingRisk,
+  getRiskPercentageFromCategory,
+} from "./unified-risk.js";
 
 export const isValidHistoryEntry = (entry) => {
-  return !!(
-    entry.predictionId &&
-    entry.risikoStunting &&
-    entry.bb &&
-    entry.tb &&
-    entry.usia
-  );
+  return !!(entry.predictionId && entry.bb && entry.tb && entry.usia);
 };
 
 export const getValidHistoryEntries = (historyData) => {
@@ -46,7 +37,6 @@ export const generateWHOStandards = (minAge, maxAge, gender, type) => {
     const whoStandard = getWHOStandard(age, gender, type);
 
     if (whoStandard && whoStandard.SD0) {
-      // Create timestamp for consistent x-axis
       const approximateDate = new Date();
       approximateDate.setMonth(approximateDate.getMonth() - (maxAge - age));
 
@@ -60,9 +50,32 @@ export const generateWHOStandards = (minAge, maxAge, gender, type) => {
   return whoData;
 };
 
-export const getRiskPercentage = (riskCategory) => {
-  const normalizedRisk = riskCategory.toLowerCase();
-  return RISK_MAPPING[normalizedRisk] || RISK_MAPPING.default;
+// Fungsi yang diperbaiki untuk konsistensi perhitungan risiko
+export const getRiskPercentage = (entry) => {
+  // Prioritas 1: Jika ada prediction data, hitung ulang
+  if (entry.predictionData || (entry.tbU && entry.bbU && entry.bbTb)) {
+    const predictionData = entry.predictionData || {
+      tbU: entry.tbU,
+      bbU: entry.bbU,
+      bbTb: entry.bbTb,
+    };
+
+    const riskCalc = calculateStuntingRisk(predictionData);
+    return riskCalc.percentage;
+  }
+
+  // Prioritas 2: Jika ada risikoPersentase yang sudah dihitung
+  if (entry.risikoPersentase && !isNaN(entry.risikoPersentase)) {
+    return parseFloat(entry.risikoPersentase);
+  }
+
+  // Prioritas 3: Konversi dari kategori risiko
+  if (entry.risikoStunting) {
+    return getRiskPercentageFromCategory(entry.risikoStunting);
+  }
+
+  // Default jika tidak ada data
+  return 50;
 };
 
 export const transformToChartData = (entries, dataType) => {
@@ -72,7 +85,7 @@ export const transformToChartData = (entries, dataType) => {
 
     switch (dataType) {
       case "risk":
-        yValue = getRiskPercentage(entry.risikoStunting);
+        yValue = getRiskPercentage(entry);
         break;
       case "weight":
         yValue = parseFloat(entry.bb);
@@ -87,12 +100,17 @@ export const transformToChartData = (entries, dataType) => {
     return {
       x: timestamp + index, // Add index for unique x values
       y: yValue,
+      // Tambahkan metadata untuk debugging
+      meta: {
+        originalRisk: entry.risikoStunting,
+        calculatedRisk: dataType === "risk" ? yValue : null,
+        date: new Date(entry.createdAt).toLocaleDateString(),
+      },
     };
   });
 };
 
 export const processHistoryData = (historyData) => {
-  // Get valid entries
   const validEntries = getValidHistoryEntries(historyData);
 
   if (validEntries.length === 0) {
@@ -108,11 +126,9 @@ export const processHistoryData = (historyData) => {
     };
   }
 
-  // Extract metadata
   const gender = validEntries[0].jenisKelamin;
   const ageRange = calculateAgeRange(validEntries);
 
-  // Generate WHO standard data
   const whoWeightData = generateWHOStandards(
     ageRange.min,
     ageRange.max,
@@ -130,6 +146,16 @@ export const processHistoryData = (historyData) => {
   const weightData = transformToChartData(validEntries, "weight");
   const heightData = transformToChartData(validEntries, "height");
 
+  // Debug log untuk melihat konsistensi data
+  console.log(
+    "Risk data points:",
+    riskData.map((d) => ({
+      date: d.meta.date,
+      originalRisk: d.meta.originalRisk,
+      calculatedPercentage: d.y,
+    })),
+  );
+
   return {
     riskData,
     weightData,
@@ -145,7 +171,7 @@ export const getChartConfigurations = (processedData) => {
   return {
     "stunting-risk": {
       title: "Riwayat Risiko Stunting",
-      info: "Grafik ini menunjukkan persentase risiko stunting anak Anda dari waktu ke waktu.",
+      info: "Grafik ini menunjukkan persentase risiko stunting anak Anda dari waktu ke waktu berdasarkan perhitungan Z-score.",
       data: {
         riskData: processedData.riskData,
       },
