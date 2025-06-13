@@ -90,7 +90,7 @@
           </div>
 
           <div class="p-4">
-            <p class="text-xl font-bold text-tertiary mb-2">X%</p>
+            <p class="text-xl font-bold text-tertiary mb-2">89%</p>
             <p class="text-gray-600 text-sm">Ketepatan Prediksi</p>
           </div>
         </div>
