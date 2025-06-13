@@ -5,7 +5,7 @@ export const getStatusCircleClass = (riskStatus) => {
   const baseClass = "inline-block w-3 h-3 mr-1 rounded-full";
 
   switch (riskStatus) {
-    case "Stunting Ringan":
+    case "Stunting":
       return `${baseClass} bg-yellow-500`;
     case "Normal":
       return `${baseClass} bg-tertiary`;
@@ -21,7 +21,7 @@ export const getStatusBadgeClass = (riskStatus) => {
     "text-xs md:text-sm px-4 py-1.5 rounded-full shadow-xl font-medium";
 
   switch (riskStatus) {
-    case "Stunting Ringan":
+    case "Stunting":
       return `${baseClass} bg-yellow-100 text-yellow-800`;
     case "Normal":
       return `${baseClass} bg-quaternary text-tertiary`;
