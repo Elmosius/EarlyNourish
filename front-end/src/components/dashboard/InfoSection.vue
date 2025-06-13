@@ -21,7 +21,7 @@ const { predictionData, profile } = defineProps({
 });
 
 const statusStunting = computed(() => {
-  if (predictionData.risikoStunting === "stunted") {
+  if (predictionData.risikoStunting === "stunting") {
     return "Stunting Ringan";
   } else if (predictionData.risikoStunting === "severely stunting") {
     return "Stunting Berat";
