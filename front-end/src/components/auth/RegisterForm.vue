@@ -159,7 +159,7 @@ const handleSubmit = async () => {
             to="sk"
             class="ml-1 text-tertiary text-base cursor-pointer"
           >
-            Syarat & Kentuan
+            Syarat & Ketentuan
           </router-link>
         </label>
 
