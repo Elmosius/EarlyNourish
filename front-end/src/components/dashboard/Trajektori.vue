@@ -15,7 +15,6 @@ const { predictionData } = defineProps({
   },
 });
 
-// Generate trajectory data tanpa proyeksi
 const trajectoryData = computed(() => {
   return generateTrajectoryData(predictionData);
 });
@@ -68,6 +67,22 @@ const chartSeries = computed(() => {
     },
   ];
 });
+
+const formatAgeLabel = (ageInMonths) => {
+  const age = Math.round(ageInMonths);
+  if (age === 0) return "Lahir";
+  if (age === 1) return "1 bulan";
+  if (age < 12) return `${age} bulan`;
+
+  const years = Math.floor(age / 12);
+  const months = age % 12;
+
+  if (months === 0) {
+    return `${years} tahun`;
+  } else {
+    return `${years} tahun ${months} bulan`;
+  }
+};
 
 const chartOptions = computed(() => ({
   chart: {
@@ -201,20 +216,27 @@ const chartOptions = computed(() => ({
       fontSize: "12px",
     },
     custom: function ({ series, seriesIndex, dataPointIndex, w }) {
-      const categories = w.globals.categoryLabels;
-      const category = categories[dataPointIndex];
+      // Ambil nilai x dari data point
+      const xValue = w.config.series[0].data[dataPointIndex]?.x || 0;
+      const ageLabel = formatAgeLabel(xValue);
 
-      let tooltipContent = `<div class="p-3 space-y-1"><strong class="text-base text-gray-800">${category}</strong><br/>`;
+      let tooltipContent = `<div class="p-3 space-y-1"><strong class="text-base text-gray-800">${ageLabel}</strong><br/>`;
 
-      series.forEach((value, index) => {
-        if (value && value[dataPointIndex] !== null) {
+      series.forEach((seriesData, index) => {
+        if (
+          seriesData &&
+          seriesData[dataPointIndex] !== null &&
+          seriesData[dataPointIndex] !== undefined
+        ) {
           const seriesName = w.config.series[index].name;
           const unit = seriesName.includes("Berat") ? "kg" : "cm";
           const color = w.config.colors[index];
+          const value = seriesData[dataPointIndex];
+
           tooltipContent += `
             <div class="flex items-center space-x-2">
               <div class="w-3 h-3 rounded-full" style="background-color: ${color}"></div>
-              <span class="text-xs">${seriesName}: <strong>${value[dataPointIndex]} ${unit}</strong></span>
+              <span class="text-xs">${seriesName}: <strong>${value.toFixed(1)} ${unit}</strong></span>
             </div>`;
         }
       });
