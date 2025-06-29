@@ -82,12 +82,12 @@ const chartOptions = computed(() => ({
     fontFamily: "Inter, sans-serif",
   },
   stroke: {
-    width: [2, 2, 2, 2], // Aktual tebal, WHO tipis
+    width: [2, 2, 2, 2],
     curve: "smooth",
-    dashArray: [0, 0, 8, 8], // Solid, solid, dashed, dashed
+    dashArray: [0, 0, 8, 8],
   },
   markers: {
-    size: [2, 2, 2, 2], // Titik aktual besar, WHO kecil
+    size: [2, 2, 2, 2],
     strokeWidth: 2,
     strokeColors: ["#fff"],
     hover: {
@@ -95,10 +95,10 @@ const chartOptions = computed(() => ({
     },
   },
   colors: [
-    chartConfig.value.colors.actualData, // Berat Aktual - Biru
-    chartConfig.value.colors.actualData, // Tinggi Aktual - Biru (sama)
-    chartConfig.value.colors.whoWeight, // WHO Berat - Merah
-    chartConfig.value.colors.whoHeight, // WHO Tinggi - Orange
+    chartConfig.value.colors.actualData,
+    chartConfig.value.colors.actualData,
+    chartConfig.value.colors.whoWeight,
+    chartConfig.value.colors.whoHeight,
   ],
   grid: {
     borderColor: "#f1f5f9",
@@ -115,13 +115,30 @@ const chartOptions = computed(() => ({
     },
   },
   xaxis: {
-    type: "category",
+    type: "numeric",
+    min: 0,
+    max: trajectoryData.value.currentAge,
     labels: {
       style: {
         fontSize: "11px",
         colors: "#64748b",
       },
-      rotate: -45,
+      formatter: function (value) {
+        const roundedValue = Math.round(value);
+
+        if (roundedValue === 0) return "Lahir";
+        if (roundedValue === 1) return "1 bln";
+        if (roundedValue < 12) return `${roundedValue} bln`;
+
+        const years = Math.floor(roundedValue / 12);
+        const months = roundedValue % 12;
+
+        if (months === 0) {
+          return `${years} th`;
+        } else {
+          return `${years}th ${months}bln`;
+        }
+      },
     },
     axisBorder: {
       show: false,
@@ -249,16 +266,6 @@ const legendItems = computed(() => [
     category: "who",
   },
 ]);
-
-// Status styles
-const getStatusStyle = (type) => {
-  const styles = {
-    success: "bg-green-50 border-green-200 text-green-700",
-    warning: "bg-yellow-50 border-yellow-200 text-yellow-700",
-    info: "bg-blue-50 border-blue-200 text-blue-700",
-  };
-  return styles[type] || styles.info;
-};
 </script>
 
 <template>

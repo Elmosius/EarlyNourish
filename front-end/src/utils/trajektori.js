@@ -23,7 +23,6 @@ export const generateTrajectoryData = (predictionData) => {
   );
 };
 
-// Generate trajectory simple: lahir → sekarang + standar WHO
 const generateActualTrajectory = (
   birthWeight,
   birthHeight,
@@ -35,37 +34,33 @@ const generateActualTrajectory = (
   const actualData = [];
   const whoStandards = [];
 
-  // 1. TITIK LAHIR (umur 0 bulan)
+  const relevantAges = [0, currentAge];
+
+  // 1. DATA AKTUAL - hanya 2 titik
   actualData.push({
-    x: "Lahir",
+    x: 0,
     weight: birthWeight,
     height: birthHeight,
     age: 0,
     type: "birth",
   });
 
-  // 2. TITIK PEMERIKSAAN SEKARANG
-  const currentLabel = `${currentAge} bulan`;
   actualData.push({
-    x: currentLabel,
+    x: currentAge,
     weight: currentWeight,
     height: currentHeight,
     age: currentAge,
     type: "current",
   });
 
-  // 3. STANDAR WHO dari lahir sampai sekarang
-  const agePoints = Array.from({ length: currentAge + 1 }, (_, i) => i);
-
-  for (const age of agePoints) {
-    const label = formatAgeLabel(age);
-
+  // 2. STANDAR WHO - hanya untuk titik yang sama dengan data aktual
+  for (const age of relevantAges) {
     const whoWeight = getWHOStandard(age, gender, "weight");
     const whoHeight = getWHOStandard(age, gender, "height");
 
     if (whoWeight && whoHeight) {
       whoStandards.push({
-        x: label,
+        x: age,
         weightWHO: parseFloat(whoWeight.SD0) || 0,
         heightWHO: parseFloat(whoHeight.SD0) || 0,
         age: age,
@@ -100,8 +95,8 @@ const generateActualTrajectory = (
   );
 
   return {
-    actualData, // Data lahir + pemeriksaan sekarang
-    whoStandards, // Standar WHO
+    actualData,
+    whoStandards,
     currentAge,
     analysis: {
       weightZScore: weightZScore,
@@ -114,23 +109,6 @@ const generateActualTrajectory = (
       birthHeight,
     },
   };
-};
-
-const formatAgeLabel = (age) => {
-  if (age === 0) return "Lahir";
-  if (age === 1) return "1 bulan";
-  if (age < 12) return `${age} bulan`;
-
-  const years = Math.floor(age / 12);
-  const months = age % 12;
-
-  if (months === 0) {
-    return years === 1 ? "1 tahun" : `${years} tahun`;
-  } else {
-    const yearText = years === 1 ? "1 tahun" : `${years} tahun`;
-    const monthText = months === 1 ? "1 bulan" : `${months} bulan`;
-    return `${yearText} ${monthText}`;
-  }
 };
 
 export const getChartConfig = (trajectoryData) => {
